@@ -1,12 +1,8 @@
-/* ═══════════════════════════════════════════
-   KrishiSetu — css/base.css
-   (Core styles, variables, reset, layout)
-   ═══════════════════════════════════════════ */
-
-/* ── CSS Reset & Variables ─────────────────── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
+/* ===========================
+   CSS Reset & Variables
+=========================== */
 :root {
+  /* Colors */
   --green-primary: #1a7a4c;
   --green-dark:    #145d39;
   --green-mid:     #2ecc71;
@@ -23,18 +19,67 @@
   --surface:       #ffffff;
   --surface-2:     #f8fdf9;
   --border:        #e0ede0;
-  --shadow-sm:     0 1px 4px rgba(26,122,76,0.08);
-  --shadow-md:     0 4px 16px rgba(26,122,76,0.12);
-  --shadow-lg:     0 12px 40px rgba(26,122,76,0.16);
+  --white:         #ffffff;
+
+  /* Typography */
+  --font-sans:     'Inter', sans-serif;
+  --font-heading:  'Poppins', sans-serif;
+  
+  --font-size-xs:  11px;
+  --font-size-sm:  12.5px;
+  --font-size-md:  14px;
+  --font-size-lg:  16px;
+  --font-size-xl:  17px;
+  
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Spacing */
+  --space-2xs:     4px;
+  --space-xs:      8px;
+  --space-sm:      12px;
+  --space-md:      16px;
+  --space-lg:      20px;
+  --space-xl:      24px;
+  --space-2xl:     32px;
+
+  /* Radius */
   --radius-sm:     8px;
   --radius-md:     12px;
   --radius-lg:     18px;
   --radius-xl:     24px;
+  --radius-full:   50%;
+
+  /* Shadows */
+  --shadow-sm:     0 1px 4px rgba(26,122,76,0.08);
+  --shadow-md:     0 4px 16px rgba(26,122,76,0.12);
+  --shadow-lg:     0 12px 40px rgba(26,122,76,0.16);
+  --shadow-nav:    0 2px 12px rgba(0,0,0,0.18);
+
+  /* Transitions */
+  --transition-fast: 0.18s ease-in-out;
+  --transition-base: 0.3s ease-in-out;
+
+  /* Sizes */
   --nav-h:         56px;
-  --font-sans:     'Inter', sans-serif;
+  --container-max: 1200px;
+  --container-sm:  700px;
+
+  /* Z-Index */
+  --z-nav:         1000;
 }
 
-html { scroll-behavior: smooth; }
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
 
 body {
   font-family: var(--font-sans);
@@ -44,43 +89,54 @@ body {
   overflow-x: hidden;
 }
 
+/* Hide Google Translate overlays */
 .goog-te-banner-frame.skiptranslate,
 #goog-gt-tt,
 .goog-te-balloon-frame {
   display: none !important;
 }
 body {
-  top: 0px !important;
+  top: 0 !important;
 }
 
-/* ── NAVBAR ───────────────────────────────── */
+/* ===========================
+   Layout
+=========================== */
+.main-content {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: var(--space-lg) var(--space-lg) 0;
+}
+
+/* ===========================
+   Navigation
+=========================== */
 .navbar {
   position: sticky;
   top: 0;
-  z-index: 1000;
+  z-index: var(--z-nav);
   height: var(--nav-h);
   background: var(--green-primary);
   display: flex;
   align-items: center;
-  gap: 0;
-  padding: 0 16px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+  padding: 0 var(--space-md);
+  box-shadow: var(--shadow-nav);
 }
 
 .nav-brand {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-xs);
   flex-shrink: 0;
   text-decoration: none;
-  margin-right: 8px;
+  margin-right: var(--space-xs);
 }
 
 .brand-logo {
   width: 34px;
   height: 34px;
   background: rgba(255,255,255,0.15);
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -88,10 +144,10 @@ body {
 }
 
 .brand-name {
-  font-family: 'Poppins', sans-serif;
-  font-weight: 700;
-  font-size: 17px;
-  color: #fff;
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-xl);
+  color: var(--white);
   letter-spacing: -0.3px;
 }
 
@@ -99,39 +155,46 @@ body {
   list-style: none;
   display: flex;
   align-items: center;
-  gap: 0;
   flex: 1;
   overflow-x: auto;
   scrollbar-width: none;
 }
-.nav-links::-webkit-scrollbar { display: none; }
+
+.nav-links::-webkit-scrollbar {
+  display: none;
+}
 
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: var(--space-2xs);
   padding: 6px 10px;
   color: rgba(255,255,255,0.82);
   text-decoration: none;
-  font-size: 12.5px;
-  font-weight: 500;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
   border-radius: var(--radius-sm);
   white-space: nowrap;
-  transition: background 0.18s, color 0.18s;
+  transition: background var(--transition-fast), color var(--transition-fast);
 }
-.nav-item:hover { background: rgba(255,255,255,0.12); color: #fff; }
+
+.nav-item:hover {
+  background: rgba(255,255,255,0.12);
+  color: var(--white);
+}
+
 .nav-item.active {
   background: rgba(255,255,255,0.2);
-  color: #fff;
-  font-weight: 600;
+  color: var(--white);
+  font-weight: var(--font-weight-semibold);
 }
 
 .nav-right {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-xs);
   flex-shrink: 0;
-  margin-left: 8px;
+  margin-left: var(--space-xs);
 }
 
 .hamburger {
@@ -141,34 +204,30 @@ body {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 4px;
+  padding: var(--space-2xs);
 }
+
 .hamburger span {
   display: block;
   width: 22px;
   height: 2px;
-  background: #fff;
+  background: var(--white);
   border-radius: 2px;
-  transition: all 0.3s;
+  transition: all var(--transition-base);
 }
 
-/* ── MAIN CONTENT ──────────────────────────── */
-.main-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px 20px 0;
-}
-
-/* ── FOOTER ────────────────────────────────── */
+/* ===========================
+   Footer
+=========================== */
 .footer {
   margin-top: 28px;
   background: var(--green-dark);
   border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-  padding: 32px 24px;
+  padding: var(--space-2xl) var(--space-xl);
 }
 
 .footer-inner {
-  max-width: 700px;
+  max-width: var(--container-sm);
   margin: 0 auto;
   text-align: center;
 }
@@ -177,11 +236,11 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  color: #fff;
-  font-family: 'Poppins', sans-serif;
-  font-size: 17px;
-  font-weight: 700;
+  gap: var(--space-xs);
+  color: var(--white);
+  font-family: var(--font-heading);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
   margin-bottom: 6px;
 }
 
@@ -189,50 +248,38 @@ body {
   width: 28px;
   height: 28px;
   background: rgba(255,255,255,0.15);
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .footer-tagline {
-  font-size: 12.5px;
+  font-size: var(--font-size-sm);
   color: rgba(255,255,255,0.6);
-  margin-bottom: 16px;
+  margin-bottom: var(--space-md);
 }
 
 .footer-links {
   display: flex;
   justify-content: center;
-  gap: 20px;
+  gap: var(--space-lg);
   margin-bottom: 14px;
 }
+
 .footer-links a {
-  font-size: 12px;
+  font-size: var(--font-size-xs);
   color: rgba(255,255,255,0.65);
   text-decoration: none;
-  font-weight: 500;
-  transition: color 0.18s;
+  font-weight: var(--font-weight-medium);
+  transition: color var(--transition-fast);
 }
-.footer-links a:hover { color: #fff; }
+
+.footer-links a:hover {
+  color: var(--white);
+}
 
 .footer-copy {
-  font-size: 11px;
+  font-size: var(--font-size-xs);
   color: rgba(255,255,255,0.38);
 }
-
-/* ── FOOTER ────────────────────────────────── */
-.footer-links {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  margin-bottom: 14px;
-}
-.footer-links a {
-  font-size: 12px;
-  color: rgba(255,255,255,0.65);
-  text-decoration: none;
-  font-weight: 500;
-  transition: color 0.18s;
-}
-.footer-links a:hover { color: #fff; }

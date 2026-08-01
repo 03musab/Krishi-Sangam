@@ -1,0 +1,8 @@
+{
+  "servers": {
+    "Krishisetu Docs": {
+      "type": "sse",
+      "url": "https://gitmcp.io/03musab/Krishisetu"
+    }
+  }
+}
