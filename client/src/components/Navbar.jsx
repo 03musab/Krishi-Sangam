@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { id: 'equipment', label: 'Equipment', view: 'equipment-rental' },
   { id: 'labour', label: 'Labour', view: 'labour' },
   { id: 'produce', label: 'Produce', view: 'produce' },
+  { id: 'about', label: 'About Us', view: 'about' },
   { id: 'admin', label: 'Admin', view: 'admin', adminOnly: true }
 ];
 

@@ -188,6 +188,7 @@ export default function SignUp() {
                 </div>
                 <div className="form-group">
                   <label className="form-label">Government ID (Aadhaar / Voter ID / Driving Licence) *</label>
+                  <span className="form-hint" style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '0.5rem', display: 'block' }}>Front image only (or both sides if your verification process requires it)</span>
                   <PhotoUpload onUploaded={(url) => setForm({ ...form, govt_id_url: url })} />
                 </div>
                 <div className="form-grid-row">
@@ -255,6 +256,12 @@ export default function SignUp() {
               </>
             ) : (
               <>
+                <h3 className="form-section-title">Identity Verification</h3>
+                <div className="form-group">
+                  <label className="form-label">Government ID (Optional)</label>
+                  <PhotoUpload onUploaded={(url) => setForm({ ...form, govt_id_url: url })} />
+                </div>
+                
                 <h3 className="form-section-title">Address</h3>
                 <div className="form-grid-row">
                   <div className="form-group">
@@ -284,8 +291,8 @@ export default function SignUp() {
                   </div>
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Farm Size (Acres)</label>
-                  <input type="text" className="form-input" placeholder="e.g. 5" value={form.farm_size} onChange={set('farm_size')} />
+                  <label className="form-label">Farm Size (Acres) *</label>
+                  <input type="text" className="form-input" placeholder="e.g. 5" value={form.farm_size} onChange={set('farm_size')} required />
                 </div>
               </>
             )}

@@ -15,6 +15,8 @@ import Profile from '../pages/Profile';
 import Admin from '../pages/Admin';
 import SignIn from '../pages/SignIn';
 import SignUp from '../pages/SignUp';
+import About from '../pages/About';
+import Terms from '../pages/Terms';
 
 const VIEWS = {
   home: Home,
@@ -32,7 +34,9 @@ const VIEWS = {
   profile: Profile,
   admin: Admin,
   signin: SignIn,
-  signup: SignUp
+  signup: SignUp,
+  about: About,
+  terms: Terms
 };
 
 export default function AppRouter() {
