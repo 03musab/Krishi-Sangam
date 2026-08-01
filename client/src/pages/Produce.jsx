@@ -1,0 +1,54 @@
+import { useEffect, useState } from 'react';
+import PageBanner from '../components/PageBanner';
+import ListingCard from '../components/ListingCard';
+import { useNav } from '../context/NavContext';
+import { getProduce } from '../lib/api';
+
+export default function Produce() {
+  const { navigate } = useNav();
+  const [listings, setListings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [search, setSearch] = useState('');
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    getProduce(search ? `search=${encodeURIComponent(search)}` : '')
+      .then((d) => {
+        if (cancelled) return;
+        setListings(d.listings);
+        setCount(d.count);
+        setError('');
+      })
+      .catch((e) => !cancelled && setError(e.message))
+      .finally(() => !cancelled && setLoading(false));
+    return () => { cancelled = true; };
+  }, [search]);
+
+  return (
+    <>
+      <PageBanner title="Produce Marketplace" color="amber" actionLabel="Sell Produce" onAction={() => navigate('list-produce')} />
+      <div className="search-filter-bar">
+        <div className="search-input-wrapper">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2">
+            <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+          </svg>
+          <input type="text" placeholder="Search produce..." value={search} onChange={(e) => setSearch(e.target.value)} />
+        </div>
+      </div>
+      <div className="listings-count-label">{count} Listing{count !== 1 ? 's' : ''}</div>
+      {loading && <div className="listings-empty">Loading...</div>}
+      {!loading && error && <div className="listings-error">{error}</div>}
+      {!loading && !error && listings.length === 0 && (
+        <div className="listings-empty">No produce listed.</div>
+      )}
+      <div className="grid-cards-2col">
+        {listings.map((l) => (
+          <ListingCard key={l.id} listing={l} type="produce" />
+        ))}
+      </div>
+    </>
+  );
+}

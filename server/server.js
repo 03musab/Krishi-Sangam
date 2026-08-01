@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════
-   KrishiSetu — server/server.js
+   Krishi Sangam — server/server.js
    (Express server entry point)
    ═══════════════════════════════════════════ */
 
@@ -17,6 +17,7 @@ const paymentsRoutes = require('./routes/payments');
 const profileRoutes = require('./routes/profile');
 const uploadRoutes = require('./routes/upload');
 const adminRoutes = require('./routes/admin');
+const servicesRoutes = require('./routes/services');
 const { getDb } = require('./db');
 
 const app = express();
@@ -60,6 +61,7 @@ app.use('/api/payments', paymentsRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/services', servicesRoutes);
 
 /* ── Health Check ─────────────────────────── */
 app.get('/api/health', (req, res) => {
@@ -77,17 +79,18 @@ app.all('/api/*', (req, res) => {
 });
 
 /* ── Serve Static Frontend Files ──────────── */
-// Serve the root directory so index.html, css/, js/ work from the API server
-// NOTE: placed AFTER API routes so API requests are never intercepted
-app.use(express.static(path.join(__dirname, '..')));
+// Serve the React build (client/dist); NOTE: placed AFTER API routes so API requests are never intercepted
+const clientDist = path.join(__dirname, '..', 'client', 'dist');
+app.use(express.static(clientDist));
 
 /* ── Serve Uploads ───────────────────────── */
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-/* ── SPA fallback: serve index.html for all non-API routes ── */
+/* ── SPA fallback: serve React index.html for all non-API routes ── */
+const indexFile = path.join(clientDist, 'index.html');
 app.get('*', (req, res) => {
   if (!req.path.startsWith('/api')) {
-    res.sendFile(path.join(__dirname, '..', 'index.html'));
+    res.sendFile(indexFile);
   }
 });
 
@@ -104,7 +107,7 @@ try {
   console.log('✅ SQLite database initialized');
 
   app.listen(PORT, () => {
-    console.log(`\n🌾 KrishiSetu API Server`);
+    console.log(`\n🌾 Krishi Sangam API Server`);
     console.log(`   └── Running on http://localhost:${PORT}`);
     console.log(`   └── Health: http://localhost:${PORT}/api/health`);
     console.log(`   └── Auth:     http://localhost:${PORT}/api/auth`);
@@ -118,6 +121,7 @@ try {
     console.log(`   └── Profile:  http://localhost:${PORT}/api/profile`);
     console.log(`   └── Upload:   http://localhost:${PORT}/api/upload`);
     console.log(`   └── Admin:    http://localhost:${PORT}/api/admin`);
+    console.log(`   └── Services: http://localhost:${PORT}/api/services`);
     console.log(`   └── App:    http://localhost:${PORT}\n`);
   });
 } catch (err) {

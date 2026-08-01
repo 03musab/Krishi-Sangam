@@ -212,12 +212,67 @@ function initSchema() {
 
   // ── Add new columns to existing users table if missing ──
   const cols = db.prepare("PRAGMA table_info(users)").all().map(c => c.name);
-  if (!cols.includes('bio')) {
-    db.exec(`ALTER TABLE users ADD COLUMN bio TEXT`);
-  }
-  if (!cols.includes('skills')) {
-    db.exec(`ALTER TABLE users ADD COLUMN skills TEXT`);
-  }
+  const addCol = (name, type) => {
+    if (!cols.includes(name)) {
+      db.exec(`ALTER TABLE users ADD COLUMN ${name} ${type}`);
+    }
+  };
+  addCol('bio', 'TEXT');
+  addCol('skills', 'TEXT');
+  addCol('gender', 'TEXT');
+  addCol('dob', 'TEXT');
+  addCol('govt_id_url', 'TEXT');
+  addCol('village', 'TEXT');
+  addCol('taluka', 'TEXT');
+  addCol('district', 'TEXT');
+  addCol('state', 'TEXT');
+  addCol('labour_category', 'TEXT');
+  addCol('skill_level', 'TEXT');
+  addCol('bank_account', 'TEXT');
+  addCol('ifsc', 'TEXT');
+  addCol('upi_id', 'TEXT');
+  addCol('farm_size', 'TEXT');
+  addCol('farm_lat', 'REAL');
+  addCol('farm_lng', 'REAL');
+  addCol('phone_verified', 'INTEGER DEFAULT 0');
+  ensureServiceSchema();
+}
+
+function ensureServiceSchema() {
+  db.exec(`
+    /* ── OTP Verifications ── */
+    CREATE TABLE IF NOT EXISTS otp_verifications (
+      id         INTEGER PRIMARY KEY AUTOINCREMENT,
+      phone      TEXT    NOT NULL,
+      otp        TEXT    NOT NULL,
+      expires_at TEXT    NOT NULL,
+      created_at TEXT    NOT NULL DEFAULT (datetime('now'))
+    );
+
+    /* ── Service Bookings (Agricultural Services & Labour Teams) ── */
+    CREATE TABLE IF NOT EXISTS service_bookings (
+      id              INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id         INTEGER NOT NULL REFERENCES users(id),
+      kind            TEXT    NOT NULL DEFAULT 'service'
+                              CHECK(kind IN ('labour_team','service')),
+      category        TEXT,
+      service_name    TEXT,
+      num_workers     INTEGER,
+      days            INTEGER,
+      team_type       TEXT,
+      skill_level     TEXT,
+      start_date      TEXT,
+      location        TEXT,
+      lat             REAL,
+      lng             REAL,
+      description     TEXT,
+      price           INTEGER,
+      status          TEXT    DEFAULT 'pending'
+                              CHECK(status IN ('pending','confirmed','completed','cancelled')),
+      created_at      TEXT    NOT NULL DEFAULT (datetime('now')),
+      updated_at      TEXT    NOT NULL DEFAULT (datetime('now'))
+    );
+  `);
 }
 
 module.exports = { getDb };

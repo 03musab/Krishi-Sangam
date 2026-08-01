@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# 🌾 KrishiSetu Launcher (Bash version)
+# 🌾 Krishi Sangam Launcher (Bash version)
 # Works in Git Bash on Windows, and Linux/macOS terminals
 #
 
@@ -8,10 +8,11 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SERVER_DIR="$SCRIPT_DIR/server"
+CLIENT_DIR="$SCRIPT_DIR/client"
 
 echo ""
 echo "============================================"
-echo "   🌾 KrishiSetu — Starting Application"
+echo "   🌾 Krishi Sangam — Starting Application"
 echo "============================================"
 echo ""
 
@@ -24,48 +25,68 @@ fi
 
 # Install dependencies if needed
 if [ ! -d "$SERVER_DIR/node_modules" ]; then
-  echo "📦 [INFO] Installing dependencies..."
+  echo "📦 [INFO] Installing server dependencies..."
   cd "$SERVER_DIR"
   npm install
   cd "$SCRIPT_DIR"
 fi
 
-echo "🚀 [INFO] Starting the KrishiSetu API server..."
+if [ ! -d "$CLIENT_DIR/node_modules" ]; then
+  echo "📦 [INFO] Installing client dependencies..."
+  cd "$CLIENT_DIR"
+  npm install
+  cd "$SCRIPT_DIR"
+fi
+
+echo "🚀 [INFO] Starting the Krishi Sangam API server..."
 echo ""
 
-# Start the server in the background
+# Start the API server in the background
 cd "$SERVER_DIR"
 node server.js &
 SERVER_PID=$!
 cd "$SCRIPT_DIR"
 
-# Wait for the server to be ready
-echo "⏳ [INFO] Waiting for server..."
-for i in $(seq 1 10); do
+# Start the React dev server in the background
+cd "$CLIENT_DIR"
+npm run dev &
+CLIENT_PID=$!
+cd "$SCRIPT_DIR"
+
+# Wait for the API server to be ready
+echo "⏳ [INFO] Waiting for API server..."
+for i in $(seq 1 15); do
   if curl -s http://localhost:3001/api/health > /dev/null 2>&1; then
-    echo "✅ [INFO] Server is ready!"
+    echo "✅ [INFO] API server is ready!"
     break
   fi
   sleep 1
 done
 
 # Open the browser (cross-platform)
-echo "🌐 [INFO] Opening http://localhost:3001 in your browser..."
+echo "🌐 [INFO] Opening http://localhost:5173 in your browser..."
 case "$(uname -s)" in
-  MINGW*|MSYS*|CYGWIN*)  cmd //c "start http://localhost:3001" ;;
-  Darwin*)               open http://localhost:3001 ;;
-  *)                     xdg-open http://localhost:3001 ;;
+  MINGW*|MSYS*|CYGWIN*)  cmd //c "start http://localhost:5173" ;;
+  Darwin*)               open http://localhost:5173 ;;
+  *)                     xdg-open http://localhost:5173 ;;
 esac
 
 echo ""
 echo "============================================"
-echo "   ✅ KrishiSetu is running!"
-echo "   📍 App:    http://localhost:3001"
-echo "   📍 Health: http://localhost:3001/api/health"
+echo "   ✅ Krishi Sangam is running!"
+echo "   📍 App:    http://localhost:5173"
+echo "   📍 API:    http://localhost:3001/api/health"
 echo ""
-echo "   Press Ctrl+C to stop the server."
+echo "   Press Ctrl+C to stop the servers."
 echo "============================================"
 echo ""
 
-# Wait for the server process
-wait $SERVER_PID
+cleanup() {
+  echo ""
+  echo "🛑 Stopping servers..."
+  kill $SERVER_PID $CLIENT_PID 2>/dev/null || true
+}
+
+trap cleanup EXIT INT TERM
+
+wait

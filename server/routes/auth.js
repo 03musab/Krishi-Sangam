@@ -13,6 +13,138 @@ const router = express.Router();
 const SALT_ROUNDS = 10;
 const SESSION_DAYS = 7;
 
+function generateOtp() {
+  return String(Math.floor(100000 + Math.random() * 900000));
+}
+
+/* ── POST /api/auth/send-otp ───────────────── */
+router.post('/send-otp', (req, res) => {
+  try {
+    const { phone } = req.body;
+    if (!phone || !/^\d{10}$/.test(String(phone))) {
+      return res.status(400).json({ error: 'A valid 10-digit mobile number is required.' });
+    }
+    const db = getDb();
+    const otp = generateOtp();
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
+
+    db.prepare('DELETE FROM otp_verifications WHERE phone = ?').run(String(phone));
+    db.prepare('INSERT INTO otp_verifications (phone, otp, expires_at) VALUES (?, ?, ?)')
+      .run(String(phone), otp, expiresAt);
+
+    console.log(`[OTP] Sent OTP ${otp} to ${phone}`);
+    // In production, send via SMS gateway. For dev, return OTP in response.
+    res.json({ message: 'OTP sent successfully.', devOtp: otp });
+  } catch (err) {
+    console.error('Send OTP error:', err);
+    res.status(500).json({ error: 'Server error sending OTP.' });
+  }
+});
+
+/* ── POST /api/auth/verify-otp ─────────────── */
+router.post('/verify-otp', (req, res) => {
+  try {
+    const { phone, otp } = req.body;
+    if (!phone || !otp) {
+      return res.status(400).json({ error: 'Phone and OTP are required.' });
+    }
+    const db = getDb();
+    const record = db.prepare(
+      'SELECT * FROM otp_verifications WHERE phone = ? ORDER BY id DESC LIMIT 1'
+    ).get(String(phone));
+
+    if (!record) {
+      return res.status(400).json({ error: 'No OTP request found for this number.' });
+    }
+    if (new Date(record.expires_at) < new Date()) {
+      return res.status(400).json({ error: 'OTP has expired. Please request a new one.' });
+    }
+    if (record.otp !== String(otp)) {
+      return res.status(400).json({ error: 'Invalid OTP. Please try again.' });
+    }
+
+    db.prepare('DELETE FROM otp_verifications WHERE phone = ?').run(String(phone));
+    res.json({ message: 'OTP verified successfully.', verified: true });
+  } catch (err) {
+    console.error('Verify OTP error:', err);
+    res.status(500).json({ error: 'Server error verifying OTP.' });
+  }
+});
+
+/* ── POST /api/auth/register ───────────────── */
+router.post('/register', (req, res) => {
+  try {
+    const db = getDb();
+    const {
+      full_name, phone, email, password, role,
+      gender, dob, govt_id_url, village, taluka, district, state,
+      labour_category, skill_level, bank_account, ifsc, upi_id,
+      farm_size, farm_lat, farm_lng
+    } = req.body;
+
+    if (!full_name || !phone || !password) {
+      return res.status(400).json({ error: 'Full name, mobile number, and password are required.' });
+    }
+    if (!/^\d{10}$/.test(String(phone))) {
+      return res.status(400).json({ error: 'A valid 10-digit mobile number is required.' });
+    }
+    if (password.length < 6) {
+      return res.status(400).json({ error: 'Password must be at least 6 characters.' });
+    }
+
+    const validRoles = ['farmer', 'owner', 'labourer', 'admin'];
+    const userRole = role && validRoles.includes(role) ? role : 'farmer';
+
+    // Unique username/email derived from phone
+    const username = (full_name || '').trim().replace(/\s+/g, '_').toLowerCase() + '_' + phone;
+    const userEmail = email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+      ? email.trim()
+      : `${phone}@krishisangam.local`;
+
+    const existing = db.prepare('SELECT id FROM users WHERE email = ? OR username = ?')
+      .get(userEmail, username);
+    if (existing) {
+      return res.status(409).json({ error: 'An account with this mobile number already exists.' });
+    }
+
+    const passwordHash = bcrypt.hashSync(password, SALT_ROUNDS);
+    const result = db.prepare(`
+      INSERT INTO users (
+        username, email, password_hash, role, phone, gender, dob,
+        govt_id_url, village, taluka, district, state, location,
+        labour_category, skill_level, bank_account, ifsc, upi_id,
+        farm_size, farm_lat, farm_lng, phone_verified
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+    `).run(
+      username, userEmail, passwordHash, userRole, String(phone),
+      gender || null, dob || null, govt_id_url || null,
+      village || null, taluka || null, district || null, state || null,
+      [village, taluka, district, state].filter(Boolean).join(', ') || null,
+      labour_category || null, skill_level || null,
+      bank_account || null, ifsc || null, upi_id || null,
+      farm_size || null,
+      farm_lat != null ? Number(farm_lat) : null,
+      farm_lng != null ? Number(farm_lng) : null
+    );
+
+    const userId = result.lastInsertRowid;
+    const token = generateToken(userId);
+    const expiresAt = new Date(Date.now() + SESSION_DAYS * 24 * 60 * 60 * 1000).toISOString();
+
+    db.prepare('INSERT INTO sessions (user_id, token, expires_at) VALUES (?, ?, ?)')
+      .run(userId, token, expiresAt);
+
+    const user = db.prepare(
+      'SELECT id, username, email, role, phone, gender, dob, village, taluka, district, state, labour_category, skill_level, bank_account, ifsc, upi_id, farm_size, created_at FROM users WHERE id = ?'
+    ).get(userId);
+
+    res.status(201).json({ message: 'Registration successful!', token, user });
+  } catch (err) {
+    console.error('Register error:', err);
+    res.status(500).json({ error: 'Server error during registration.' });
+  }
+});
+
 /* ── POST /api/auth/signup ─────────────────── */
 router.post('/signup', (req, res) => {
   try {
