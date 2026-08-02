@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import { useLanguage } from '../i18n/LanguageContext';
 
 export default function FarmLocationField({ value, onChange, onCoords }) {
+  const { t } = useLanguage();
   const [coords, setCoords] = useState(null);
   const [showMap, setShowMap] = useState(false);
   const [locating, setLocating] = useState(false);
@@ -14,7 +16,7 @@ export default function FarmLocationField({ value, onChange, onCoords }) {
 
   const handleLocate = () => {
     if (!navigator.geolocation) {
-      setMapError('Geolocation not supported on this device.');
+      setMapError(t('field.geoError'));
       return;
     }
     setLocating(true);
@@ -27,7 +29,7 @@ export default function FarmLocationField({ value, onChange, onCoords }) {
       },
       () => {
         setLocating(false);
-        setMapError('Unable to fetch location. Please type it manually.');
+        setMapError(t('field.geoFail'));
       },
       { timeout: 8000 }
     );
@@ -39,21 +41,21 @@ export default function FarmLocationField({ value, onChange, onCoords }) {
 
   return (
     <div className="form-group">
-      <label className="form-label">Farm Location *</label>
+      <label className="form-label">{t('field.farmLocation')} *</label>
       <input
         type="text"
         className="form-input"
-        placeholder="Village, Taluka"
+        placeholder={t('field.villageTaluka')}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         required
       />
       <div className="location-actions">
         <button type="button" className="locate-btn" onClick={handleLocate} disabled={locating}>
-          📍 {locating ? 'Locating...' : 'Use My Location'}
+          📍 {locating ? t('field.locating') : t('field.useMyLocation')}
         </button>
         <button type="button" className="locate-btn secondary" onClick={() => setShowMap((s) => !s)}>
-          🗺️ {showMap ? 'Hide Map' : 'Show Map'}
+          🗺️ {showMap ? t('field.hideMap') : t('field.showMap')}
         </button>
       </div>
       {mapError && <div className="field-error">{mapError}</div>}
@@ -72,8 +74,8 @@ export default function FarmLocationField({ value, onChange, onCoords }) {
           />
           <div className="map-hint">
             {coords
-              ? `Selected point: ${coords.lat.toFixed(5)}, ${coords.lng.toFixed(5)}`
-              : 'Use "My Location" or type the address to pin the farm.'}
+              ? t('field.selectedPoint', { lat: coords.lat.toFixed(5), lng: coords.lng.toFixed(5) })
+              : t('field.mapHint')}
           </div>
         </div>
       )}

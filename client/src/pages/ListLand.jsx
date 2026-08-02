@@ -3,11 +3,13 @@ import FormCard from '../components/FormCard';
 import PhotoUpload from '../components/PhotoUpload';
 import { useNav } from '../context/NavContext';
 import { useToast } from '../context/ToastContext';
+import { useLanguage } from '../i18n/LanguageContext';
 import { createLand } from '../lib/api';
 
 export default function ListLand() {
   const { navigate } = useNav();
   const { showToast } = useToast();
+  const { t } = useLanguage();
   const [photoUrl, setPhotoUrl] = useState(null);
   const [form, setForm] = useState({
     title: '', area_acres: '', lease_type: 'Per Season', price_per_season: '',
@@ -33,80 +35,80 @@ export default function ListLand() {
         description: form.description || null,
         photo_url: photoUrl
       });
-      showToast('Land listing created!');
+      showToast(t('land.created'));
       navigate('land-leasing');
     } catch (err) {
-      showToast('Error: ' + err.message);
+      showToast(t('common.error', { msg: err.message }));
     }
   };
 
   return (
     <FormCard
-      title="List Your Land"
+      title={t('land.listTitle')}
       color="banner-green"
       backTo="land-leasing"
-      submitLabel="Submit Listing"
-      note="Your listing will be reviewed by admin before going live."
+      submitLabel={t('land.submit')}
+      note={t('land.note')}
       onSubmit={handleSubmit}
     >
       <PhotoUpload onUploaded={setPhotoUrl} />
       <div className="form-group">
-        <label className="form-label">Title *</label>
-        <input type="text" className="form-input" placeholder="e.g. 5 Acre Farm in Nashik" value={form.title} onChange={set('title')} required />
+        <label className="form-label">{t('land.titleLabel')} *</label>
+        <input type="text" className="form-input" placeholder={t('land.titlePh')} value={form.title} onChange={set('title')} required />
       </div>
       <div className="form-grid-row">
         <div className="form-group">
-          <label className="form-label">Area (Acres) *</label>
+          <label className="form-label">{t('land.area')} *</label>
           <input type="number" className="form-input" placeholder="e.g. 5" value={form.area_acres} onChange={set('area_acres')} required />
         </div>
         <div className="form-group">
-          <label className="form-label">Lease Type</label>
+          <label className="form-label">{t('land.leaseType')}</label>
           <select className="form-select" value={form.lease_type} onChange={set('lease_type')}>
-            <option>Per Season</option><option>Per Month</option><option>Per Year</option>
+            <option>{t('land.perSeason')}</option><option>{t('land.perMonth')}</option><option>{t('land.perYear')}</option>
           </select>
         </div>
       </div>
       <div className="form-grid-row">
         <div className="form-group">
-          <label className="form-label">Price per Season (₹)</label>
+          <label className="form-label">{t('land.priceSeason')}</label>
           <input type="number" className="form-input" placeholder="e.g. 25000" value={form.price_per_season} onChange={set('price_per_season')} />
         </div>
         <div className="form-group">
-          <label className="form-label">Price per Year (₹)</label>
+          <label className="form-label">{t('land.priceYear')}</label>
           <input type="number" className="form-input" placeholder="e.g. 50000" value={form.price_per_year} onChange={set('price_per_year')} />
         </div>
       </div>
       <div className="form-group">
-        <label className="form-label">Location *</label>
+        <label className="form-label">{t('land.location')} *</label>
         <input type="text" className="form-input" placeholder="Village, Taluka" value={form.location} onChange={set('location')} required />
       </div>
       <div className="form-grid-row">
         <div className="form-group">
-          <label className="form-label">District</label>
+          <label className="form-label">{t('auth.district')}</label>
           <input type="text" className="form-input" value={form.district} onChange={set('district')} />
         </div>
         <div className="form-group">
-          <label className="form-label">State</label>
+          <label className="form-label">{t('auth.state')}</label>
           <input type="text" className="form-input" value={form.state} onChange={set('state')} />
         </div>
       </div>
       <div className="form-grid-row">
         <div className="form-group">
-          <label className="form-label">Soil Type</label>
+          <label className="form-label">{t('land.soilType')}</label>
           <select className="form-select" value={form.soil_type} onChange={set('soil_type')}>
-            <option>Black Soil</option><option>Red Soil</option><option>Alluvial Soil</option><option>Loamy Soil</option>
+            <option>{t('land.black')}</option><option>{t('land.red')}</option><option>{t('land.alluvial')}</option><option>{t('land.loamy')}</option>
           </select>
         </div>
         <div className="form-group">
-          <label className="form-label">Water Source</label>
+          <label className="form-label">{t('land.water')}</label>
           <select className="form-select" value={form.water_source} onChange={set('water_source')}>
-            <option>Borewell</option><option>Canal</option><option>River</option><option>Well</option>
+            <option>{t('land.borewell')}</option><option>{t('land.canal')}</option><option>{t('land.river')}</option><option>{t('land.well')}</option>
           </select>
         </div>
       </div>
       <div className="form-group">
-        <label className="form-label">Description</label>
-        <textarea className="form-textarea" placeholder="Describe the land..." value={form.description} onChange={set('description')} />
+        <label className="form-label">{t('land.description')}</label>
+        <textarea className="form-textarea" placeholder={t('land.descriptionPh')} value={form.description} onChange={set('description')} />
       </div>
     </FormCard>
   );

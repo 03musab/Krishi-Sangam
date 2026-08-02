@@ -1,16 +1,18 @@
 import { useNav } from '../context/NavContext';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { useLanguage } from '../i18n/LanguageContext';
 
 export default function BookingCard({ title, subtitle, emoji, backTo, submitLabel, onSubmit, children }) {
   const { navigate } = useNav();
   const { user } = useAuth();
   const { showToast } = useToast();
+  const { t } = useLanguage();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!user) {
-      showToast('Please sign in first.');
+      showToast(t('common.pleaseSignin'));
       navigate('signin');
       return;
     }

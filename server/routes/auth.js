@@ -76,7 +76,7 @@ router.post('/register', (req, res) => {
   try {
     const db = getDb();
     const {
-      full_name, phone, email, password, role,
+      full_name, username, phone, email, password, role,
       gender, dob, govt_id_url, village, taluka, district, state,
       labour_category, skill_level, bank_account, ifsc, upi_id,
       farm_size, farm_lat, farm_lng
@@ -95,16 +95,21 @@ router.post('/register', (req, res) => {
     const validRoles = ['farmer', 'owner', 'labourer', 'admin'];
     const userRole = role && validRoles.includes(role) ? role : 'farmer';
 
-    // Unique username/email derived from phone
-    const username = (full_name || '').trim().replace(/\s+/g, '_').toLowerCase() + '_' + phone;
+    // Unique username/email derived from phone (fallback if the user leaves them blank)
+    const derivedUsername = (full_name || '').trim().replace(/\s+/g, '_').toLowerCase() + '_' + phone;
+    const providedUsername = (username || '').trim().replace(/\s+/g, '_').toLowerCase();
+    if (providedUsername && !/^[a-z0-9_]{3,30}$/.test(providedUsername)) {
+      return res.status(400).json({ error: 'Username must be 3-30 characters using letters, numbers, or underscores.' });
+    }
+    const finalUsername = providedUsername || derivedUsername;
     const userEmail = email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
       ? email.trim()
       : `${phone}@krishisangam.local`;
 
     const existing = db.prepare('SELECT id FROM users WHERE email = ? OR username = ?')
-      .get(userEmail, username);
+      .get(userEmail, finalUsername);
     if (existing) {
-      return res.status(409).json({ error: 'An account with this mobile number already exists.' });
+      return res.status(409).json({ error: 'Username, email, or mobile number already in use.' });
     }
 
     const passwordHash = bcrypt.hashSync(password, SALT_ROUNDS);
@@ -116,7 +121,7 @@ router.post('/register', (req, res) => {
         farm_size, farm_lat, farm_lng, phone_verified
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
     `).run(
-      username, userEmail, passwordHash, userRole, String(phone),
+      finalUsername, userEmail, passwordHash, userRole, String(phone),
       gender || null, dob || null, govt_id_url || null,
       village || null, taluka || null, district || null, state || null,
       [village, taluka, district, state].filter(Boolean).join(', ') || null,
@@ -214,30 +219,53 @@ router.post('/signup', (req, res) => {
   }
 });
 
+/* ── GET /api/auth/check-username ──────────── */
+router.get('/check-username', (req, res) => {
+  try {
+    const raw = (req.query.username || '').trim();
+    if (!raw) {
+      return res.json({ available: false });
+    }
+    // Sanitize the same way registration does
+    const username = raw.replace(/\s+/g, '_').toLowerCase();
+    if (!/^[a-z0-9_]{3,30}$/.test(username)) {
+      return res.json({ available: false });
+    }
+    const db = getDb();
+    const existing = db.prepare('SELECT id FROM users WHERE username = ?').get(username);
+    res.json({ available: !existing });
+  } catch (err) {
+    console.error('Check username error:', err);
+    res.status(500).json({ error: 'Server error checking username.' });
+  }
+});
+
 /* ── POST /api/auth/signin ─────────────────── */
 router.post('/signin', (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { identifier, username, email, password } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required.' });
+    // Accept username or email as the login identifier
+    const loginId = identifier || username || email;
+    if (!loginId || !password) {
+      return res.status(400).json({ error: 'Username and password are required.' });
     }
 
     const db = getDb();
 
-    // ── Find user ──
+    // ── Find user by username or email ──
     const user = db.prepare(
-      'SELECT * FROM users WHERE email = ?'
-    ).get(email);
+      'SELECT * FROM users WHERE email = ? OR username = ?'
+    ).get(loginId, loginId);
 
     if (!user) {
-      return res.status(401).json({ error: 'Invalid email or password.' });
+      return res.status(401).json({ error: 'Invalid username or password.' });
     }
 
     // ── Verify password ──
     const valid = bcrypt.compareSync(password, user.password_hash);
     if (!valid) {
-      return res.status(401).json({ error: 'Invalid email or password.' });
+      return res.status(401).json({ error: 'Invalid username or password.' });
     }
 
     // ── Generate token & create session ──

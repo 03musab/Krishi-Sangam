@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useNav } from '../context/NavContext';
+import { useLanguage } from '../i18n/LanguageContext';
 import BookLabourTeam from '../components/BookLabourTeam';
 import ServiceBookingForm from '../components/ServiceBookingForm';
 import { SERVICE_CATEGORIES } from '../data/services';
 
 export default function Labour() {
   const { navigate } = useNav();
+  const { t } = useLanguage();
   const [flow, setFlow] = useState({ view: 'home', category: null, service: null });
 
   if (flow.view === 'labour-team') {
@@ -37,7 +39,7 @@ export default function Labour() {
                 className="sub-service-item"
                 onClick={() => setFlow({ view: 'service', category, service: svc })}
               >
-                <div className="sub-service-main">
+                <div className="sub-service-main tip" data-tip={svc.desc}>
                   <span className="sub-service-name">{svc.name}</span>
                   <span className="sub-service-desc">{svc.desc}</span>
                 </div>
@@ -54,12 +56,12 @@ export default function Labour() {
     <>
       <div className="page-banner banner-purple">
         <button className="btn-back-icon" onClick={() => navigate('home')}>←</button>
-        <h1 className="page-banner-title">👷 Book Services</h1>
+        <h1 className="page-banner-title">👷 {t('labour.bookServices')}</h1>
         <button
           className="banner-action-btn purple"
           onClick={() => setFlow({ view: 'labour-team' })}
         >
-          + Book Labour Team
+          + {t('labour.bookLabourTeam')}
         </button>
       </div>
 
@@ -68,17 +70,17 @@ export default function Labour() {
         <button className="labour-team-card" onClick={() => setFlow({ view: 'labour-team' })}>
           <span className="labour-team-emoji">👷</span>
           <div className="labour-team-text">
-            <h3>Book Labour Team</h3>
-            <p>Hire farm workers on a daily basis. Choose workers, team type, skill level, date &amp; farm location.</p>
-            <span className="labour-team-link">Book Now →</span>
+            <h3>{t('labour.bookLabourTeam')}</h3>
+            <p>{t('labour.hireFarmWorkers')}</p>
+            <span className="labour-team-link">{t('labour.bookNow')}</span>
           </div>
         </button>
       </div>
 
       {/* Agricultural Services — categories */}
       <section className="section agri-services-section">
-        <h2 className="section-title">🌾 Agricultural Services</h2>
-        <p className="section-subtitle">Pick a service category to explore available options</p>
+        <h2 className="section-title">🌾 {t('labour.agriServices')}</h2>
+        <p className="section-subtitle">{t('labour.pickCategory')}</p>
         <div className="service-category-grid">
           {SERVICE_CATEGORIES.map((cat) => (
             <button
@@ -86,10 +88,10 @@ export default function Labour() {
               className="service-category-card"
               onClick={() => setFlow({ view: 'category', category: cat })}
             >
-              <span className="service-category-emoji">{cat.emoji}</span>
+              <span className="service-category-emoji tip tip-left" data-tip={cat.desc || cat.tagline}>{cat.emoji}</span>
               <span className="service-category-name">{cat.name}</span>
               <span className="service-category-tagline">{cat.tagline}</span>
-              <span className="service-category-count">{cat.services.length} services</span>
+              <span className="service-category-count">{t('labour.xServices', { n: cat.services.length })}</span>
             </button>
           ))}
         </div>

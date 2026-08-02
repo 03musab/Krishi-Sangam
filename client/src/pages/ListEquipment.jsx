@@ -3,11 +3,13 @@ import FormCard from '../components/FormCard';
 import PhotoUpload from '../components/PhotoUpload';
 import { useNav } from '../context/NavContext';
 import { useToast } from '../context/ToastContext';
+import { useLanguage } from '../i18n/LanguageContext';
 import { createEquipment } from '../lib/api';
 
 export default function ListEquipment() {
   const { navigate } = useNav();
   const { showToast } = useToast();
+  const { t } = useLanguage();
   const [photoUrl, setPhotoUrl] = useState(null);
   const [form, setForm] = useState({
     name: '', type: 'Tractor', price_per_hour: '', price_per_day: '',
@@ -30,67 +32,67 @@ export default function ListEquipment() {
         description: form.description || null,
         photo_url: photoUrl
       });
-      showToast('Equipment listed!');
+      showToast(t('equip.created'));
       navigate('equipment-rental');
     } catch (err) {
-      showToast('Error: ' + err.message);
+      showToast(t('common.error', { msg: err.message }));
     }
   };
 
   return (
     <FormCard
-      title="List Equipment"
+      title={t('equip.listTitle')}
       color="banner-orange"
       backTo="equipment-rental"
-      submitLabel="Add Listing"
-      note="Your listing will be reviewed by admin before going live."
+      submitLabel={t('equip.add')}
+      note={t('land.note')}
       onSubmit={handleSubmit}
     >
       <PhotoUpload onUploaded={setPhotoUrl} />
       <div className="form-grid-row">
         <div className="form-group">
-          <label className="form-label">Name *</label>
-          <input type="text" className="form-input" placeholder="e.g. Mahindra 575" value={form.name} onChange={set('name')} required />
+          <label className="form-label">{t('equip.name')} *</label>
+          <input type="text" className="form-input" placeholder={t('equip.namePh')} value={form.name} onChange={set('name')} required />
         </div>
         <div className="form-group">
-          <label className="form-label">Type *</label>
+          <label className="form-label">{t('equip.type')} *</label>
           <select className="form-select" value={form.type} onChange={set('type')} required>
-            <option>Tractor</option><option>Harvester</option><option>Sprayer</option>
-            <option>Rotavator</option><option>Seed Drill</option><option>Other</option>
+            <option>{t('equip.tractor')}</option><option>{t('equip.harvester')}</option><option>{t('equip.sprayer')}</option>
+            <option>{t('equip.rotavator')}</option><option>{t('equip.seedDrill')}</option><option>{t('equip.other')}</option>
           </select>
         </div>
       </div>
       <div className="form-grid-row">
         <div className="form-group">
-          <label className="form-label">Per Hour (₹)</label>
+          <label className="form-label">{t('equip.perHour')}</label>
           <input type="number" className="form-input" placeholder="e.g. 500" value={form.price_per_hour} onChange={set('price_per_hour')} />
         </div>
         <div className="form-group">
-          <label className="form-label">Per Day (₹)</label>
+          <label className="form-label">{t('equip.perDay')}</label>
           <input type="number" className="form-input" placeholder="e.g. 3500" value={form.price_per_day} onChange={set('price_per_day')} />
         </div>
       </div>
       <div className="form-group">
-        <label className="form-label">Location *</label>
+        <label className="form-label">{t('equip.location')} *</label>
         <input type="text" className="form-input" placeholder="Village, Taluka" value={form.location} onChange={set('location')} required />
       </div>
       <div className="form-grid-row">
         <div className="form-group">
-          <label className="form-label">District</label>
+          <label className="form-label">{t('auth.district')}</label>
           <input type="text" className="form-input" value={form.district} onChange={set('district')} />
         </div>
         <div className="form-group">
-          <label className="form-label">State</label>
+          <label className="form-label">{t('auth.state')}</label>
           <input type="text" className="form-input" value={form.state} onChange={set('state')} />
         </div>
       </div>
       <label className="form-checkbox-group">
         <input type="checkbox" className="form-checkbox" checked={form.with_operator} onChange={(e) => setForm({ ...form, with_operator: e.target.checked })} />
-        <span className="form-checkbox-text">With Operator</span>
+        <span className="form-checkbox-text">{t('equip.withOperator')}</span>
       </label>
       <div className="form-group">
-        <label className="form-label">Description</label>
-        <textarea className="form-textarea" placeholder="Describe the equipment..." value={form.description} onChange={set('description')} />
+        <label className="form-label">{t('equip.description')}</label>
+        <textarea className="form-textarea" placeholder={t('equip.descriptionPh')} value={form.description} onChange={set('description')} />
       </div>
     </FormCard>
   );

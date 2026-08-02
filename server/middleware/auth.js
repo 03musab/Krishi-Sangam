@@ -3,6 +3,7 @@
    (JWT authentication middleware)
    ═══════════════════════════════════════════ */
 
+const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const { getDb } = require('../db');
 
@@ -54,7 +55,8 @@ function authenticateToken(req, res, next) {
  * Generate a JWT token for a user.
  */
 function generateToken(userId) {
-  return jwt.sign({ userId }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+  // Include a unique jti so concurrent/rapid sign-ins never collide on sessions.token
+  return jwt.sign({ userId, jti: crypto.randomUUID() }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 }
 
 /**

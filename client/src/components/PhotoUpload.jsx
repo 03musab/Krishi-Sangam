@@ -1,12 +1,14 @@
 import { useState, useRef, useCallback } from 'react';
 import { apiUpload } from '../lib/api';
 import { useToast } from '../context/ToastContext';
+import { useLanguage } from '../i18n/LanguageContext';
 
 export default function PhotoUpload({ onUploaded }) {
   const [preview, setPreview] = useState(null);
   const [uploading, setUploading] = useState(false);
   const inputRef = useRef(null);
   const { showToast } = useToast();
+  const { t } = useLanguage();
 
   const handleFile = useCallback(async (file) => {
     if (!file) return;
@@ -16,7 +18,7 @@ export default function PhotoUpload({ onUploaded }) {
       const result = await apiUpload(file);
       if (onUploaded) onUploaded(result.url);
     } catch (err) {
-      showToast('Upload failed: ' + err.message);
+      showToast(t('upload.failed', { msg: err.message }));
     } finally {
       setUploading(false);
     }
@@ -24,7 +26,7 @@ export default function PhotoUpload({ onUploaded }) {
 
   return (
     <div className="upload-section">
-      <label className="upload-label">Upload Photo</label>
+      <label className="upload-label">{t('upload.photo')}</label>
       <div
         className="upload-dropzone"
         onClick={() => inputRef.current?.click()}
@@ -46,7 +48,7 @@ export default function PhotoUpload({ onUploaded }) {
               <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
               <circle cx="12" cy="13" r="4"/>
             </svg>
-            <span>{uploading ? 'Uploading...' : 'Click or drag an image here'}</span>
+            <span>{uploading ? t('upload.uploading') : t('upload.clickOrDrag')}</span>
           </>
         )}
       </div>

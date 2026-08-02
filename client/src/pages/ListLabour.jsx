@@ -2,11 +2,13 @@ import { useState } from 'react';
 import FormCard from '../components/FormCard';
 import { useNav } from '../context/NavContext';
 import { useToast } from '../context/ToastContext';
+import { useLanguage } from '../i18n/LanguageContext';
 import { createLabour } from '../lib/api';
 
 export default function ListLabour() {
   const { navigate } = useNav();
   const { showToast } = useToast();
+  const { t } = useLanguage();
   const [form, setForm] = useState({
     title: '', skills: '', experience_years: '', daily_rate: '', location: '', description: ''
   });
@@ -23,47 +25,47 @@ export default function ListLabour() {
         location: form.location,
         description: form.description || null
       });
-      showToast('Labour listed!');
+      showToast(t('labour.created'));
       navigate('labour');
     } catch (err) {
-      showToast('Error: ' + err.message);
+      showToast(t('common.error', { msg: err.message }));
     }
   };
 
   return (
     <FormCard
-      title="Post Labour Service"
+      title={t('labour.postTitle')}
       color="banner-purple"
       backTo="labour"
-      submitLabel="Submit Listing"
-      note="Your listing will be reviewed by admin before going live."
+      submitLabel={t('land.submit')}
+      note={t('land.note')}
       onSubmit={handleSubmit}
     >
       <div className="form-group">
-        <label className="form-label">Title *</label>
-        <input type="text" className="form-input" placeholder="e.g. Experienced Farm Worker" value={form.title} onChange={set('title')} required />
+        <label className="form-label">{t('land.titleLabel')} *</label>
+        <input type="text" className="form-input" placeholder={t('labour.titlePh')} value={form.title} onChange={set('title')} required />
       </div>
       <div className="form-group">
-        <label className="form-label">Skills (comma-separated)</label>
-        <input type="text" className="form-input" placeholder="e.g. plowing, harvesting, irrigation" value={form.skills} onChange={set('skills')} />
+        <label className="form-label">{t('labour.skillsLabel')}</label>
+        <input type="text" className="form-input" placeholder={t('labour.skillsPh')} value={form.skills} onChange={set('skills')} />
       </div>
       <div className="form-grid-row">
         <div className="form-group">
-          <label className="form-label">Experience (years)</label>
-          <input type="number" className="form-input" placeholder="e.g. 5" value={form.experience_years} onChange={set('experience_years')} />
+          <label className="form-label">{t('labour.experience')}</label>
+          <input type="number" className="form-input" placeholder={t('labour.experiencePh')} value={form.experience_years} onChange={set('experience_years')} />
         </div>
         <div className="form-group">
-          <label className="form-label">Daily Rate (₹)</label>
-          <input type="number" className="form-input" placeholder="e.g. 800" value={form.daily_rate} onChange={set('daily_rate')} />
+          <label className="form-label">{t('labour.dailyRate')}</label>
+          <input type="number" className="form-input" placeholder={t('labour.ratePh')} value={form.daily_rate} onChange={set('daily_rate')} />
         </div>
       </div>
       <div className="form-group">
-        <label className="form-label">Location *</label>
-        <input type="text" className="form-input" placeholder="Village, Taluka" value={form.location} onChange={set('location')} required />
+        <label className="form-label">{t('labour.location')} *</label>
+        <input type="text" className="form-input" placeholder={t('labour.locationPh')} value={form.location} onChange={set('location')} required />
       </div>
       <div className="form-group">
-        <label className="form-label">Description</label>
-        <textarea className="form-textarea" placeholder="Describe your services..." value={form.description} onChange={set('description')} />
+        <label className="form-label">{t('labour.description')}</label>
+        <textarea className="form-textarea" placeholder={t('labour.descriptionPh')} value={form.description} onChange={set('description')} />
       </div>
     </FormCard>
   );

@@ -74,6 +74,7 @@ export const fetchMe = () => apiCall('/auth/me');
 export const sendOtp = (data) => apiCall('/auth/send-otp', 'POST', data);
 export const verifyOtp = (data) => apiCall('/auth/verify-otp', 'POST', data);
 export const register = (data) => apiCall('/auth/register', 'POST', data);
+export const checkUsername = (username) => apiCall(`/auth/check-username?username=${encodeURIComponent(username)}`);
 
 /* Services (agricultural services & labour teams) */
 export const bookService = (data) => apiCall('/services/book', 'POST', data);

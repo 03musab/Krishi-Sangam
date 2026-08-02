@@ -3,12 +3,14 @@ import BookingCard from './BookingCard';
 import FarmLocationField from './FarmLocationField';
 import { useNav } from '../context/NavContext';
 import { useToast } from '../context/ToastContext';
+import { useLanguage } from '../i18n/LanguageContext';
 import { bookService } from '../lib/api';
 import { TEAM_TYPES, SKILL_LEVELS, DEFAULT_WORKER_RATE } from '../data/services';
 
 export default function BookLabourTeam() {
   const { navigate } = useNav();
   const { showToast } = useToast();
+  const { t } = useLanguage();
   const [form, setForm] = useState({
     workers: '',
     days: '',
@@ -41,48 +43,48 @@ export default function BookLabourTeam() {
         description: form.description || null,
         price: total
       });
-      showToast('Labour team request submitted!');
+      showToast(t('labour.requestSubmitted'));
       navigate('labour');
     } catch (err) {
-      showToast('Error: ' + err.message);
+      showToast(t('common.error', { msg: err.message }));
     }
   };
 
   return (
     <BookingCard
-      title="Book Labour Team"
-      subtitle="Hire farm workers on a daily basis"
+      title={t('labour.bookLabourTeam')}
+      subtitle={t('labour.teamSubtitle')}
       emoji="👷"
       backTo="labour"
-      submitLabel="Request Labour Team"
+      submitLabel={t('labour.requestTeam')}
       onSubmit={handleSubmit}
     >
       <div className="pricing-banner">
-        <span className="pricing-label">Pricing</span>
-        <span className="pricing-value">₹ {form.rate} per worker/day</span>
-        <span className="pricing-total">Total: ₹ {total.toLocaleString()}</span>
+        <span className="pricing-label">{t('labour.pricing')}</span>
+        <span className="pricing-value">{t('labour.perWorkerDay', { rate: form.rate })}</span>
+        <span className="pricing-total">{t('labour.total', { total: total.toLocaleString() })}</span>
       </div>
 
       <div className="form-grid-row">
         <div className="form-group">
-          <label className="form-label">Number of Workers *</label>
+          <label className="form-label">{t('labour.numWorkers')} *</label>
           <input type="number" className="form-input" min="1" placeholder="e.g. 4" value={form.workers} onChange={set('workers')} required />
         </div>
         <div className="form-group">
-          <label className="form-label">Number of Days (Full Day) *</label>
+          <label className="form-label">{t('labour.numDays')} *</label>
           <input type="number" className="form-input" min="1" placeholder="e.g. 2" value={form.days} onChange={set('days')} required />
         </div>
       </div>
 
       <div className="form-grid-row">
         <div className="form-group">
-          <label className="form-label">Team Type</label>
+          <label className="form-label">{t('labour.teamType')}</label>
           <select className="form-select" value={form.team_type} onChange={set('team_type')}>
-            {TEAM_TYPES.map((t) => <option key={t} value={t}>{t} Team</option>)}
+            {TEAM_TYPES.map((type) => <option key={type} value={type}>{t('labour.' + type.toLowerCase() + 'Team')}</option>)}
           </select>
         </div>
         <div className="form-group">
-          <label className="form-label">Skill Level</label>
+          <label className="form-label">{t('labour.skillLevel')}</label>
           <select className="form-select" value={form.skill_level} onChange={set('skill_level')}>
             {SKILL_LEVELS.map((s) => <option key={s} value={s}>{s}</option>)}
           </select>
@@ -90,15 +92,15 @@ export default function BookLabourTeam() {
       </div>
 
       <div className="form-group">
-        <label className="form-label">Date & Time *</label>
+        <label className="form-label">{t('labour.dateTime')} *</label>
         <input type="datetime-local" className="form-input" value={form.start_date} onChange={set('start_date')} required />
       </div>
 
       <FarmLocationField value={form.location} onChange={(v) => setForm({ ...form, location: v })} onCoords={setCoords} />
 
       <div className="form-group">
-        <label className="form-label">Additional Notes</label>
-        <textarea className="form-textarea" placeholder="Describe the work needed..." value={form.description} onChange={set('description')} />
+        <label className="form-label">{t('labour.notes')}</label>
+        <textarea className="form-textarea" placeholder={t('labour.notesPh')} value={form.description} onChange={set('description')} />
       </div>
     </BookingCard>
   );

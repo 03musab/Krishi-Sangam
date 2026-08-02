@@ -1,18 +1,21 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNav } from '../context/NavContext';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
-import { register, sendOtp, verifyOtp } from '../lib/api';
+import { useLanguage } from '../i18n/LanguageContext';
+import { register, sendOtp, verifyOtp, checkUsername } from '../lib/api';
 import PhotoUpload from '../components/PhotoUpload';
+import LocationSelects from '../components/LocationSelects';
+import WelcomeOverlay from '../components/WelcomeOverlay';
 
 const ROLES = [
-  { value: 'farmer', label: '👨‍🌾 Farmer', desc: 'I grow crops and need services' },
-  { value: 'owner', label: '🚜 Land / Equipment Owner', desc: 'I want to list land or equipment' },
-  { value: 'labourer', label: '👷 Labourer', desc: 'I offer farm labour services' }
+  { value: 'farmer', labelKey: 'auth.farmer', emoji: '👨‍🌾', descKey: 'auth.farmerDesc' },
+  { value: 'owner', labelKey: 'auth.owner', emoji: '🚜', descKey: 'auth.ownerDesc' },
+  { value: 'labourer', labelKey: 'auth.labourer', emoji: '👷', descKey: 'auth.labourerDesc' }
 ];
 
-function StepIndicator({ current }) {
-  const steps = ['Role', 'Details', 'Verify'];
+function StepIndicator({ current, t }) {
+  const steps = [t('auth.stepRole'), t('auth.stepDetails'), t('auth.stepVerify')];
   return (
     <div className="step-indicator">
       {steps.map((s, i) => (
@@ -28,11 +31,12 @@ export default function SignUp() {
   const { navigate } = useNav();
   const { login } = useAuth();
   const { showToast } = useToast();
+  const { t } = useLanguage();
 
   const [step, setStep] = useState(0);
   const [role, setRole] = useState('');
   const [form, setForm] = useState({
-    full_name: '', phone: '', email: '', password: '',
+    full_name: '', username: '', phone: '', email: '', password: '',
     gender: 'Male', dob: '', govt_id_url: '',
     village: '', taluka: '', district: '', state: '',
     labour_category: '', skill_level: 'Skilled',
@@ -40,10 +44,42 @@ export default function SignUp() {
     farm_size: ''
   });
   const [farmCoords, setFarmCoords] = useState(null);
+  const [farmLoc, setFarmLoc] = useState('');
   const [otp, setOtp] = useState('');
   const [otpSent, setOtpSent] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
+  const [status, setStatus] = useState('idle'); // 'idle' | 'loading' | 'success'
+  const [welcomeName, setWelcomeName] = useState('');
+  const [usernameStatus, setUsernameStatus] = useState('idle'); // 'idle' | 'checking' | 'available' | 'taken' | 'invalid'
   const otpInput = useRef(null);
+  const navTimer = useRef(null);
+
+  // Clear the pending navigation timer if the user navigates away mid-animation
+  useEffect(() => () => clearTimeout(navTimer.current), []);
+
+  // Live username availability check (debounced)
+  useEffect(() => {
+    const clean = form.username.trim().replace(/\s+/g, '_').toLowerCase();
+    if (!clean) {
+      setUsernameStatus('idle');
+      return;
+    }
+    if (!/^[a-z0-9_]{3,30}$/.test(clean)) {
+      setUsernameStatus('invalid');
+      return;
+    }
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      // Only show the spinner once the request is about to fire (after the debounce)
+      setUsernameStatus('checking');
+      try {
+        const res = await checkUsername(clean);
+        if (!cancelled) setUsernameStatus(res.available ? 'available' : 'taken');
+      } catch {
+        if (!cancelled) setUsernameStatus('idle');
+      }
+    }, 450);
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, [form.username]);
 
   const set = (key) => (e) => setForm({ ...form, [key]: e.target.value });
 
@@ -51,17 +87,29 @@ export default function SignUp() {
 
   const handleSendOtp = async (e) => {
     e.preventDefault();
+    if (usernameStatus === 'checking') {
+      showToast(t('auth.usernameChecking'));
+      return;
+    }
+    if (usernameStatus === 'taken') {
+      showToast(t('auth.usernameTaken'));
+      return;
+    }
+    if (usernameStatus === 'invalid') {
+      showToast(t('auth.usernameInvalid'));
+      return;
+    }
     if (!/^\d{10}$/.test(form.phone)) {
-      showToast('Enter a valid 10-digit mobile number.');
+      showToast(t('auth.phoneInvalid'));
       return;
     }
     try {
       const res = await sendOtp({ phone: form.phone });
       setOtpSent(true);
-      showToast(`OTP sent! Use ${res.devOtp} in this demo.`, 5000);
+      showToast(t('auth.otpSent', { otp: res.devOtp }), 5000);
       setTimeout(() => otpInput.current?.focus(), 100);
     } catch (err) {
-      showToast('Error: ' + err.message);
+      showToast(t('common.error', { msg: err.message }));
     }
   };
 
@@ -69,20 +117,21 @@ export default function SignUp() {
     e.preventDefault();
     try {
       await verifyOtp({ phone: form.phone, otp });
-      showToast('Phone verified!');
+      showToast(t('auth.phoneVerified'));
       setOtpSent(false);
       setStep(2);
     } catch (err) {
-      showToast('Error: ' + err.message);
+      showToast(t('common.error', { msg: err.message }));
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitting(true);
+    setStatus('loading');
     try {
       const payload = {
         full_name: form.full_name,
+        username: form.username || undefined,
         phone: form.phone,
         email: form.email || undefined,
         password: form.password,
@@ -105,20 +154,25 @@ export default function SignUp() {
       };
       const data = await register(payload);
       login(data.token, data.user);
-      showToast('Welcome, ' + data.user.username + '!');
-      navigate('home');
+      setWelcomeName(data.user.username);
+      setStatus('success');
+      // Show the full-screen welcome overlay, then land on the home page
+      navTimer.current = setTimeout(() => {
+        showToast(t('common.toast.welcome', { name: data.user.username }));
+        navigate('home');
+      }, 1400);
     } catch (err) {
-      showToast('Registration error: ' + err.message);
-    } finally {
-      setSubmitting(false);
+      setStatus('idle');
+      showToast(t('common.error', { msg: err.message }));
     }
   };
 
   return (
     <div className="form-card-container auth-container">
+      {status === 'success' && <WelcomeOverlay name={welcomeName} />}
       <div className="form-card">
-        <h2 className="auth-title">Create Account</h2>
-        <StepIndicator current={step} />
+        <h2 className="auth-title">{t('auth.signupTitle')}</h2>
+        <StepIndicator current={step} t={t} />
 
         {step === 0 && (
           <div className="role-select">
@@ -128,13 +182,13 @@ export default function SignUp() {
                 className={`role-option ${role === r.value ? 'selected' : ''}`}
                 onClick={() => setRole(r.value)}
               >
-                <span className="role-emoji">{r.label.split(' ')[0]}</span>
-                <span className="role-label">{r.label.replace(/^[^\s]+\s/, '')}</span>
-                <span className="role-desc">{r.desc}</span>
+                <span className="role-emoji">{r.emoji}</span>
+                <span className="role-label">{t(r.labelKey)}</span>
+                <span className="role-desc">{t(r.descKey)}</span>
               </button>
             ))}
             <button className="btn-form-submit" disabled={!role} onClick={() => setStep(1)}>
-              Continue
+              {t('auth.continue')}
             </button>
           </div>
         )}
@@ -142,30 +196,46 @@ export default function SignUp() {
         {step === 1 && (
           <form className="form-body" onSubmit={handleSendOtp}>
             <div className="form-group">
-              <label className="form-label">Full Name *</label>
+              <label className="form-label">{t('auth.fullName')} *</label>
               <input type="text" className="form-input" placeholder="Your full name" value={form.full_name} onChange={set('full_name')} required />
             </div>
+            <div className="form-grid-row">
+              <div className="form-group">
+                <label className="form-label">{t('auth.username')} *</label>
+                <input type="text" className="form-input" autoComplete="username" placeholder="e.g. ramesh_kumar" value={form.username} onChange={set('username')} required />
+                {usernameStatus === 'checking' && (
+                  <div className="username-status checking"><span className="btn-spinner btn-spinner-dark btn-spinner-sm" aria-hidden="true" /> {t('auth.usernameChecking')}</div>
+                )}
+                {usernameStatus === 'available' && <div className="username-status ok">✓ {t('auth.usernameAvailable')}</div>}
+                {usernameStatus === 'taken' && <div className="username-status err">✕ {t('auth.usernameTaken')}</div>}
+                {usernameStatus === 'invalid' && <div className="username-status err">✕ {t('auth.usernameInvalid')}</div>}
+              </div>
+              <div className="form-group">
+                <label className="form-label">{t('auth.email')}</label>
+                <input type="email" className="form-input" autoComplete="email" placeholder="you@example.com" value={form.email} onChange={set('email')} />
+              </div>
+            </div>
             <div className="form-group">
-              <label className="form-label">Mobile Number *</label>
+              <label className="form-label">{t('auth.mobile')} *</label>
               <div className="otp-row">
                 <input type="tel" className="form-input" placeholder="10-digit mobile" value={form.phone} onChange={set('phone')} required />
                 <button type="submit" className="btn-small" style={{ background: '#15803d', whiteSpace: 'nowrap' }}>
-                  Send OTP
+                  {t('auth.sendOtp')}
                 </button>
               </div>
             </div>
             {otpSent && (
               <div className="form-group">
-                <label className="form-label">Enter OTP *</label>
+                <label className="form-label">{t('auth.enterOtp')} *</label>
                 <div className="otp-row">
                   <input ref={otpInput} type="text" className="form-input" placeholder="6-digit OTP" value={otp} onChange={(e) => setOtp(e.target.value)} required />
                   <button type="button" className="btn-small" style={{ background: '#0d9488', whiteSpace: 'nowrap' }} onClick={handleVerifyOtp}>
-                    Verify
+                    {t('auth.verify')}
                   </button>
                 </div>
               </div>
             )}
-            <button type="button" className="btn-form-submit btn-slate" onClick={() => setStep(0)}>Back</button>
+            <button type="button" className="btn-form-submit btn-slate" onClick={() => setStep(0)}>{t('common.back')}</button>
           </form>
         )}
 
@@ -173,51 +243,32 @@ export default function SignUp() {
           <form className="form-body" onSubmit={handleSubmit}>
             {isDetailed ? (
               <>
-                <h3 className="form-section-title">Identity & Address</h3>
+                <h3 className="form-section-title">{t('auth.identityAddress')}</h3>
                 <div className="form-grid-row">
                   <div className="form-group">
-                    <label className="form-label">Gender *</label>
+                    <label className="form-label">{t('auth.gender')} *</label>
                     <select className="form-select" value={form.gender} onChange={set('gender')}>
-                      <option>Male</option><option>Female</option><option>Other</option>
+                      <option value="Male">{t('auth.male')}</option><option value="Female">{t('auth.female')}</option><option value="Other">{t('auth.other')}</option>
                     </select>
                   </div>
                   <div className="form-group">
-                    <label className="form-label">Date of Birth *</label>
+                    <label className="form-label">{t('auth.dob')} *</label>
                     <input type="date" className="form-input" value={form.dob} onChange={set('dob')} required />
                   </div>
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Government ID (Aadhaar / Voter ID / Driving Licence) *</label>
-                  <span className="form-hint" style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '0.5rem', display: 'block' }}>Front image only (or both sides if your verification process requires it)</span>
+                  <label className="form-label">{t('auth.govtId')} *</label>
+                  <span className="form-hint" style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '0.5rem', display: 'block' }}>{t('auth.govtIdHint')}</span>
                   <PhotoUpload onUploaded={(url) => setForm({ ...form, govt_id_url: url })} />
                 </div>
-                <div className="form-grid-row">
-                  <div className="form-group">
-                    <label className="form-label">Village / Town *</label>
-                    <input type="text" className="form-input" value={form.village} onChange={set('village')} required />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Taluka *</label>
-                    <input type="text" className="form-input" value={form.taluka} onChange={set('taluka')} required />
-                  </div>
-                </div>
-                <div className="form-grid-row">
-                  <div className="form-group">
-                    <label className="form-label">District *</label>
-                    <input type="text" className="form-input" value={form.district} onChange={set('district')} required />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">State *</label>
-                    <input type="text" className="form-input" value={form.state} onChange={set('state')} required />
-                  </div>
-                </div>
+                <LocationSelects value={form} onChange={setForm} />
 
-                <h3 className="form-section-title">Work Profile</h3>
+                <h3 className="form-section-title">{t('auth.workProfile')}</h3>
                 <div className="form-grid-row">
                   <div className="form-group">
-                    <label className="form-label">Labour Category *</label>
+                    <label className="form-label">{t('auth.labourCategory')} *</label>
                     <select className="form-select" value={form.labour_category} onChange={set('labour_category')} required>
-                      <option value="">Select category</option>
+                      <option value="">{t('auth.selectCategory')}</option>
                       <option>Field Worker</option>
                       <option>Harvesting</option>
                       <option>Sowing & Planting</option>
@@ -230,86 +281,68 @@ export default function SignUp() {
                     </select>
                   </div>
                   <div className="form-group">
-                    <label className="form-label">Skill Level *</label>
+                    <label className="form-label">{t('auth.skillLevel')} *</label>
                     <select className="form-select" value={form.skill_level} onChange={set('skill_level')}>
-                      <option>Skilled</option><option>Semi-Skilled</option><option>Unskilled</option>
+                      <option value="Skilled">{t('auth.skilled')}</option><option value="Semi-Skilled">{t('auth.semiSkilled')}</option><option value="Unskilled">{t('auth.unskilled')}</option>
                     </select>
                   </div>
                 </div>
 
-                <h3 className="form-section-title">Payment Details</h3>
+                <h3 className="form-section-title">{t('auth.paymentDetails')}</h3>
                 <div className="form-grid-row">
                   <div className="form-group">
-                    <label className="form-label">Bank Account Number</label>
+                    <label className="form-label">{t('auth.bankAccount')}</label>
                     <input type="text" className="form-input" value={form.bank_account} onChange={set('bank_account')} />
                   </div>
                   <div className="form-group">
-                    <label className="form-label">IFSC Code</label>
+                    <label className="form-label">{t('auth.ifsc')}</label>
                     <input type="text" className="form-input" placeholder="e.g. HDFC0001234" value={form.ifsc} onChange={set('ifsc')} />
                   </div>
                 </div>
-                <div className="payment-or">— OR —</div>
+                <div className="payment-or">{t('auth.or')}</div>
                 <div className="form-group">
-                  <label className="form-label">UPI ID</label>
+                  <label className="form-label">{t('auth.upiId')}</label>
                   <input type="text" className="form-input" placeholder="e.g. name@upi" value={form.upi_id} onChange={set('upi_id')} />
                 </div>
               </>
             ) : (
               <>
-                <h3 className="form-section-title">Identity Verification</h3>
+                <h3 className="form-section-title">{t('auth.identityVerification')}</h3>
                 <div className="form-group">
-                  <label className="form-label">Government ID (Optional)</label>
+                  <label className="form-label">{t('auth.govtId')} ({t('auth.optional')})</label>
                   <PhotoUpload onUploaded={(url) => setForm({ ...form, govt_id_url: url })} />
                 </div>
                 
-                <h3 className="form-section-title">Address</h3>
-                <div className="form-grid-row">
-                  <div className="form-group">
-                    <label className="form-label">Village / Town *</label>
-                    <input type="text" className="form-input" value={form.village} onChange={set('village')} required />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Taluka *</label>
-                    <input type="text" className="form-input" value={form.taluka} onChange={set('taluka')} required />
-                  </div>
-                </div>
-                <div className="form-grid-row">
-                  <div className="form-group">
-                    <label className="form-label">District *</label>
-                    <input type="text" className="form-input" value={form.district} onChange={set('district')} required />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">State *</label>
-                    <input type="text" className="form-input" value={form.state} onChange={set('state')} required />
-                  </div>
-                </div>
+                <h3 className="form-section-title">{t('auth.address')}</h3>
+                <LocationSelects value={form} onChange={setForm} />
                 <div className="form-group">
-                  <label className="form-label">Farm Location (Map Pin) *</label>
-                  <input type="text" className="form-input" placeholder="Village, Taluka" value={form.village} onChange={set('village')} />
+                  <label className="form-label">{t('auth.farmLocation')} *</label>
+                  <input type="text" className="form-input" placeholder="Village, Taluka" value={farmLoc} onChange={(e) => setFarmLoc(e.target.value)} />
                   <div className="coords-chip">
-                    📌 Map pin: {farmCoords ? `${farmCoords.lat.toFixed(5)}, ${farmCoords.lng.toFixed(5)}` : 'Not set'}
+                    📌 {t('auth.mapPin')} {farmCoords ? `${farmCoords.lat.toFixed(5)}, ${farmCoords.lng.toFixed(5)}` : t('field.notSet')}
                   </div>
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Farm Size (Acres) *</label>
+                  <label className="form-label">{t('auth.farmSize')} *</label>
                   <input type="text" className="form-input" placeholder="e.g. 5" value={form.farm_size} onChange={set('farm_size')} required />
                 </div>
               </>
             )}
 
             <div className="form-group">
-              <label className="form-label">Password (min 6 characters) *</label>
+              <label className="form-label">{t('auth.password6')} *</label>
               <input type="password" className="form-input" minLength="6" value={form.password} onChange={set('password')} required />
             </div>
 
-            <button type="submit" className="btn-form-submit" disabled={submitting}>
-              {submitting ? 'Creating...' : 'Create Account'}
+            <button type="submit" className={`btn-form-submit ${status === 'loading' ? 'loading' : ''}`} disabled={status !== 'idle'}>
+              {status === 'loading' && <span className="btn-spinner" aria-hidden="true" />}
+              {status === 'loading' ? t('auth.creating') : t('auth.createAccount')}
             </button>
           </form>
         )}
 
         <p className="auth-switch">
-          Already have an account? <a href="#" onClick={(e) => { e.preventDefault(); navigate('signin'); }}>Sign In</a>
+          {t('auth.alreadyHave')} <a href="#" onClick={(e) => { e.preventDefault(); navigate('signin'); }}>{t('auth.signinTitle')}</a>
         </p>
       </div>
     </div>

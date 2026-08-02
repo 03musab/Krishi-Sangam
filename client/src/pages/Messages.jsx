@@ -2,11 +2,13 @@ import { useEffect, useState, useRef } from 'react';
 import PageBanner from '../components/PageBanner';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { useLanguage } from '../i18n/LanguageContext';
 import { getConversations, getThread, sendMessage } from '../lib/api';
 
 export default function Messages() {
   const { user } = useAuth();
   const { showToast } = useToast();
+  const { t } = useLanguage();
   const [conversations, setConversations] = useState([]);
   const [activeChat, setActiveChat] = useState(null);
   const [thread, setThread] = useState([]);
@@ -33,7 +35,7 @@ export default function Messages() {
       const d = await getThread(otherUser.id);
       setThread(d.messages || []);
     } catch (err) {
-      showToast('Error: ' + err.message);
+      showToast(t('common.error', { msg: err.message }));
     }
   };
 
@@ -45,17 +47,17 @@ export default function Messages() {
       const d = await getThread(activeChat.id);
       setThread(d.messages || []);
     } catch (err) {
-      showToast('Error: ' + err.message);
+      showToast(t('common.error', { msg: err.message }));
     }
   };
 
   return (
     <>
-      <PageBanner title="Messages" color="teal" />
+      <PageBanner title={t('msg.title')} color="teal" />
       <div className="messages-layout">
         <div className="conversations-list">
           {conversations.length === 0 && (
-            <div className="listings-empty">No conversations yet.</div>
+            <div className="listings-empty">{t('msg.noConversations')}</div>
           )}
           {conversations.map((cv) => (
             <div
@@ -72,9 +74,9 @@ export default function Messages() {
           ))}
         </div>
         <div className="message-thread">
-          <div className="thread-header">{activeChat ? activeChat.username : 'Select a conversation'}</div>
+          <div className="thread-header">{activeChat ? activeChat.username : t('msg.selectConversation')}</div>
           <div className="thread-messages" ref={threadRef}>
-            {activeChat && thread.length === 0 && <div className="listings-empty">No messages yet.</div>}
+            {activeChat && thread.length === 0 && <div className="listings-empty">{t('msg.noMessages')}</div>}
             {thread.map((m) => {
               const isMe = m.sender_id === user?.id;
               return (
@@ -88,12 +90,12 @@ export default function Messages() {
             <div className="thread-input">
               <input
                 type="text"
-                placeholder="Type a message..."
+                placeholder={t('msg.typeMessage')}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSend()}
               />
-              <button onClick={handleSend}>Send</button>
+              <button onClick={handleSend}>{t('msg.send')}</button>
             </div>
           )}
         </div>

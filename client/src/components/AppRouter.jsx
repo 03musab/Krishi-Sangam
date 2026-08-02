@@ -1,25 +1,32 @@
+import { lazy, Suspense } from 'react';
 import { useNav } from '../context/NavContext';
-import Home from '../pages/Home';
-import LandLeasing from '../pages/LandLeasing';
-import ListLand from '../pages/ListLand';
-import EquipmentRental from '../pages/EquipmentRental';
-import ListEquipment from '../pages/ListEquipment';
-import Labour from '../pages/Labour';
-import ListLabour from '../pages/ListLabour';
-import Produce from '../pages/Produce';
-import ListProduce from '../pages/ListProduce';
-import Bookings from '../pages/Bookings';
-import Messages from '../pages/Messages';
-import Payments from '../pages/Payments';
-import Profile from '../pages/Profile';
-import Admin from '../pages/Admin';
-import SignIn from '../pages/SignIn';
-import SignUp from '../pages/SignUp';
-import About from '../pages/About';
-import Terms from '../pages/Terms';
+import PageLoader from './PageLoader';
+
+const Home = lazy(() => import('../pages/Home'));
+const Services = lazy(() => import('../pages/Services'));
+const Contact = lazy(() => import('../pages/Contact'));
+const LandLeasing = lazy(() => import('../pages/LandLeasing'));
+const ListLand = lazy(() => import('../pages/ListLand'));
+const EquipmentRental = lazy(() => import('../pages/EquipmentRental'));
+const ListEquipment = lazy(() => import('../pages/ListEquipment'));
+const Labour = lazy(() => import('../pages/Labour'));
+const ListLabour = lazy(() => import('../pages/ListLabour'));
+const Produce = lazy(() => import('../pages/Produce'));
+const ListProduce = lazy(() => import('../pages/ListProduce'));
+const Bookings = lazy(() => import('../pages/Bookings'));
+const Messages = lazy(() => import('../pages/Messages'));
+const Payments = lazy(() => import('../pages/Payments'));
+const Profile = lazy(() => import('../pages/Profile'));
+const Admin = lazy(() => import('../pages/Admin'));
+const SignIn = lazy(() => import('../pages/SignIn'));
+const SignUp = lazy(() => import('../pages/SignUp'));
+const About = lazy(() => import('../pages/About'));
+const Terms = lazy(() => import('../pages/Terms'));
 
 const VIEWS = {
   home: Home,
+  services: Services,
+  contact: Contact,
   'land-leasing': LandLeasing,
   'list-land': ListLand,
   'equipment-rental': EquipmentRental,
@@ -42,5 +49,11 @@ const VIEWS = {
 export default function AppRouter() {
   const { view } = useNav();
   const ViewComponent = VIEWS[view] || Home;
-  return <ViewComponent key={view} />;
+  return (
+    <div className="page-view" key={view}>
+      <Suspense fallback={<PageLoader />}>
+        <ViewComponent />
+      </Suspense>
+    </div>
+  );
 }
