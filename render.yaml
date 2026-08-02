@@ -1,0 +1,22 @@
+# ── Krishi Sangam — Render Blueprint ──────────────────────────────
+# Deploy: Render dashboard → New → Blueprint → select this repo.
+# Set the four env vars when prompted (or in Service → Environment).
+
+services:
+  - type: web
+    name: krishi-sangam
+    runtime: node
+    plan: free
+    buildCommand: npm run build
+    startCommand: npm start
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: NODE_VERSION
+        value: 22.19.0
