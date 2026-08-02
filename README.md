@@ -30,10 +30,10 @@ Krishi Sangam is a full-stack web application that helps farmers find trusted la
 | -------- | ---------- |
 | Frontend | **React 19** + **Vite 5** (JavaScript/JSX) |
 | Backend  | **Node.js** + **Express 4** |
-| Database | **SQLite** via `better-sqlite3` (WAL mode) |
+| Database | **PostgreSQL 17** hosted on **Supabase** (via `pg` + a better-sqlite3-compatible facade) |
 | Auth     | **JWT** (Bearer tokens, 7-day sessions) + **bcryptjs** password hashing |
 | Uploads  | **Multer** (images stored in `server/uploads/`) |
-| Other    | CORS, Google Fonts (Inter + Poppins) |
+| Other    | CORS, Google Fonts (Inter + Poppins), `dotenv` |
 
 ---
 
@@ -58,8 +58,11 @@ krishi-sangam/
 │                            # Admin, SignIn, SignUp, About, Contact, Terms…
 ├── server/                  # Express backend
 │   ├── server.js            # Entry point (port 3001)
-│   ├── db.js                # SQLite schema + init
+│   ├── db.js                # pg Pool + better-sqlite3-compatible async facade
+│   ├── sql/schema.sql       # Postgres DDL (run in Supabase SQL editor)
+│   ├── migrate.js           # One-time SQLite → Postgres data migration
 │   ├── seed.js              # Idempotent sample-data seeder
+│   ├── .env.example         # Copy to .env, fill in DATABASE_URL + JWT_SECRET
 │   ├── middleware/auth.js   # JWT auth middleware
 │   └── routes/              # auth, land, equipment, labour, produce,
 │                            # bookings, messages, payments, profile,
@@ -99,8 +102,9 @@ These scripts install dependencies (if missing), start the API server and the Vi
 ```bash
 # 1. Backend
 cd server
-npm install          # express, better-sqlite3, bcryptjs, jsonwebtoken, multer, cors
-npm start            # → http://localhost:3001
+cp .env.example .env   # then edit .env with your Supabase DATABASE_URL + JWT_SECRET
+npm install            # express, pg, dotenv, bcryptjs, jsonwebtoken, multer, cors
+npm start              # → http://localhost:3001
 
 # 2. Frontend (new terminal)
 cd client
@@ -109,6 +113,8 @@ npm run dev          # → http://localhost:5173
 ```
 
 Then open **http://localhost:5173**.
+
+> ⚙️ The Vite dev server proxies `/api` and `/uploads` to `http://localhost:3001`, so no CORS fiddling is needed in development.
 
 > ⚙️ The Vite dev server proxies `/api` and `/uploads` to `http://localhost:3001`, so no CORS fiddling is needed in development.
 
@@ -141,12 +147,21 @@ Then open **http://localhost:5173**.
 
 ## 🗄️ Database
 
-SQLite database at `server/krishisetu.db`, created automatically on first run (WAL mode, foreign keys on). Main tables:
+Hosted **PostgreSQL on Supabase** (project region: Mumbai `ap-south-1`). The app connects through the IPv4 transaction pooler. Main tables:
 
 - `users`, `sessions`, `otp_verifications`
 - `land_listings`, `equipment_listings`, `labour_services`, `produce_listings`
 - `bookings`, `service_bookings` (labour teams + agri services)
 - `messages`, `payments` (escrow ledger), `reviews`
+
+The schema lives in `server/sql/schema.sql` — paste it into the **Supabase SQL Editor** once when creating a new project (the server doesn't auto-create tables anymore).
+
+**Migrating from the old SQLite DB** (one-time):
+
+```bash
+cd server
+node migrate.js   # copies server/krishisetu.db → Supabase, preserving IDs & FKs
+```
 
 **Seed sample data** (idempotent — only runs when tables are empty):
 
@@ -155,6 +170,10 @@ cd server && node seed.js
 ```
 
 This inserts ~3–4 approved demo listings per category and demo owner/farmer/worker accounts (`demo_landowner_ravi`, `demo_farmer_kiran`, …). Note: demo accounts use a placeholder hash and **cannot be signed into** — create a real account via the sign-up form to test auth.
+
+### How the DB layer works
+
+`server/db.js` exposes a **better-sqlite3-compatible facade** over a `pg` connection pool, so routes keep their familiar `db.prepare(sql).get()/all()/run()` API — just `async`/`await` now. It auto-translates SQLite syntax to Postgres: `datetime('now')` → `NOW()`, `LIKE` → `ILIKE` (case-insensitive search), `?` → `$1..$n`, and appends `RETURNING id` on INSERTs so `lastInsertRowid` still works.
 
 ---
 
@@ -213,6 +232,7 @@ cd server && npm start   # serves API + built frontend on :3001
 | -------------------------- | ----------------------------------------- |
 | `cd server && npm start`   | Start the API server on :3001             |
 | `cd server && node seed.js`| Seed sample listings (idempotent)         |
+| `cd server && node migrate.js` | One-time SQLite → Supabase migration  |
 | `cd client && npm run dev` | Start the Vite dev server on :5173        |
 | `cd client && npm run build` | Production build to `client/dist`       |
 | `cd client && npm run preview` | Preview the production build          |

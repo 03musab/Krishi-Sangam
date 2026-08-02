@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════
    KrishiSetu — server/routes/produce.js
-   (Produce Marketplace CRUD)
+   (Produce Marketplace CRUD — async, Postgres)
    ═══════════════════════════════════════════ */
 
 const express = require('express');
@@ -10,7 +10,7 @@ const { authenticateToken, requireRole } = require('../middleware/auth');
 const router = express.Router();
 
 /* ── GET /api/produce — List all approved produce ── */
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const db = getDb();
     const { search, district, state, crop, min_price, max_price } = req.query;
@@ -32,7 +32,7 @@ router.get('/', (req, res) => {
     if (max_price) { query += ` AND p.price_per_unit <= ?`; params.push(Number(max_price)); }
 
     query += ` ORDER BY p.created_at DESC`;
-    const listings = db.prepare(query).all(...params);
+    const listings = await db.prepare(query).all(...params);
     res.json({ listings, count: listings.length });
   } catch (err) {
     res.status(500).json({ error: 'Server error.' });
@@ -40,10 +40,10 @@ router.get('/', (req, res) => {
 });
 
 /* ── GET /api/produce/my ── */
-router.get('/my', authenticateToken, (req, res) => {
+router.get('/my', authenticateToken, async (req, res) => {
   try {
     const db = getDb();
-    const listings = db.prepare(
+    const listings = await db.prepare(
       `SELECT * FROM produce_listings WHERE seller_id = ? ORDER BY created_at DESC`
     ).all(req.user.id);
     res.json({ listings, count: listings.length });
@@ -53,10 +53,10 @@ router.get('/my', authenticateToken, (req, res) => {
 });
 
 /* ── GET /api/produce/pending ── */
-router.get('/pending', authenticateToken, requireRole('admin'), (req, res) => {
+router.get('/pending', authenticateToken, requireRole('admin'), async (req, res) => {
   try {
     const db = getDb();
-    const listings = db.prepare(
+    const listings = await db.prepare(
       `SELECT p.*, u.username as seller_name
        FROM produce_listings p JOIN users u ON p.seller_id = u.id
        WHERE p.status = 'pending' ORDER BY p.created_at DESC`
@@ -68,10 +68,10 @@ router.get('/pending', authenticateToken, requireRole('admin'), (req, res) => {
 });
 
 /* ── GET /api/produce/:id ── */
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
     const db = getDb();
-    const listing = db.prepare(
+    const listing = await db.prepare(
       `SELECT p.*, u.username as seller_name, u.phone as seller_phone
        FROM produce_listings p JOIN users u ON p.seller_id = u.id WHERE p.id = ?`
     ).get(req.params.id);
@@ -83,7 +83,7 @@ router.get('/:id', (req, res) => {
 });
 
 /* ── POST /api/produce — Create ── */
-router.post('/', authenticateToken, (req, res) => {
+router.post('/', authenticateToken, async (req, res) => {
   try {
     const db = getDb();
     const { crop_name, description, quantity, unit, price_per_unit,
@@ -93,7 +93,7 @@ router.post('/', authenticateToken, (req, res) => {
       return res.status(400).json({ error: 'Crop name, quantity, price, and location are required.' });
     }
 
-    const result = db.prepare(`
+    const result = await db.prepare(`
       INSERT INTO produce_listings (seller_id, crop_name, description, quantity, unit,
         price_per_unit, location, district, state, quality_grade, photo_url)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -101,7 +101,7 @@ router.post('/', authenticateToken, (req, res) => {
            unit || 'kg', price_per_unit, location,
            district || null, state || null, quality_grade || 'A', photo_url || null);
 
-    const listing = db.prepare('SELECT * FROM produce_listings WHERE id = ?')
+    const listing = await db.prepare('SELECT * FROM produce_listings WHERE id = ?')
       .get(result.lastInsertRowid);
     res.status(201).json({ message: 'Produce listing created! Awaiting approval.', listing });
   } catch (err) {
@@ -111,10 +111,10 @@ router.post('/', authenticateToken, (req, res) => {
 });
 
 /* ── PUT /api/produce/:id ── */
-router.put('/:id', authenticateToken, (req, res) => {
+router.put('/:id', authenticateToken, async (req, res) => {
   try {
     const db = getDb();
-    const listing = db.prepare('SELECT * FROM produce_listings WHERE id = ?').get(req.params.id);
+    const listing = await db.prepare('SELECT * FROM produce_listings WHERE id = ?').get(req.params.id);
     if (!listing) return res.status(404).json({ error: 'Not found.' });
     if (listing.seller_id !== req.user.id && req.user.role !== 'admin') {
       return res.status(403).json({ error: 'Not authorized.' });
@@ -123,10 +123,10 @@ router.put('/:id', authenticateToken, (req, res) => {
     const { crop_name, description, quantity, unit, price_per_unit,
             location, district, state, quality_grade, photo_url } = req.body;
 
-    db.prepare(`
+    await db.prepare(`
       UPDATE produce_listings SET crop_name=?, description=?, quantity=?, unit=?,
         price_per_unit=?, location=?, district=?, state=?, quality_grade=?,
-        photo_url=?, updated_at=datetime('now') WHERE id=?
+        photo_url=?, updated_at=NOW() WHERE id=?
     `).run(crop_name || listing.crop_name, description ?? listing.description,
            quantity || listing.quantity, unit || listing.unit,
            price_per_unit || listing.price_per_unit,
@@ -134,7 +134,7 @@ router.put('/:id', authenticateToken, (req, res) => {
            state ?? listing.state, quality_grade || listing.quality_grade,
            photo_url ?? listing.photo_url, req.params.id);
 
-    const updated = db.prepare('SELECT * FROM produce_listings WHERE id = ?').get(req.params.id);
+    const updated = await db.prepare('SELECT * FROM produce_listings WHERE id = ?').get(req.params.id);
     res.json({ message: 'Updated.', listing: updated });
   } catch (err) {
     res.status(500).json({ error: 'Server error.' });
@@ -142,15 +142,15 @@ router.put('/:id', authenticateToken, (req, res) => {
 });
 
 /* ── DELETE /api/produce/:id ── */
-router.delete('/:id', authenticateToken, (req, res) => {
+router.delete('/:id', authenticateToken, async (req, res) => {
   try {
     const db = getDb();
-    const listing = db.prepare('SELECT * FROM produce_listings WHERE id = ?').get(req.params.id);
+    const listing = await db.prepare('SELECT * FROM produce_listings WHERE id = ?').get(req.params.id);
     if (!listing) return res.status(404).json({ error: 'Not found.' });
     if (listing.seller_id !== req.user.id && req.user.role !== 'admin') {
       return res.status(403).json({ error: 'Not authorized.' });
     }
-    db.prepare('DELETE FROM produce_listings WHERE id = ?').run(req.params.id);
+    await db.prepare('DELETE FROM produce_listings WHERE id = ?').run(req.params.id);
     res.json({ message: 'Deleted.' });
   } catch (err) {
     res.status(500).json({ error: 'Server error.' });
@@ -158,14 +158,14 @@ router.delete('/:id', authenticateToken, (req, res) => {
 });
 
 /* ── PUT /api/produce/:id/status — Admin ── */
-router.put('/:id/status', authenticateToken, requireRole('admin'), (req, res) => {
+router.put('/:id/status', authenticateToken, requireRole('admin'), async (req, res) => {
   try {
     const db = getDb();
     const { status } = req.body;
     if (!['approved', 'rejected'].includes(status)) {
       return res.status(400).json({ error: 'Status must be approved or rejected.' });
     }
-    db.prepare(`UPDATE produce_listings SET status=?, updated_at=datetime('now') WHERE id=?`)
+    await db.prepare(`UPDATE produce_listings SET status=?, updated_at=NOW() WHERE id=?`)
       .run(status, req.params.id);
     res.json({ message: `Listing ${status}.` });
   } catch (err) {

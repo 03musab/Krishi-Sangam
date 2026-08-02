@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════
    KrishiSetu — server/routes/profile.js
-   (Profile Update & Password Change)
+   (Profile Update & Password Change — async, Postgres)
    ═══════════════════════════════════════════ */
 
 const express = require('express');
@@ -12,10 +12,10 @@ const router = express.Router();
 const SALT_ROUNDS = 10;
 
 /* ── GET /api/profile — Get my profile ── */
-router.get('/', authenticateToken, (req, res) => {
+router.get('/', authenticateToken, async (req, res) => {
   try {
     const db = getDb();
-    const user = db.prepare(
+    const user = await db.prepare(
       `SELECT id, username, email, role, phone, location, bio, skills,
               avatar_url, created_at, updated_at FROM users WHERE id = ?`
     ).get(req.user.id);
@@ -26,21 +26,21 @@ router.get('/', authenticateToken, (req, res) => {
 });
 
 /* ── PUT /api/profile — Update profile ── */
-router.put('/', authenticateToken, (req, res) => {
+router.put('/', authenticateToken, async (req, res) => {
   try {
     const db = getDb();
     const { username, phone, location, bio, skills, avatar_url } = req.body;
 
     // Check username uniqueness if changed
     if (username && username !== req.user.username) {
-      const existing = db.prepare('SELECT id FROM users WHERE username = ? AND id != ?')
+      const existing = await db.prepare('SELECT id FROM users WHERE username = ? AND id != ?')
         .get(username, req.user.id);
       if (existing) {
         return res.status(409).json({ error: 'Username already taken.' });
       }
     }
 
-    db.prepare(`
+    await db.prepare(`
       UPDATE users SET
         username = COALESCE(?, username),
         phone = COALESCE(?, phone),
@@ -48,12 +48,12 @@ router.put('/', authenticateToken, (req, res) => {
         bio = COALESCE(?, bio),
         skills = COALESCE(?, skills),
         avatar_url = COALESCE(?, avatar_url),
-        updated_at = datetime('now')
+        updated_at = NOW()
       WHERE id = ?
     `).run(username || null, phone ?? null, location ?? null,
            bio ?? null, skills ?? null, avatar_url ?? null, req.user.id);
 
-    const user = db.prepare(
+    const user = await db.prepare(
       `SELECT id, username, email, role, phone, location, bio, skills,
               avatar_url, created_at, updated_at FROM users WHERE id = ?`
     ).get(req.user.id);
@@ -66,7 +66,7 @@ router.put('/', authenticateToken, (req, res) => {
 });
 
 /* ── PUT /api/profile/password — Change password ── */
-router.put('/password', authenticateToken, (req, res) => {
+router.put('/password', authenticateToken, async (req, res) => {
   try {
     const { current_password, new_password } = req.body;
 
@@ -78,7 +78,7 @@ router.put('/password', authenticateToken, (req, res) => {
     }
 
     const db = getDb();
-    const user = db.prepare('SELECT password_hash FROM users WHERE id = ?').get(req.user.id);
+    const user = await db.prepare('SELECT password_hash FROM users WHERE id = ?').get(req.user.id);
 
     const valid = bcrypt.compareSync(current_password, user.password_hash);
     if (!valid) {
@@ -86,7 +86,7 @@ router.put('/password', authenticateToken, (req, res) => {
     }
 
     const newHash = bcrypt.hashSync(new_password, SALT_ROUNDS);
-    db.prepare(`UPDATE users SET password_hash = ?, updated_at = datetime('now') WHERE id = ?`)
+    await db.prepare(`UPDATE users SET password_hash = ?, updated_at = NOW() WHERE id = ?`)
       .run(newHash, req.user.id);
 
     res.json({ message: 'Password changed successfully.' });
@@ -97,10 +97,10 @@ router.put('/password', authenticateToken, (req, res) => {
 });
 
 /* ── GET /api/profile/:userId — Public profile ── */
-router.get('/:userId', (req, res) => {
+router.get('/:userId', async (req, res) => {
   try {
     const db = getDb();
-    const user = db.prepare(
+    const user = await db.prepare(
       `SELECT id, username, role, location, bio, skills, avatar_url, created_at
        FROM users WHERE id = ?`
     ).get(req.params.userId);

@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════
    KrishiSetu — server/routes/labour.js
-   (Labour Services CRUD)
+   (Labour Services CRUD — async, Postgres)
    ═══════════════════════════════════════════ */
 
 const express = require('express');
@@ -10,7 +10,7 @@ const { authenticateToken, requireRole } = require('../middleware/auth');
 const router = express.Router();
 
 /* ── GET /api/labour — List all approved labour ── */
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const db = getDb();
     const { search, district, state, skill, min_rate, max_rate } = req.query;
@@ -32,7 +32,7 @@ router.get('/', (req, res) => {
     if (max_rate) { query += ` AND (l.daily_rate <= ? OR l.hourly_rate <= ?)`; params.push(Number(max_rate), Number(max_rate)); }
 
     query += ` ORDER BY l.created_at DESC`;
-    const listings = db.prepare(query).all(...params);
+    const listings = await db.prepare(query).all(...params);
     res.json({ listings, count: listings.length });
   } catch (err) {
     console.error('Get labour error:', err);
@@ -41,10 +41,10 @@ router.get('/', (req, res) => {
 });
 
 /* ── GET /api/labour/my ── */
-router.get('/my', authenticateToken, (req, res) => {
+router.get('/my', authenticateToken, async (req, res) => {
   try {
     const db = getDb();
-    const listings = db.prepare(
+    const listings = await db.prepare(
       `SELECT * FROM labour_services WHERE worker_id = ? ORDER BY created_at DESC`
     ).all(req.user.id);
     res.json({ listings, count: listings.length });
@@ -54,10 +54,10 @@ router.get('/my', authenticateToken, (req, res) => {
 });
 
 /* ── GET /api/labour/pending ── */
-router.get('/pending', authenticateToken, requireRole('admin'), (req, res) => {
+router.get('/pending', authenticateToken, requireRole('admin'), async (req, res) => {
   try {
     const db = getDb();
-    const listings = db.prepare(
+    const listings = await db.prepare(
       `SELECT l.*, u.username as worker_name
        FROM labour_services l JOIN users u ON l.worker_id = u.id
        WHERE l.status = 'pending' ORDER BY l.created_at DESC`
@@ -69,10 +69,10 @@ router.get('/pending', authenticateToken, requireRole('admin'), (req, res) => {
 });
 
 /* ── GET /api/labour/:id ── */
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
     const db = getDb();
-    const listing = db.prepare(
+    const listing = await db.prepare(
       `SELECT l.*, u.username as worker_name, u.phone as worker_phone, u.avatar_url
        FROM labour_services l JOIN users u ON l.worker_id = u.id WHERE l.id = ?`
     ).get(req.params.id);
@@ -84,7 +84,7 @@ router.get('/:id', (req, res) => {
 });
 
 /* ── POST /api/labour — Create ── */
-router.post('/', authenticateToken, (req, res) => {
+router.post('/', authenticateToken, async (req, res) => {
   try {
     const db = getDb();
     const { title, description, skills, experience_years, daily_rate,
@@ -94,7 +94,7 @@ router.post('/', authenticateToken, (req, res) => {
       return res.status(400).json({ error: 'Title and location are required.' });
     }
 
-    const result = db.prepare(`
+    const result = await db.prepare(`
       INSERT INTO labour_services (worker_id, title, description, skills,
         experience_years, daily_rate, hourly_rate, location, district, state, photo_url)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -102,7 +102,7 @@ router.post('/', authenticateToken, (req, res) => {
            experience_years || 0, daily_rate || null, hourly_rate || null,
            location, district || null, state || null, photo_url || null);
 
-    const listing = db.prepare('SELECT * FROM labour_services WHERE id = ?')
+    const listing = await db.prepare('SELECT * FROM labour_services WHERE id = ?')
       .get(result.lastInsertRowid);
     res.status(201).json({ message: 'Labour listing created! Awaiting approval.', listing });
   } catch (err) {
@@ -112,10 +112,10 @@ router.post('/', authenticateToken, (req, res) => {
 });
 
 /* ── PUT /api/labour/:id ── */
-router.put('/:id', authenticateToken, (req, res) => {
+router.put('/:id', authenticateToken, async (req, res) => {
   try {
     const db = getDb();
-    const listing = db.prepare('SELECT * FROM labour_services WHERE id = ?').get(req.params.id);
+    const listing = await db.prepare('SELECT * FROM labour_services WHERE id = ?').get(req.params.id);
     if (!listing) return res.status(404).json({ error: 'Not found.' });
     if (listing.worker_id !== req.user.id && req.user.role !== 'admin') {
       return res.status(403).json({ error: 'Not authorized.' });
@@ -124,10 +124,10 @@ router.put('/:id', authenticateToken, (req, res) => {
     const { title, description, skills, experience_years, daily_rate,
             hourly_rate, location, district, state, availability, photo_url } = req.body;
 
-    db.prepare(`
+    await db.prepare(`
       UPDATE labour_services SET title=?, description=?, skills=?, experience_years=?,
         daily_rate=?, hourly_rate=?, location=?, district=?, state=?, availability=?,
-        photo_url=?, updated_at=datetime('now') WHERE id=?
+        photo_url=?, updated_at=NOW() WHERE id=?
     `).run(title || listing.title, description ?? listing.description,
            skills ?? listing.skills, experience_years ?? listing.experience_years,
            daily_rate ?? listing.daily_rate, hourly_rate ?? listing.hourly_rate,
@@ -135,7 +135,7 @@ router.put('/:id', authenticateToken, (req, res) => {
            state ?? listing.state, availability || listing.availability,
            photo_url ?? listing.photo_url, req.params.id);
 
-    const updated = db.prepare('SELECT * FROM labour_services WHERE id = ?').get(req.params.id);
+    const updated = await db.prepare('SELECT * FROM labour_services WHERE id = ?').get(req.params.id);
     res.json({ message: 'Updated.', listing: updated });
   } catch (err) {
     res.status(500).json({ error: 'Server error.' });
@@ -143,15 +143,15 @@ router.put('/:id', authenticateToken, (req, res) => {
 });
 
 /* ── DELETE /api/labour/:id ── */
-router.delete('/:id', authenticateToken, (req, res) => {
+router.delete('/:id', authenticateToken, async (req, res) => {
   try {
     const db = getDb();
-    const listing = db.prepare('SELECT * FROM labour_services WHERE id = ?').get(req.params.id);
+    const listing = await db.prepare('SELECT * FROM labour_services WHERE id = ?').get(req.params.id);
     if (!listing) return res.status(404).json({ error: 'Not found.' });
     if (listing.worker_id !== req.user.id && req.user.role !== 'admin') {
       return res.status(403).json({ error: 'Not authorized.' });
     }
-    db.prepare('DELETE FROM labour_services WHERE id = ?').run(req.params.id);
+    await db.prepare('DELETE FROM labour_services WHERE id = ?').run(req.params.id);
     res.json({ message: 'Deleted.' });
   } catch (err) {
     res.status(500).json({ error: 'Server error.' });
@@ -159,14 +159,14 @@ router.delete('/:id', authenticateToken, (req, res) => {
 });
 
 /* ── PUT /api/labour/:id/status — Admin ── */
-router.put('/:id/status', authenticateToken, requireRole('admin'), (req, res) => {
+router.put('/:id/status', authenticateToken, requireRole('admin'), async (req, res) => {
   try {
     const db = getDb();
     const { status } = req.body;
     if (!['approved', 'rejected'].includes(status)) {
       return res.status(400).json({ error: 'Status must be approved or rejected.' });
     }
-    db.prepare(`UPDATE labour_services SET status=?, updated_at=datetime('now') WHERE id=?`)
+    await db.prepare(`UPDATE labour_services SET status=?, updated_at=NOW() WHERE id=?`)
       .run(status, req.params.id);
     res.json({ message: `Listing ${status}.` });
   } catch (err) {

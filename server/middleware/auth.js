@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════
    KrishiSetu — server/middleware/auth.js
-   (JWT authentication middleware)
+   (JWT authentication middleware — async, Postgres-backed)
    ═══════════════════════════════════════════ */
 
 const crypto = require('crypto');
@@ -14,7 +14,7 @@ const JWT_EXPIRES_IN = '7d';
  * Authenticate a user by verifying their JWT token.
  * Attaches `req.user` if successful.
  */
-function authenticateToken(req, res, next) {
+async function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1]; // "Bearer <token>"
 
@@ -27,8 +27,8 @@ function authenticateToken(req, res, next) {
 
     // Verify session exists in DB
     const db = getDb();
-    const session = db.prepare(
-      'SELECT id FROM sessions WHERE token = ? AND expires_at > datetime(\'now\')'
+    const session = await db.prepare(
+      "SELECT id FROM sessions WHERE token = ? AND expires_at > NOW()"
     ).get(token);
 
     if (!session) {
@@ -36,7 +36,7 @@ function authenticateToken(req, res, next) {
     }
 
     // Get user data
-    const user = db.prepare(
+    const user = await db.prepare(
       'SELECT id, username, email, role, phone, location, avatar_url, created_at FROM users WHERE id = ?'
     ).get(decoded.userId);
 
@@ -47,7 +47,12 @@ function authenticateToken(req, res, next) {
     req.user = user;
     next();
   } catch (err) {
-    return res.status(401).json({ error: 'Invalid token.' });
+    // Distinguish DB failures from real token problems
+    if (err.name === 'JsonWebTokenError' || err.name === 'TokenExpiredError') {
+      return res.status(401).json({ error: 'Invalid token.' });
+    }
+    console.error('Auth middleware DB error:', err);
+    return res.status(500).json({ error: 'Server error during authentication.' });
   }
 }
 

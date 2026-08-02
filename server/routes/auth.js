@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════
    KrishiSetu — server/routes/auth.js
-   (Authentication routes: signup, signin, me)
+   (Authentication routes: signup, signin, me — async, Postgres)
    ═══════════════════════════════════════════ */
 
 const express = require('express');
@@ -18,7 +18,7 @@ function generateOtp() {
 }
 
 /* ── POST /api/auth/send-otp ───────────────── */
-router.post('/send-otp', (req, res) => {
+router.post('/send-otp', async (req, res) => {
   try {
     const { phone } = req.body;
     if (!phone || !/^\d{10}$/.test(String(phone))) {
@@ -28,8 +28,8 @@ router.post('/send-otp', (req, res) => {
     const otp = generateOtp();
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
 
-    db.prepare('DELETE FROM otp_verifications WHERE phone = ?').run(String(phone));
-    db.prepare('INSERT INTO otp_verifications (phone, otp, expires_at) VALUES (?, ?, ?)')
+    await db.prepare('DELETE FROM otp_verifications WHERE phone = ?').run(String(phone));
+    await db.prepare('INSERT INTO otp_verifications (phone, otp, expires_at) VALUES (?, ?, ?)')
       .run(String(phone), otp, expiresAt);
 
     console.log(`[OTP] Sent OTP ${otp} to ${phone}`);
@@ -42,14 +42,14 @@ router.post('/send-otp', (req, res) => {
 });
 
 /* ── POST /api/auth/verify-otp ─────────────── */
-router.post('/verify-otp', (req, res) => {
+router.post('/verify-otp', async (req, res) => {
   try {
     const { phone, otp } = req.body;
     if (!phone || !otp) {
       return res.status(400).json({ error: 'Phone and OTP are required.' });
     }
     const db = getDb();
-    const record = db.prepare(
+    const record = await db.prepare(
       'SELECT * FROM otp_verifications WHERE phone = ? ORDER BY id DESC LIMIT 1'
     ).get(String(phone));
 
@@ -63,7 +63,7 @@ router.post('/verify-otp', (req, res) => {
       return res.status(400).json({ error: 'Invalid OTP. Please try again.' });
     }
 
-    db.prepare('DELETE FROM otp_verifications WHERE phone = ?').run(String(phone));
+    await db.prepare('DELETE FROM otp_verifications WHERE phone = ?').run(String(phone));
     res.json({ message: 'OTP verified successfully.', verified: true });
   } catch (err) {
     console.error('Verify OTP error:', err);
@@ -72,7 +72,7 @@ router.post('/verify-otp', (req, res) => {
 });
 
 /* ── POST /api/auth/register ───────────────── */
-router.post('/register', (req, res) => {
+router.post('/register', async (req, res) => {
   try {
     const db = getDb();
     const {
@@ -106,14 +106,14 @@ router.post('/register', (req, res) => {
       ? email.trim()
       : `${phone}@krishisangam.local`;
 
-    const existing = db.prepare('SELECT id FROM users WHERE email = ? OR username = ?')
+    const existing = await db.prepare('SELECT id FROM users WHERE email = ? OR username = ?')
       .get(userEmail, finalUsername);
     if (existing) {
       return res.status(409).json({ error: 'Username, email, or mobile number already in use.' });
     }
 
     const passwordHash = bcrypt.hashSync(password, SALT_ROUNDS);
-    const result = db.prepare(`
+    const result = await db.prepare(`
       INSERT INTO users (
         username, email, password_hash, role, phone, gender, dob,
         govt_id_url, village, taluka, district, state, location,
@@ -136,10 +136,10 @@ router.post('/register', (req, res) => {
     const token = generateToken(userId);
     const expiresAt = new Date(Date.now() + SESSION_DAYS * 24 * 60 * 60 * 1000).toISOString();
 
-    db.prepare('INSERT INTO sessions (user_id, token, expires_at) VALUES (?, ?, ?)')
+    await db.prepare('INSERT INTO sessions (user_id, token, expires_at) VALUES (?, ?, ?)')
       .run(userId, token, expiresAt);
 
-    const user = db.prepare(
+    const user = await db.prepare(
       'SELECT id, username, email, role, phone, gender, dob, village, taluka, district, state, labour_category, skill_level, bank_account, ifsc, upi_id, farm_size, created_at FROM users WHERE id = ?'
     ).get(userId);
 
@@ -151,7 +151,7 @@ router.post('/register', (req, res) => {
 });
 
 /* ── POST /api/auth/signup ─────────────────── */
-router.post('/signup', (req, res) => {
+router.post('/signup', async (req, res) => {
   try {
     const { username, email, password, role, phone, location } = req.body;
 
@@ -175,7 +175,7 @@ router.post('/signup', (req, res) => {
     const db = getDb();
 
     // ── Check duplicates ──
-    const existingUser = db.prepare(
+    const existingUser = await db.prepare(
       'SELECT id FROM users WHERE email = ? OR username = ?'
     ).get(email, username);
 
@@ -186,7 +186,7 @@ router.post('/signup', (req, res) => {
     // ── Create user ──
     const passwordHash = bcrypt.hashSync(password, SALT_ROUNDS);
 
-    const result = db.prepare(`
+    const result = await db.prepare(`
       INSERT INTO users (username, email, password_hash, role, phone, location)
       VALUES (?, ?, ?, ?, ?, ?)
     `).run(username, email, passwordHash, userRole, phone || null, location || null);
@@ -197,13 +197,13 @@ router.post('/signup', (req, res) => {
     const token = generateToken(userId);
     const expiresAt = new Date(Date.now() + SESSION_DAYS * 24 * 60 * 60 * 1000).toISOString();
 
-    db.prepare(`
+    await db.prepare(`
       INSERT INTO sessions (user_id, token, expires_at)
       VALUES (?, ?, ?)
     `).run(userId, token, expiresAt);
 
     // ── Response ──
-    const user = db.prepare(
+    const user = await db.prepare(
       'SELECT id, username, email, role, phone, location, avatar_url, created_at FROM users WHERE id = ?'
     ).get(userId);
 
@@ -220,7 +220,7 @@ router.post('/signup', (req, res) => {
 });
 
 /* ── GET /api/auth/check-username ──────────── */
-router.get('/check-username', (req, res) => {
+router.get('/check-username', async (req, res) => {
   try {
     const raw = (req.query.username || '').trim();
     if (!raw) {
@@ -232,7 +232,7 @@ router.get('/check-username', (req, res) => {
       return res.json({ available: false });
     }
     const db = getDb();
-    const existing = db.prepare('SELECT id FROM users WHERE username = ?').get(username);
+    const existing = await db.prepare('SELECT id FROM users WHERE username = ?').get(username);
     res.json({ available: !existing });
   } catch (err) {
     console.error('Check username error:', err);
@@ -241,7 +241,7 @@ router.get('/check-username', (req, res) => {
 });
 
 /* ── POST /api/auth/signin ─────────────────── */
-router.post('/signin', (req, res) => {
+router.post('/signin', async (req, res) => {
   try {
     const { identifier, username, email, password } = req.body;
 
@@ -254,7 +254,7 @@ router.post('/signin', (req, res) => {
     const db = getDb();
 
     // ── Find user by username or email ──
-    const user = db.prepare(
+    const user = await db.prepare(
       'SELECT * FROM users WHERE email = ? OR username = ?'
     ).get(loginId, loginId);
 
@@ -272,7 +272,7 @@ router.post('/signin', (req, res) => {
     const token = generateToken(user.id);
     const expiresAt = new Date(Date.now() + SESSION_DAYS * 24 * 60 * 60 * 1000).toISOString();
 
-    db.prepare(`
+    await db.prepare(`
       INSERT INTO sessions (user_id, token, expires_at)
       VALUES (?, ?, ?)
     `).run(user.id, token, expiresAt);
@@ -298,13 +298,13 @@ router.get('/me', authenticateToken, (req, res) => {
 });
 
 /* ── POST /api/auth/signout ────────────────── */
-router.post('/signout', authenticateToken, (req, res) => {
+router.post('/signout', authenticateToken, async (req, res) => {
   try {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
 
     const db = getDb();
-    db.prepare('DELETE FROM sessions WHERE token = ?').run(token);
+    await db.prepare('DELETE FROM sessions WHERE token = ?').run(token);
 
     res.json({ message: 'Signed out successfully.' });
   } catch (err) {

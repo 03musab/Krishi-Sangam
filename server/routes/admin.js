@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════
    KrishiSetu — server/routes/admin.js
-   (Admin Panel: Stats, Approve/Reject, Users)
+   (Admin Panel: Stats, Approve/Reject, Users — async, Postgres)
    ═══════════════════════════════════════════ */
 
 const express = require('express');
@@ -13,28 +13,28 @@ const router = express.Router();
 router.use(authenticateToken, requireRole('admin'));
 
 /* ── GET /api/admin/stats — Dashboard statistics ── */
-router.get('/stats', (req, res) => {
+router.get('/stats', async (req, res) => {
   try {
     const db = getDb();
 
-    const totalUsers = db.prepare(`SELECT COUNT(*) as count FROM users`).get();
-    const totalLand = db.prepare(`SELECT COUNT(*) as count FROM land_listings`).get();
-    const totalEquipment = db.prepare(`SELECT COUNT(*) as count FROM equipment_listings`).get();
-    const totalLabour = db.prepare(`SELECT COUNT(*) as count FROM labour_services`).get();
-    const totalProduce = db.prepare(`SELECT COUNT(*) as count FROM produce_listings`).get();
-    const totalBookings = db.prepare(`SELECT COUNT(*) as count FROM bookings`).get();
-    const pendingLand = db.prepare(`SELECT COUNT(*) as count FROM land_listings WHERE status = 'pending'`).get();
-    const pendingEquip = db.prepare(`SELECT COUNT(*) as count FROM equipment_listings WHERE status = 'pending'`).get();
-    const pendingLabour = db.prepare(`SELECT COUNT(*) as count FROM labour_services WHERE status = 'pending'`).get();
-    const pendingProduce = db.prepare(`SELECT COUNT(*) as count FROM produce_listings WHERE status = 'pending'`).get();
-    const totalRevenue = db.prepare(`SELECT COALESCE(SUM(amount), 0) as total FROM payments WHERE status = 'released'`).get();
-    const heldEscrow = db.prepare(`SELECT COALESCE(SUM(amount), 0) as total FROM payments WHERE status = 'held'`).get();
+    const totalUsers = await db.prepare(`SELECT COUNT(*) as count FROM users`).get();
+    const totalLand = await db.prepare(`SELECT COUNT(*) as count FROM land_listings`).get();
+    const totalEquipment = await db.prepare(`SELECT COUNT(*) as count FROM equipment_listings`).get();
+    const totalLabour = await db.prepare(`SELECT COUNT(*) as count FROM labour_services`).get();
+    const totalProduce = await db.prepare(`SELECT COUNT(*) as count FROM produce_listings`).get();
+    const totalBookings = await db.prepare(`SELECT COUNT(*) as count FROM bookings`).get();
+    const pendingLand = await db.prepare(`SELECT COUNT(*) as count FROM land_listings WHERE status = 'pending'`).get();
+    const pendingEquip = await db.prepare(`SELECT COUNT(*) as count FROM equipment_listings WHERE status = 'pending'`).get();
+    const pendingLabour = await db.prepare(`SELECT COUNT(*) as count FROM labour_services WHERE status = 'pending'`).get();
+    const pendingProduce = await db.prepare(`SELECT COUNT(*) as count FROM produce_listings WHERE status = 'pending'`).get();
+    const totalRevenue = await db.prepare(`SELECT COALESCE(SUM(amount), 0) as total FROM payments WHERE status = 'released'`).get();
+    const heldEscrow = await db.prepare(`SELECT COALESCE(SUM(amount), 0) as total FROM payments WHERE status = 'held'`).get();
 
     // Users by role
-    const usersByRole = db.prepare(`SELECT role, COUNT(*) as count FROM users GROUP BY role`).all();
+    const usersByRole = await db.prepare(`SELECT role, COUNT(*) as count FROM users GROUP BY role`).all();
 
     // Recent activity
-    const recentBookings = db.prepare(`
+    const recentBookings = await db.prepare(`
       SELECT b.*, u1.username as booker_name, u2.username as owner_name
       FROM bookings b
       JOIN users u1 ON b.booker_id = u1.id
@@ -68,7 +68,7 @@ router.get('/stats', (req, res) => {
 });
 
 /* ── GET /api/admin/listings/pending — All pending listings ── */
-router.get('/listings/pending', (req, res) => {
+router.get('/listings/pending', async (req, res) => {
   try {
     const db = getDb();
     const { type } = req.query;
@@ -76,28 +76,28 @@ router.get('/listings/pending', (req, res) => {
     let landPending = [], equipPending = [], labourPending = [], producePending = [];
 
     if (!type || type === 'land') {
-      landPending = db.prepare(`
+      landPending = await db.prepare(`
         SELECT l.*, u.username as owner_name FROM land_listings l
         JOIN users u ON l.owner_id = u.id WHERE l.status = 'pending'
         ORDER BY l.created_at DESC
       `).all();
     }
     if (!type || type === 'equipment') {
-      equipPending = db.prepare(`
+      equipPending = await db.prepare(`
         SELECT e.*, u.username as owner_name FROM equipment_listings e
         JOIN users u ON e.owner_id = u.id WHERE e.status = 'pending'
         ORDER BY e.created_at DESC
       `).all();
     }
     if (!type || type === 'labour') {
-      labourPending = db.prepare(`
+      labourPending = await db.prepare(`
         SELECT l.*, u.username as worker_name FROM labour_services l
         JOIN users u ON l.worker_id = u.id WHERE l.status = 'pending'
         ORDER BY l.created_at DESC
       `).all();
     }
     if (!type || type === 'produce') {
-      producePending = db.prepare(`
+      producePending = await db.prepare(`
         SELECT p.*, u.username as seller_name FROM produce_listings p
         JOIN users u ON p.seller_id = u.id WHERE p.status = 'pending'
         ORDER BY p.created_at DESC
@@ -123,7 +123,7 @@ router.get('/listings/pending', (req, res) => {
 });
 
 /* ── PUT /api/admin/approve/:type/:id ── */
-router.put('/approve/:type/:id', (req, res) => {
+router.put('/approve/:type/:id', async (req, res) => {
   try {
     const db = getDb();
     const { type } = req.params;
@@ -140,10 +140,10 @@ router.put('/approve/:type/:id', (req, res) => {
     else if (type === 'produce') table = 'produce_listings';
     else return res.status(400).json({ error: 'Invalid listing type.' });
 
-    const listing = db.prepare(`SELECT id FROM ${table} WHERE id = ?`).get(req.params.id);
+    const listing = await db.prepare(`SELECT id FROM ${table} WHERE id = ?`).get(req.params.id);
     if (!listing) return res.status(404).json({ error: 'Listing not found.' });
 
-    db.prepare(`UPDATE ${table} SET status = ?, updated_at = datetime('now') WHERE id = ?`)
+    await db.prepare(`UPDATE ${table} SET status = ?, updated_at = NOW() WHERE id = ?`)
       .run(status, req.params.id);
 
     res.json({ message: `Listing ${status}.` });
@@ -153,7 +153,7 @@ router.put('/approve/:type/:id', (req, res) => {
 });
 
 /* ── PUT /api/admin/bulk-approve — Bulk approve ── */
-router.put('/bulk-approve', (req, res) => {
+router.put('/bulk-approve', async (req, res) => {
   try {
     const db = getDb();
     const { type, status, ids } = req.body;
@@ -170,8 +170,8 @@ router.put('/bulk-approve', (req, res) => {
     else return res.status(400).json({ error: 'Invalid listing type.' });
 
     const placeholders = ids.map(() => '?').join(',');
-    const result = db.prepare(
-      `UPDATE ${table} SET status = ?, updated_at = datetime('now') WHERE id IN (${placeholders})`
+    const result = await db.prepare(
+      `UPDATE ${table} SET status = ?, updated_at = NOW() WHERE id IN (${placeholders})`
     ).run(status, ...ids);
 
     res.json({ message: `${result.changes} listing(s) ${status}.` });
@@ -181,7 +181,7 @@ router.put('/bulk-approve', (req, res) => {
 });
 
 /* ── GET /api/admin/users — List all users ── */
-router.get('/users', (req, res) => {
+router.get('/users', async (req, res) => {
   try {
     const db = getDb();
     const { role, search } = req.query;
@@ -196,7 +196,7 @@ router.get('/users', (req, res) => {
     }
 
     query += ` ORDER BY created_at DESC`;
-    const users = db.prepare(query).all(...params);
+    const users = await db.prepare(query).all(...params);
     res.json({ users, count: users.length });
   } catch (err) {
     res.status(500).json({ error: 'Server error.' });
@@ -204,14 +204,14 @@ router.get('/users', (req, res) => {
 });
 
 /* ── PUT /api/admin/users/:id/role — Change user role ── */
-router.put('/users/:id/role', (req, res) => {
+router.put('/users/:id/role', async (req, res) => {
   try {
     const db = getDb();
     const { role } = req.body;
     if (!['farmer', 'owner', 'labourer', 'admin'].includes(role)) {
       return res.status(400).json({ error: 'Invalid role.' });
     }
-    db.prepare(`UPDATE users SET role = ?, updated_at = datetime('now') WHERE id = ?`)
+    await db.prepare(`UPDATE users SET role = ?, updated_at = NOW() WHERE id = ?`)
       .run(role, req.params.id);
     res.json({ message: 'Role updated.' });
   } catch (err) {
@@ -220,13 +220,13 @@ router.put('/users/:id/role', (req, res) => {
 });
 
 /* ── DELETE /api/admin/users/:id — Delete user ── */
-router.delete('/users/:id', (req, res) => {
+router.delete('/users/:id', async (req, res) => {
   try {
     const db = getDb();
     if (Number(req.params.id) === req.user.id) {
       return res.status(400).json({ error: 'Cannot delete yourself.' });
     }
-    db.prepare('DELETE FROM users WHERE id = ?').run(req.params.id);
+    await db.prepare('DELETE FROM users WHERE id = ?').run(req.params.id);
     res.json({ message: 'User deleted.' });
   } catch (err) {
     res.status(500).json({ error: 'Server error.' });
@@ -234,7 +234,7 @@ router.delete('/users/:id', (req, res) => {
 });
 
 /* ── DELETE /api/admin/listings/:type/:id — Delete listing ── */
-router.delete('/listings/:type/:id', (req, res) => {
+router.delete('/listings/:type/:id', async (req, res) => {
   try {
     const db = getDb();
     const { type, id } = req.params;
@@ -246,7 +246,7 @@ router.delete('/listings/:type/:id', (req, res) => {
     else if (type === 'produce') table = 'produce_listings';
     else return res.status(400).json({ error: 'Invalid type.' });
 
-    db.prepare(`DELETE FROM ${table} WHERE id = ?`).run(id);
+    await db.prepare(`DELETE FROM ${table} WHERE id = ?`).run(id);
     res.json({ message: 'Listing deleted.' });
   } catch (err) {
     res.status(500).json({ error: 'Server error.' });

@@ -3,6 +3,8 @@
    (Express server entry point)
    ═══════════════════════════════════════════ */
 
+require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -18,7 +20,7 @@ const profileRoutes = require('./routes/profile');
 const uploadRoutes = require('./routes/upload');
 const adminRoutes = require('./routes/admin');
 const servicesRoutes = require('./routes/services');
-const { getDb } = require('./db');
+const { getPool } = require('./db');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -95,18 +97,21 @@ app.get('*', (req, res) => {
 });
 
 /* ── Initialize Database & Start Server ──── */
-try {
-  const db = getDb();
+async function init() {
+  try {
+    const { getPool } = require('./db');
+    const pool = getPool();
 
-  // Clean up expired sessions on startup
-  const deleted = db.prepare("DELETE FROM sessions WHERE expires_at < datetime('now')").run();
-  if (deleted.changes > 0) {
-    console.log(`🧹 Cleaned up ${deleted.changes} expired session(s)`);
-  }
+    // Verify connection & clean up expired sessions on startup
+    await pool.query('SELECT 1');
+    const deleted = await pool.query("DELETE FROM sessions WHERE expires_at < NOW()");
+    if (deleted.rowCount > 0) {
+      console.log(`🧹 Cleaned up ${deleted.rowCount} expired session(s)`);
+    }
 
-  console.log('✅ SQLite database initialized');
+    console.log('✅ PostgreSQL database connected');
 
-  app.listen(PORT, () => {
+    app.listen(PORT, () => {
     console.log(`\n🌾 Krishi Sangam API Server`);
     console.log(`   └── Running on http://localhost:${PORT}`);
     console.log(`   └── Health: http://localhost:${PORT}/api/health`);
@@ -123,8 +128,12 @@ try {
     console.log(`   └── Admin:    http://localhost:${PORT}/api/admin`);
     console.log(`   └── Services: http://localhost:${PORT}/api/services`);
     console.log(`   └── App:    http://localhost:${PORT}\n`);
-  });
-} catch (err) {
-  console.error('❌ Failed to start server:', err);
-  process.exit(1);
+    });
+  } catch (err) {
+    console.error('❌ Failed to start server:', err);
+    console.error('   → Is DATABASE_URL set in server/.env? (see .env.example)');
+    process.exit(1);
+  }
 }
+
+init();

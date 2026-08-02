@@ -123,7 +123,7 @@ export default function About() {
 
       {/* CTA */}
       <section className="section" style={{ maxWidth: '1120px', margin: '12px auto 0', padding: '24px 24px' }}>
-        <div style={{ position: 'relative', overflow: 'hidden', padding: '56px 40px', background: 'linear-gradient(135deg, rgba(20, 83, 45, 0.9), rgba(15, 63, 33, 0.93))', borderRadius: 'var(--radius-xl)', textAlign: 'center', color: 'white', boxShadow: '0 16px 32px rgba(22, 101, 52, 0.25)' }}>
+        <div style={{ position: 'relative', overflow: 'hidden', padding: '56px 40px', background: 'linear-gradient(135deg, rgba(255,255,255,0.94), rgba(240,253,244,0.96))', borderRadius: 'var(--radius-xl)', textAlign: 'center', color: '#0b0f0c', boxShadow: '0 16px 32px rgba(22, 101, 52, 0.18)' }}>
           <img
             src="https://images.unsplash.com/photo-1523741543316-beb7fc7023d8?auto=format&fit=crop&w=1400&q=80"
             alt=""
@@ -132,11 +132,11 @@ export default function About() {
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
           />
           <div style={{ position: 'relative', zIndex: 1 }}>
-            <h2 style={{ fontSize: '28px', color: 'white', marginBottom: '16px' }}>{t('home.ctaTitle')}</h2>
-            <p style={{ fontSize: '17px', maxWidth: '680px', margin: '0 auto 32px', opacity: '0.95', lineHeight: '1.6' }}>
+            <h2 style={{ fontSize: '28px', color: '#0b0f0c', marginBottom: '16px' }}>{t('home.ctaTitle')}</h2>
+            <p style={{ fontSize: '17px', maxWidth: '680px', margin: '0 auto 32px', color: '#111827', lineHeight: '1.6' }}>
               {t('home.ctaBody')}
             </p>
-            <button className="btn-hero" style={{ background: 'white', color: 'var(--green-dark)', padding: '14px 36px', fontSize: '16px', border: 'none', boxShadow: '0 8px 24px rgba(0,0,0,0.15)' }} onClick={() => navigate(user ? 'profile' : 'signup')}>
+            <button className="btn-hero" style={{ background: '#ffffff', color: '#0b0f0c', padding: '14px 36px', fontSize: '16px', border: '2px solid #0b0f0c', boxShadow: '0 8px 24px rgba(0,0,0,0.18)' }} onClick={() => navigate(user ? 'profile' : 'signup')}>
               {t('home.ctaButton')}
             </button>
           </div>
