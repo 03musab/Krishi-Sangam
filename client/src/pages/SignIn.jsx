@@ -20,12 +20,31 @@ export default function SignIn() {
   // Clear the pending navigation timer if the user navigates away mid-animation
   useEffect(() => () => clearTimeout(navTimer.current), []);
 
+  const requestLocationOnLogin = () => {
+    if (!navigator.geolocation) return;
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const coords = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        };
+        localStorage.setItem('krishisangam_location', JSON.stringify(coords));
+      },
+      () => {
+        // Ignore location denial errors here; the browser prompt is the important part.
+      },
+      { timeout: 10000, enableHighAccuracy: true }
+    );
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus('loading');
     try {
       const data = await signin({ username: username.trim(), password });
       login(data.token, data.user);
+      requestLocationOnLogin();
       setWelcomeName(data.user.username);
       setStatus('success');
       // Show the full-screen welcome overlay, then land on the home page
