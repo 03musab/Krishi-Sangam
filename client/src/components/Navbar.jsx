@@ -8,9 +8,7 @@ import { signout } from '../lib/api';
 
 const NAV_ITEMS = [
   { id: 'land', labelKey: 'nav.land', view: 'land-leasing' },
-  { id: 'equipment', labelKey: 'nav.equipment', view: 'equipment-rental' },
   { id: 'labour', labelKey: 'nav.labour', view: 'labour' },
-  { id: 'contact', labelKey: 'nav.contact', view: 'contact' },
   { id: 'admin', labelKey: 'nav.admin', view: 'admin', adminOnly: true }
 ];
 
@@ -107,31 +105,6 @@ export default function Navbar() {
       </ul>
 
       <div className="nav-right">
-        <div className="nav-lang" ref={langRef}>
-          <button className="nav-lang-btn" onClick={() => setLangOpen((o) => !o)} title={t('nav.selectLanguage')}>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-              <circle cx="12" cy="12" r="10" />
-              <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-            </svg>
-            <span className="nav-lang-label">{currentLang.native}</span>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 12 15 18 9" /></svg>
-          </button>
-          {langOpen && (
-            <div className="nav-lang-dropdown">
-              {languages.map((l) => (
-                <button
-                  key={l.code}
-                  className={`nav-lang-option ${l.code === lang ? 'active' : ''}`}
-                  onClick={() => { setLang(l.code); setLangOpen(false); }}
-                >
-                  <span className="nav-lang-native">{l.native}</span>
-                  <span className="nav-lang-name">{l.label}</span>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
         {!user && (
           <>
             <button className="nav-auth-btn" onClick={() => navigate('signin')}>{t('nav.signin')}</button>
@@ -173,6 +146,30 @@ export default function Navbar() {
             )}
           </div>
         )}
+        <div className="nav-lang" ref={langRef}>
+          <button className="nav-lang-btn" onClick={() => setLangOpen((o) => !o)} title={t('nav.selectLanguage')}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+            </svg>
+            <span className="nav-lang-label">{currentLang.native}</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 12 15 18 9" /></svg>
+          </button>
+          {langOpen && (
+            <div className="nav-lang-dropdown">
+              {languages.map((l) => (
+                <button
+                  key={l.code}
+                  className={`nav-lang-option ${l.code === lang ? 'active' : ''}`}
+                  onClick={() => { setLang(l.code); setLangOpen(false); }}
+                >
+                  <span className="nav-lang-native">{l.native}</span>
+                  <span className="nav-lang-name">{l.label}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
         <button className="hamburger" aria-label="Menu" onClick={() => setMenuOpen((o) => !o)}>
           <span></span><span></span><span></span>
         </button>

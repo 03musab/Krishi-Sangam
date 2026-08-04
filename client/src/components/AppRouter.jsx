@@ -1,10 +1,12 @@
 import { lazy, Suspense } from 'react';
 import { useNav } from '../context/NavContext';
+import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../i18n/LanguageContext';
 import PageLoader from './PageLoader';
+import MembersGate from './MembersGate';
 
 const Home = lazy(() => import('../pages/Home'));
 const Services = lazy(() => import('../pages/Services'));
-const Contact = lazy(() => import('../pages/Contact'));
 const LandLeasing = lazy(() => import('../pages/LandLeasing'));
 const ListLand = lazy(() => import('../pages/ListLand'));
 const EquipmentRental = lazy(() => import('../pages/EquipmentRental'));
@@ -26,7 +28,6 @@ const Terms = lazy(() => import('../pages/Terms'));
 const VIEWS = {
   home: Home,
   services: Services,
-  contact: Contact,
   'land-leasing': LandLeasing,
   'list-land': ListLand,
   'equipment-rental': EquipmentRental,
@@ -46,9 +47,38 @@ const VIEWS = {
   terms: Terms
 };
 
+// Views shown only to signed-in users. Logged-out visitors get a short
+// description plus a Sign Up CTA instead of the actual content.
+const MEMBERS_ONLY_VIEWS = {
+  'land-leasing': { icon: 'wheat', titleKey: 'land.title', descKey: 'services.landBody', color: 'green' },
+  'equipment-rental': { icon: 'tractor', titleKey: 'equip.title', descKey: 'services.equipmentBody', color: 'orange' },
+  labour: { icon: 'worker', titleKey: 'labour.bookServices', descKey: 'services.labourBody', color: 'purple' }
+};
+
 export default function AppRouter() {
   const { view } = useNav();
+  const { user, loading } = useAuth();
+  const { t } = useLanguage();
   const ViewComponent = VIEWS[view] || Home;
+  const gate = MEMBERS_ONLY_VIEWS[view];
+
+  if (gate && !user) {
+    return (
+      <div className="page-view" key={view}>
+        {loading ? (
+          <PageLoader />
+        ) : (
+          <MembersGate
+            icon={gate.icon}
+            title={t(gate.titleKey)}
+            description={t(gate.descKey)}
+            color={gate.color}
+          />
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="page-view" key={view}>
       <Suspense fallback={<PageLoader />}>

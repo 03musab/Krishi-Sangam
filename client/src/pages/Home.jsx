@@ -1,6 +1,9 @@
 import { useNav } from '../context/NavContext';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../i18n/LanguageContext';
+import ContactSection from '../components/ContactSection';
+import Chatbot from '../components/Chatbot';
+import Icon from '../components/Icon';
 
 const WHY_CARDS = [
   { key: 'why1', color: 'var(--green-mid)', bg: 'var(--green-light)', icon: <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg> },
@@ -79,8 +82,8 @@ export default function Home() {
                 loading="lazy"
                 style={{ width: '100%', height: '380px', objectFit: 'cover', borderRadius: 'var(--radius-xl)', boxShadow: 'var(--shadow-lg)' }}
               />
-              <div style={{ position: 'absolute', bottom: '16px', left: '16px', background: 'rgba(255, 255, 255, 0.94)', borderRadius: '999px', padding: '8px 18px', fontWeight: '700', fontSize: '13px', color: 'var(--green-dark)', boxShadow: 'var(--shadow-md)' }}>
-                🌾 Krishi Sangam
+              <div style={{ position: 'absolute', bottom: '16px', left: '16px', background: 'rgba(255, 255, 255, 0.94)', borderRadius: '999px', padding: '8px 18px', fontWeight: '700', fontSize: '13px', color: 'var(--green-dark)', boxShadow: 'var(--shadow-md)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Icon name="wheat" size={16} /> Krishi Sangam
               </div>
             </div>
           </div>
@@ -96,6 +99,17 @@ export default function Home() {
             </div>
           </div>
 
+          {/* Our Mission — paired feature block */}
+          <div className="vision-block hover-lift" style={{ marginTop: '24px' }}>
+            <div className="vision-icon">
+              <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+            </div>
+            <div className="vision-text">
+              <h3>{t('about.mission')}</h3>
+              <p>{t('about.missionBody')}</p>
+            </div>
+          </div>
+
           <div style={{ textAlign: 'center', marginTop: '40px' }}>
             <button
               className="btn-hero"
@@ -108,34 +122,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 3. Sell Produce */}
-      <section className="section" style={{ background: 'var(--surface-2)' }}>
-        <div className="sell-produce-block hover-lift" style={{ maxWidth: 'var(--container-max)', margin: '0 auto' }}>
-          <div className="sell-produce-copy">
-            <h2 className="section-title" style={{ marginBottom: '18px' }}>{t('home.sellTitle')}</h2>
-            <p style={{ fontSize: '17px', color: 'var(--text-mid)', lineHeight: '1.85', marginBottom: '28px', maxWidth: '640px' }}>
-              {t('home.sellBody')}
-            </p>
-            <button
-              className="btn-hero"
-              style={{ background: 'linear-gradient(135deg, var(--accent-orange), #c2410c)', color: 'white', border: 'none', padding: '14px 34px', fontSize: '16px', boxShadow: '0 8px 20px rgba(234, 88, 12, 0.3)' }}
-              onClick={() => navigate('produce')}
-            >
-              {t('home.sellCta')} →
-            </button>
-          </div>
-          <div className="sell-produce-art" style={{ overflow: 'hidden', padding: 0 }}>
-            <img
-              src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=900&q=80"
-              alt="Freshly harvested vegetables at a farm market"
-              loading="lazy"
-              style={{ width: '100%', height: '280px', objectFit: 'cover', display: 'block' }}
-            />
-          </div>
-        </div>
-      </section>
 
-      {/* 4. Services — What We Offer Today */}
+      {/* 3. Services — What We Offer Today */}
       <section id="services" className="section">
         <div style={{ maxWidth: 'var(--container-max)', margin: '0 auto' }}>
           <h2 className="section-title section-title-center" style={{ marginBottom: '32px' }}>{t('home.offerTitle')}</h2>
@@ -179,7 +167,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 5. Why Farmers Choose Krishi Sangam */}
+      {/* 4. Why Farmers Choose Krishi Sangam */}
       <section className="section" style={{ background: 'var(--surface-2)' }}>
         <div style={{ maxWidth: 'var(--container-max)', margin: '0 auto' }}>
           <h2 className="section-title section-title-center" style={{ marginBottom: '32px' }}>{t('home.whyTitle')}</h2>
@@ -195,7 +183,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 6. Coming Soon */}
+      {/* 5. Coming Soon */}
       <section className="section">
         <div style={{ maxWidth: 'var(--container-max)', margin: '0 auto' }}>
           <h2 className="section-title section-title-center" style={{ marginBottom: '16px' }}>{t('home.comingSoon')}</h2>
@@ -260,6 +248,17 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Contact — above the footer */}
+      <section id="contact" className="section" style={{ background: 'var(--surface-2)', borderRadius: 'var(--radius-xl)', boxShadow: 'var(--shadow-sm)', marginTop: '32px', scrollMarginTop: '90px' }}>
+        <div style={{ maxWidth: 'var(--container-max)', margin: '0 auto' }}>
+          <h2 className="section-title section-title-center" style={{ marginBottom: '16px' }}>{t('contact.title')}</h2>
+          <p style={{ textAlign: 'center', color: 'var(--text-mid)', maxWidth: '680px', margin: '0 auto 32px', fontSize: '16px', lineHeight: '1.7' }}>
+            {t('contact.subtitle')}
+          </p>
+          <ContactSection />
+        </div>
+      </section>
+
       {/* Footer */}
       <footer style={{ background: '#0f172a', color: '#94a3b8', padding: '64px 24px 32px', marginTop: '48px' }}>
         <div style={{ maxWidth: 'var(--container-max)', margin: '0 auto', display: 'flex', flexWrap: 'wrap', gap: '32px', justifyContent: 'space-between', borderBottom: '1px solid #334155', paddingBottom: '32px' }}>
@@ -269,7 +268,7 @@ export default function Home() {
             <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
               <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('services'); }}>{t('nav.services')}</a>
               <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('about'); }}>{t('home.footer.aboutUs')}</a>
-              <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('contact'); }}>{t('nav.contact')}</a>
+              <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); document.getElementById('contact').scrollIntoView({ behavior: 'smooth' }); }}>{t('nav.contact')}</a>
               <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('terms'); }}>{t('home.footer.terms')}</a>
             </div>
           </div>
@@ -290,6 +289,7 @@ export default function Home() {
           {t('home.footer.rights')}
         </div>
       </footer>
+      <Chatbot />
     </div>
   );
 }

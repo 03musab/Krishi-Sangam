@@ -12,12 +12,11 @@ const BANNER_CLASSES = {
 };
 
 export default function PageBanner({ title, color = 'green', actionLabel, onAction, backTo }) {
-  const { navigate } = useNav();
+  const { navigate, back } = useNav();
+  const handleBack = () => (backTo ? navigate(backTo) : back());
   return (
     <div className={`page-banner ${BANNER_CLASSES[color] || BANNER_CLASSES.green}`}>
-      {backTo && (
-        <button className="btn-back-icon" onClick={() => navigate(backTo)}>←</button>
-      )}
+      <button className="btn-back-icon" onClick={handleBack} aria-label="Back">←</button>
       <h1 className="page-banner-title">{title}</h1>
       {actionLabel && (
         <button className="banner-action-btn" onClick={onAction}>+ {actionLabel}</button>
