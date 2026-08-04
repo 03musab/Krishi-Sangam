@@ -14,14 +14,6 @@ const WHY_CARDS = [
   { key: 'why6', color: 'var(--accent-purple)', bg: '#f5f3ff', icon: <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> }
 ];
 
-const COMING_CARDS = [
-  { key: 'cs1', img: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=600&q=80' },
-  { key: 'cs2', img: 'https://images.unsplash.com/photo-1574943320219-553eb213f72d?auto=format&fit=crop&w=600&q=80' },
-  { key: 'cs3', img: 'https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=600&q=80' },
-  { key: 'cs4', img: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=600&q=80' },
-  { key: 'cs5', img: 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=600&q=80' }
-];
-
 export default function Home() {
   const { navigate } = useNav();
   const { user } = useAuth();
@@ -175,25 +167,6 @@ export default function Home() {
             {WHY_CARDS.map((c) => (
               <div key={c.key} className="why-card hover-lift">
                 <div className="why-card-icon" style={{ background: c.bg, color: c.color }}>{c.icon}</div>
-                <h4>{t(`home.${c.key}Title`)}</h4>
-                <p>{t(`home.${c.key}Body`)}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 5. Coming Soon */}
-      <section className="section">
-        <div style={{ maxWidth: 'var(--container-max)', margin: '0 auto' }}>
-          <h2 className="section-title section-title-center" style={{ marginBottom: '16px' }}>{t('home.comingSoon')}</h2>
-          <p style={{ textAlign: 'center', color: 'var(--text-mid)', maxWidth: '680px', margin: '0 auto 32px', fontSize: '16px', lineHeight: '1.7' }}>
-            {t('home.comingSoonSub')}
-          </p>
-          <div className="coming-soon-grid">
-            {COMING_CARDS.map((c) => (
-              <div key={c.key} className="coming-soon-card hover-lift">
-                <img src={c.img} alt={t(`home.${c.key}Title`)} loading="lazy" style={{ width: 'calc(100% + 48px)', height: '110px', objectFit: 'cover', display: 'block', margin: '-24px -24px 14px', borderTopLeftRadius: '20px', borderTopRightRadius: '20px' }} />
                 <h4>{t(`home.${c.key}Title`)}</h4>
                 <p>{t(`home.${c.key}Body`)}</p>
               </div>
