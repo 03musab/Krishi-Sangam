@@ -2,6 +2,7 @@ import { useNav } from '../context/NavContext';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../i18n/LanguageContext';
 import founderImg from '../assets/fouder.jpeg';
+import Icon from '../components/Icon';
 
 const WHY_CARDS = [
   { key: 'why1', color: 'var(--green-mid)', bg: 'var(--green-light)', icon: <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg> },
@@ -13,12 +14,15 @@ const WHY_CARDS = [
 ];
 
 export default function About() {
-  const { navigate } = useNav();
+  const { navigate, back } = useNav();
   const { user } = useAuth();
   const { t } = useLanguage();
 
   return (
     <div style={{ paddingBottom: '60px' }}>
+      <div style={{ maxWidth: 'var(--container-max)', margin: '0 auto', padding: '16px 24px 0' }}>
+        <button className="btn-back-icon" onClick={back} aria-label="Back">←</button>
+      </div>
       {/* Header */}
       <section className="section" style={{ position: 'relative', overflow: 'hidden', background: 'linear-gradient(135deg, rgba(20, 83, 45, 0.88), rgba(15, 63, 33, 0.9))', textAlign: 'center', padding: '56px 24px' }}>
         <img
@@ -64,25 +68,16 @@ export default function About() {
         </div>
       </section>
 
-      {/* Mission & Impact */}
-      <section className="section" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '32px', maxWidth: '1120px', margin: '12px auto 0', padding: '24px 24px' }}>
-        <div style={{ padding: '32px', background: 'var(--white)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-sm)' }}>
-          <div style={{ color: 'var(--accent-orange)', marginBottom: '15px' }}>
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+      {/* Our Mission — paired with Vision */}
+      <section className="section" style={{ maxWidth: '1120px', margin: '12px auto 0', padding: '24px 24px' }}>
+        <div className="vision-block hover-lift">
+          <div className="vision-icon">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
           </div>
-          <h3 style={{ fontSize: '22px', marginBottom: '15px' }}>{t('about.mission')}</h3>
-          <p style={{ color: 'var(--text-mid)', lineHeight: '1.7' }}>
-            {t('about.missionBody')}
-          </p>
-        </div>
-        <div style={{ padding: '32px', background: 'var(--white)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-sm)' }}>
-          <div style={{ color: 'var(--accent-blue)', marginBottom: '15px' }}>
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <div className="vision-text">
+            <h3>{t('about.mission')}</h3>
+            <p>{t('about.missionBody')}</p>
           </div>
-          <h3 style={{ fontSize: '22px', marginBottom: '15px' }}>{t('about.impact')}</h3>
-          <p style={{ color: 'var(--text-mid)', lineHeight: '1.7' }}>
-            {t('about.impactBody')}
-          </p>
         </div>
       </section>
 
@@ -108,7 +103,7 @@ export default function About() {
             <div style={{ width: '180px', height: '180px', borderRadius: '50%', overflow: 'hidden', boxShadow: '0 14px 34px rgba(22, 101, 52, 0.3)', border: '6px solid white', outline: '3px solid var(--green-mid)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <img src={founderImg} alt={t('about.founderName')} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             </div>
-            <span style={{ position: 'absolute', bottom: '4px', right: '4px', background: 'var(--green-mid)', color: 'white', fontSize: '12px', fontWeight: '700', padding: '5px 12px', borderRadius: '999px', boxShadow: '0 4px 10px rgba(22, 101, 52, 0.35)' }}>🌱</span>
+            <span style={{ position: 'absolute', bottom: '4px', right: '4px', background: 'var(--green-mid)', color: 'white', fontSize: '12px', fontWeight: '700', padding: '5px 12px', borderRadius: '999px', boxShadow: '0 4px 10px rgba(22, 101, 52, 0.35)', display: 'flex', alignItems: 'center', gap: '6px' }}><Icon name="seedling" size={14} /></span>
           </div>
           <div style={{ textAlign: 'center' }}>
             <h3 style={{ fontSize: '26px', color: 'var(--text-dark)', marginBottom: '4px' }}>{t('about.founderName')}</h3>
