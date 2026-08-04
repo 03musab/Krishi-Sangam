@@ -4,10 +4,12 @@ import { useToast } from '../context/ToastContext';
 import { useLanguage } from '../i18n/LanguageContext';
 
 export default function FormCard({ title, color, backTo, submitLabel, note, onSubmit, children }) {
-  const { navigate } = useNav();
+  const { navigate, back } = useNav();
   const { user } = useAuth();
   const { showToast } = useToast();
   const { t } = useLanguage();
+
+  const handleBack = () => (backTo ? navigate(backTo) : back());
 
   const handleSubmit = (e) => {
     e.preventDefault();

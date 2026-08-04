@@ -87,7 +87,7 @@ router.get('/:id', async (req, res) => {
 router.post('/', authenticateToken, async (req, res) => {
   try {
     const db = getDb();
-    const { name, type, description, price_per_hour, price_per_day,
+    const { name, type, description, price_per_hour, price_per_day, deposit,
             location, district, state, with_operator, photo_url } = req.body;
 
     if (!name || !type || !location) {
@@ -96,16 +96,16 @@ router.post('/', authenticateToken, async (req, res) => {
 
     const result = await db.prepare(`
       INSERT INTO equipment_listings (owner_id, name, type, description,
-        price_per_hour, price_per_day, location, district, state, with_operator, photo_url)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        price_per_hour, price_per_day, deposit, location, district, state, with_operator, photo_url, status)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'approved')
     `).run(req.user.id, name, type, description || null,
-           price_per_hour || null, price_per_day || null,
+           price_per_hour || null, price_per_day || null, deposit || null,
            location, district || null, state || null,
            with_operator ? 1 : 0, photo_url || null);
 
     const listing = await db.prepare('SELECT * FROM equipment_listings WHERE id = ?')
       .get(result.lastInsertRowid);
-    res.status(201).json({ message: 'Equipment listing created! Awaiting admin approval.', listing });
+    res.status(201).json({ message: 'Equipment listing created!', listing });
   } catch (err) {
     console.error('Create equipment error:', err);
     res.status(500).json({ error: 'Server error.' });
@@ -122,15 +122,16 @@ router.put('/:id', authenticateToken, async (req, res) => {
       return res.status(403).json({ error: 'Not authorized.' });
     }
 
-    const { name, type, description, price_per_hour, price_per_day,
+    const { name, type, description, price_per_hour, price_per_day, deposit,
             location, district, state, with_operator, photo_url } = req.body;
 
     await db.prepare(`
       UPDATE equipment_listings SET name=?, type=?, description=?, price_per_hour=?,
-        price_per_day=?, location=?, district=?, state=?, with_operator=?, photo_url=?,
+        price_per_day=?, deposit=?, location=?, district=?, state=?, with_operator=?, photo_url=?,
         updated_at=NOW() WHERE id=?
     `).run(name || listing.name, type || listing.type, description ?? listing.description,
            price_per_hour ?? listing.price_per_hour, price_per_day ?? listing.price_per_day,
+           deposit ?? listing.deposit,
            location || listing.location, district ?? listing.district, state ?? listing.state,
            with_operator !== undefined ? (with_operator ? 1 : 0) : listing.with_operator,
            photo_url ?? listing.photo_url, req.params.id);

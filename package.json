@@ -2,7 +2,7 @@
   "name": "krishi-sangam",
   "version": "1.0.0",
   "private": true,
-  "description": "Krishi Sangam — Connecting Farmers, Land & Equipment",
+  "description": "Krishi Sangam - Connecting Farmers, Land & Equipment",
   "engines": {
     "node": ">=20"
   },

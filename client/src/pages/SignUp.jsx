@@ -3,16 +3,60 @@ import { useNav } from '../context/NavContext';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { useLanguage } from '../i18n/LanguageContext';
-import { register, sendOtp, verifyOtp, checkUsername } from '../lib/api';
+import { register, sendOtp, verifyOtp } from '../lib/api';
 import PhotoUpload from '../components/PhotoUpload';
 import LocationSelects from '../components/LocationSelects';
+import FarmLocationField from '../components/FarmLocationField';
 import WelcomeOverlay from '../components/WelcomeOverlay';
+import Icon from '../components/Icon';
 
 const ROLES = [
-  { value: 'farmer', labelKey: 'auth.farmer', emoji: '👨‍🌾', descKey: 'auth.farmerDesc' },
-  { value: 'owner', labelKey: 'auth.owner', emoji: '🚜', descKey: 'auth.ownerDesc' },
-  { value: 'labourer', labelKey: 'auth.labourer', emoji: '👷', descKey: 'auth.labourerDesc' }
+  { value: 'farmer', labelKey: 'auth.farmer', icon: 'farmer', descKey: 'auth.farmerDesc' },
+  { value: 'owner', labelKey: 'auth.owner', icon: 'tractor', descKey: 'auth.ownerDesc' },
+  { value: 'labourer', labelKey: 'auth.labourer', icon: 'worker', descKey: 'auth.labourerDesc' }
 ];
+
+const ID_TYPES = [
+  { value: 'aadhaar', labelKey: 'auth.idAadhaar' },
+  { value: 'voter', labelKey: 'auth.idVoter' },
+  { value: 'driving', labelKey: 'auth.idDriving' }
+];
+
+function GovtIdSection({ form, setForm, t }) {
+  return (
+    <>
+      <div className="form-group">
+        <label className="form-label">{t('auth.idTypeLabel')} *</label>
+        <select
+          className="form-select"
+          value={form.id_type}
+          onChange={(e) => setForm({ ...form, id_type: e.target.value })}
+          required
+        >
+          <option value="">{t('auth.selectIdType')}</option>
+          {ID_TYPES.map((id) => (
+            <option key={id.value} value={id.value}>{t(id.labelKey)}</option>
+          ))}
+        </select>
+      </div>
+      <div className="form-group">
+        <label className="form-label">{t('auth.idNumber')} *</label>
+        <input
+          type="text"
+          className="form-input"
+          value={form.id_number}
+          onChange={(e) => setForm({ ...form, id_number: e.target.value })}
+          placeholder={t('auth.idNumberPh')}
+          required
+        />
+      </div>
+      <div className="form-group">
+        <label className="form-label">{t('auth.govtIdPhoto')} ({t('auth.optional')})</label>
+        <PhotoUpload onUploaded={(url) => setForm({ ...form, govt_id_url: url })} />
+      </div>
+    </>
+  );
+}
 
 function StepIndicator({ current, t }) {
   const steps = [t('auth.stepRole'), t('auth.stepDetails'), t('auth.stepVerify')];
@@ -28,7 +72,7 @@ function StepIndicator({ current, t }) {
 }
 
 export default function SignUp() {
-  const { navigate } = useNav();
+  const { navigate, back } = useNav();
   const { login } = useAuth();
   const { showToast } = useToast();
   const { t } = useLanguage();
@@ -36,9 +80,9 @@ export default function SignUp() {
   const [step, setStep] = useState(0);
   const [role, setRole] = useState('');
   const [form, setForm] = useState({
-    full_name: '', username: '', phone: '', email: '', password: '',
-    gender: 'Male', dob: '', govt_id_url: '',
-    village: '', taluka: '', district: '', state: '',
+    full_name: '', phone: '', email: '', password: '',
+    gender: 'Male', dob: '', govt_id_url: '', id_type: '', id_number: '',
+    district: '', state: '',
     labour_category: '', skill_level: 'Skilled',
     bank_account: '', ifsc: '', upi_id: '',
     farm_size: ''
@@ -49,37 +93,11 @@ export default function SignUp() {
   const [otpSent, setOtpSent] = useState(false);
   const [status, setStatus] = useState('idle'); // 'idle' | 'loading' | 'success'
   const [welcomeName, setWelcomeName] = useState('');
-  const [usernameStatus, setUsernameStatus] = useState('idle'); // 'idle' | 'checking' | 'available' | 'taken' | 'invalid'
   const otpInput = useRef(null);
   const navTimer = useRef(null);
 
   // Clear the pending navigation timer if the user navigates away mid-animation
   useEffect(() => () => clearTimeout(navTimer.current), []);
-
-  // Live username availability check (debounced)
-  useEffect(() => {
-    const clean = form.username.trim().replace(/\s+/g, '_').toLowerCase();
-    if (!clean) {
-      setUsernameStatus('idle');
-      return;
-    }
-    if (!/^[a-z0-9_]{3,30}$/.test(clean)) {
-      setUsernameStatus('invalid');
-      return;
-    }
-    let cancelled = false;
-    const timer = setTimeout(async () => {
-      // Only show the spinner once the request is about to fire (after the debounce)
-      setUsernameStatus('checking');
-      try {
-        const res = await checkUsername(clean);
-        if (!cancelled) setUsernameStatus(res.available ? 'available' : 'taken');
-      } catch {
-        if (!cancelled) setUsernameStatus('idle');
-      }
-    }, 450);
-    return () => { cancelled = true; clearTimeout(timer); };
-  }, [form.username]);
 
   const set = (key) => (e) => setForm({ ...form, [key]: e.target.value });
 
@@ -87,18 +105,6 @@ export default function SignUp() {
 
   const handleSendOtp = async (e) => {
     e.preventDefault();
-    if (usernameStatus === 'checking') {
-      showToast(t('auth.usernameChecking'));
-      return;
-    }
-    if (usernameStatus === 'taken') {
-      showToast(t('auth.usernameTaken'));
-      return;
-    }
-    if (usernameStatus === 'invalid') {
-      showToast(t('auth.usernameInvalid'));
-      return;
-    }
     if (!/^\d{10}$/.test(form.phone)) {
       showToast(t('auth.phoneInvalid'));
       return;
@@ -106,7 +112,12 @@ export default function SignUp() {
     try {
       const res = await sendOtp({ phone: form.phone });
       setOtpSent(true);
-      showToast(t('auth.otpSent', { otp: res.devOtp }), 5000);
+      if (res.devOtp) {
+        // Dev mode: SMS provider not configured — surface the code in a toast.
+        showToast(t('auth.otpSent', { otp: res.devOtp }), 5000);
+      } else {
+        showToast(t('auth.otpSentReal'));
+      }
       setTimeout(() => otpInput.current?.focus(), 100);
     } catch (err) {
       showToast(t('common.error', { msg: err.message }));
@@ -131,7 +142,7 @@ export default function SignUp() {
     try {
       const payload = {
         full_name: form.full_name,
-        username: form.username || undefined,
+        username: undefined,
         phone: form.phone,
         email: form.email || undefined,
         password: form.password,
@@ -139,18 +150,19 @@ export default function SignUp() {
         gender: isDetailed ? form.gender : undefined,
         dob: isDetailed ? form.dob : undefined,
         govt_id_url: form.govt_id_url || undefined,
-        village: form.village,
-        taluka: form.taluka,
+        id_type: form.id_type || undefined,
+        id_number: form.id_number || undefined,
         district: form.district,
         state: form.state,
+        location: farmLoc || undefined,
         labour_category: isDetailed ? form.labour_category : undefined,
         skill_level: isDetailed ? form.skill_level : undefined,
         bank_account: isDetailed ? form.bank_account : undefined,
         ifsc: isDetailed ? form.ifsc : undefined,
         upi_id: isDetailed ? form.upi_id : undefined,
-        farm_size: !isDetailed ? form.farm_size : undefined,
-        farm_lat: !isDetailed ? farmCoords?.lat : undefined,
-        farm_lng: !isDetailed ? farmCoords?.lng : undefined
+        farm_size: form.farm_size || undefined,
+        farm_lat: farmCoords?.lat,
+        farm_lng: farmCoords?.lng
       };
       const data = await register(payload);
       login(data.token, data.user);
@@ -171,6 +183,7 @@ export default function SignUp() {
     <div className="form-card-container auth-container">
       {status === 'success' && <WelcomeOverlay name={welcomeName} />}
       <div className="form-card">
+        <button className="btn-back-icon" onClick={back} aria-label="Back" style={{ marginBottom: '14px' }}>←</button>
         <h2 className="auth-title">{t('auth.signupTitle')}</h2>
         <StepIndicator current={step} t={t} />
 
@@ -182,7 +195,7 @@ export default function SignUp() {
                 className={`role-option ${role === r.value ? 'selected' : ''}`}
                 onClick={() => setRole(r.value)}
               >
-                <span className="role-emoji">{r.emoji}</span>
+                <span className="role-emoji"><Icon name={r.icon} size={22} /></span>
                 <span className="role-label">{t(r.labelKey)}</span>
                 <span className="role-desc">{t(r.descKey)}</span>
               </button>
@@ -195,20 +208,10 @@ export default function SignUp() {
 
         {step === 1 && (
           <form className="form-body" onSubmit={handleSendOtp}>
-            <div className="form-group">
-              <label className="form-label">{t('auth.fullName')} *</label>
-              <input type="text" className="form-input" placeholder="Your full name" value={form.full_name} onChange={set('full_name')} required />
-            </div>
             <div className="form-grid-row">
               <div className="form-group">
-                <label className="form-label">{t('auth.username')} *</label>
-                <input type="text" className="form-input" autoComplete="username" placeholder="e.g. ramesh_kumar" value={form.username} onChange={set('username')} required />
-                {usernameStatus === 'checking' && (
-                  <div className="username-status checking"><span className="btn-spinner btn-spinner-dark btn-spinner-sm" aria-hidden="true" /> {t('auth.usernameChecking')}</div>
-                )}
-                {usernameStatus === 'available' && <div className="username-status ok">✓ {t('auth.usernameAvailable')}</div>}
-                {usernameStatus === 'taken' && <div className="username-status err">✕ {t('auth.usernameTaken')}</div>}
-                {usernameStatus === 'invalid' && <div className="username-status err">✕ {t('auth.usernameInvalid')}</div>}
+                <label className="form-label">{t('auth.fullName')} *</label>
+                <input type="text" className="form-input" placeholder="Your full name" value={form.full_name} onChange={set('full_name')} required />
               </div>
               <div className="form-group">
                 <label className="form-label">{t('auth.email')}</label>
@@ -256,12 +259,9 @@ export default function SignUp() {
                     <input type="date" className="form-input" value={form.dob} onChange={set('dob')} required />
                   </div>
                 </div>
-                <div className="form-group">
-                  <label className="form-label">{t('auth.govtId')} *</label>
-                  <span className="form-hint" style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '0.5rem', display: 'block' }}>{t('auth.govtIdHint')}</span>
-                  <PhotoUpload onUploaded={(url) => setForm({ ...form, govt_id_url: url })} />
-                </div>
+                <GovtIdSection form={form} setForm={setForm} t={t} />
                 <LocationSelects value={form} onChange={setForm} />
+                <FarmLocationField value={farmLoc} onChange={setFarmLoc} onCoords={setFarmCoords} />
 
                 <h3 className="form-section-title">{t('auth.workProfile')}</h3>
                 <div className="form-grid-row">
@@ -308,20 +308,11 @@ export default function SignUp() {
             ) : (
               <>
                 <h3 className="form-section-title">{t('auth.identityVerification')}</h3>
-                <div className="form-group">
-                  <label className="form-label">{t('auth.govtId')} ({t('auth.optional')})</label>
-                  <PhotoUpload onUploaded={(url) => setForm({ ...form, govt_id_url: url })} />
-                </div>
+                <GovtIdSection form={form} setForm={setForm} t={t} />
                 
                 <h3 className="form-section-title">{t('auth.address')}</h3>
                 <LocationSelects value={form} onChange={setForm} />
-                <div className="form-group">
-                  <label className="form-label">{t('auth.farmLocation')} *</label>
-                  <input type="text" className="form-input" placeholder="Village, Taluka" value={farmLoc} onChange={(e) => setFarmLoc(e.target.value)} />
-                  <div className="coords-chip">
-                    📌 {t('auth.mapPin')} {farmCoords ? `${farmCoords.lat.toFixed(5)}, ${farmCoords.lng.toFixed(5)}` : t('field.notSet')}
-                  </div>
-                </div>
+                <FarmLocationField value={farmLoc} onChange={setFarmLoc} onCoords={setFarmCoords} />
                 <div className="form-group">
                   <label className="form-label">{t('auth.farmSize')} *</label>
                   <input type="text" className="form-input" placeholder="e.g. 5" value={form.farm_size} onChange={set('farm_size')} required />
@@ -333,6 +324,8 @@ export default function SignUp() {
               <label className="form-label">{t('auth.password6')} *</label>
               <input type="password" className="form-input" minLength="6" value={form.password} onChange={set('password')} required />
             </div>
+
+            <button type="button" className="btn-form-submit btn-slate" onClick={() => setStep(1)}>{t('common.back')}</button>
 
             <button type="submit" className={`btn-form-submit ${status === 'loading' ? 'loading' : ''}`} disabled={status !== 'idle'}>
               {status === 'loading' && <span className="btn-spinner" aria-hidden="true" />}

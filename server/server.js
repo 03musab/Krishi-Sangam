@@ -104,6 +104,12 @@ async function init() {
 
     // Verify connection & clean up expired sessions on startup
     await pool.query('SELECT 1');
+
+    // Idempotently add new columns to existing databases
+    // (fresh installs get them from sql/schema.sql)
+    await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS id_type TEXT');
+    await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS id_number TEXT');
+    await pool.query('ALTER TABLE equipment_listings ADD COLUMN IF NOT EXISTS deposit INTEGER');
     const deleted = await pool.query("DELETE FROM sessions WHERE expires_at < NOW()");
     if (deleted.rowCount > 0) {
       console.log(`🧹 Cleaned up ${deleted.rowCount} expired session(s)`);

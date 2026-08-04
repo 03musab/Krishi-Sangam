@@ -3,18 +3,28 @@ import { useNav } from '../context/NavContext';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { useLanguage } from '../i18n/LanguageContext';
-import { signin } from '../lib/api';
+import { signin, signinOtp, sendOtp } from '../lib/api';
 import WelcomeOverlay from '../components/WelcomeOverlay';
 
 export default function SignIn() {
-  const { navigate } = useNav();
+  const { navigate, back } = useNav();
   const { login } = useAuth();
   const { showToast } = useToast();
   const { t } = useLanguage();
-  const [username, setUsername] = useState('');
+  const [mode, setMode] = useState('password'); // 'password' | 'otp'
+
+  // Password mode fields
+  const [loginId, setLoginId] = useState('');
   const [password, setPassword] = useState('');
+
+  // OTP mode fields
+  const [otpPhone, setOtpPhone] = useState('');
+  const [otp, setOtp] = useState('');
+  const [otpSent, setOtpSent] = useState(false);
+
   const [status, setStatus] = useState('idle'); // 'idle' | 'loading' | 'success'
   const [welcomeName, setWelcomeName] = useState('');
+  const otpInput = useRef(null);
   const navTimer = useRef(null);
 
   // Clear the pending navigation timer if the user navigates away mid-animation
@@ -38,49 +48,184 @@ export default function SignIn() {
     );
   };
 
-  const handleSubmit = async (e) => {
+  const finishLogin = (data) => {
+    login(data.token, data.user);
+    requestLocationOnLogin();
+    setWelcomeName(data.user.full_name || data.user.username || '');
+    setStatus('success');
+    // Show the full-screen welcome overlay, then land on the home page
+    navTimer.current = setTimeout(() => {
+      showToast(t('common.toast.welcome', { name: data.user.full_name || data.user.username }));
+      navigate('home');
+    }, 1400);
+  };
+
+  const handlePasswordSubmit = async (e) => {
     e.preventDefault();
     setStatus('loading');
     try {
-      const data = await signin({ username: username.trim(), password });
-      login(data.token, data.user);
-      requestLocationOnLogin();
-      setWelcomeName(data.user.username);
-      setStatus('success');
-      // Show the full-screen welcome overlay, then land on the home page
-      navTimer.current = setTimeout(() => {
-        showToast(t('common.toast.welcome', { name: data.user.username }));
-        navigate('home');
-      }, 1400);
+      const isPhone = /^\d{10}$/.test(loginId.trim());
+      const data = await signin(
+        isPhone ? { phone: loginId.trim(), password } : { email: loginId.trim(), password }
+      );
+      finishLogin(data);
     } catch (err) {
       setStatus('idle');
       showToast(t('common.error', { msg: err.message }));
     }
   };
 
+  const handleSendOtp = async (e) => {
+    e.preventDefault();
+    if (!/^\d{10}$/.test(otpPhone.trim())) {
+      showToast(t('auth.phoneInvalid'));
+      return;
+    }
+    try {
+      const res = await sendOtp({ phone: otpPhone.trim() });
+      setOtpSent(true);
+      if (res.devOtp) {
+        // Dev mode: SMS provider not configured — surface the code in a toast.
+        showToast(t('auth.otpSent', { otp: res.devOtp }), 5000);
+      } else {
+        showToast(t('auth.otpSentReal'));
+      }
+      setTimeout(() => otpInput.current?.focus(), 100);
+    } catch (err) {
+      showToast(t('common.error', { msg: err.message }));
+    }
+  };
+
+  const handleOtpSubmit = async (e) => {
+    e.preventDefault();
+    if (!otpSent || !otp.trim()) return;
+    setStatus('loading');
+    try {
+      const data = await signinOtp({ phone: otpPhone.trim(), otp: otp.trim() });
+      finishLogin(data);
+    } catch (err) {
+      setStatus('idle');
+      showToast(t('common.error', { msg: err.message }));
+    }
+  };
+
+  const switchMode = (m) => {
+    setMode(m);
+    setStatus('idle');
+    setOtpSent(false);
+    setOtp('');
+  };
+
   return (
     <div className="form-card-container auth-container">
       {status === 'success' && <WelcomeOverlay name={welcomeName} />}
       <div className="form-card">
+        <button className="btn-back-icon" onClick={back} aria-label="Back" style={{ marginBottom: '14px' }}>←</button>
         <h2 className="auth-title">{t('auth.signinTitle')}</h2>
-        <form className="form-body" onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label className="form-label">{t('auth.username')}</label>
-            <input type="text" className="form-input" required autoComplete="username" placeholder={t('auth.username')} value={username} onChange={(e) => setUsername(e.target.value)} />
-          </div>
-          <div className="form-group">
-            <label className="form-label">{t('auth.password')}</label>
-            <input type="password" className="form-input" required autoComplete="current-password" placeholder="••••••" value={password} onChange={(e) => setPassword(e.target.value)} />
-          </div>
-          <button type="submit" className={`btn-form-submit btn-green ${status === 'loading' ? 'loading' : ''}`} disabled={status !== 'idle'}>
-            {status === 'loading' && <span className="btn-spinner" aria-hidden="true" />}
-            {t('auth.signinTitle')}
+
+        {/* Mode tabs */}
+        <div className="admin-subnav-tabs" style={{ maxWidth: 'none', margin: '0 0 18px', padding: 0, justifyContent: 'center' }}>
+          <button
+            type="button"
+            className={`admin-tab-btn ${mode === 'password' ? 'active' : ''}`}
+            onClick={() => switchMode('password')}
+          >
+            {t('auth.signinPassword')}
           </button>
-        </form>
+          <button
+            type="button"
+            className={`admin-tab-btn ${mode === 'otp' ? 'active' : ''}`}
+            onClick={() => switchMode('otp')}
+          >
+            {t('auth.signinOtp')}
+          </button>
+        </div>
+
+        {mode === 'password' && (
+          <form className="form-body" onSubmit={handlePasswordSubmit}>
+            <div className="form-group">
+              <label className="form-label">{t('auth.emailOrPhone')}</label>
+              <input
+                type="text"
+                className="form-input"
+                required
+                autoComplete="username"
+                placeholder={t('auth.emailOrPhone')}
+                value={loginId}
+                onChange={(e) => setLoginId(e.target.value)}
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label">{t('auth.password')}</label>
+              <input
+                type="password"
+                className="form-input"
+                required
+                autoComplete="current-password"
+                placeholder="••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+            <button type="submit" className={`btn-form-submit btn-green ${status === 'loading' ? 'loading' : ''}`} disabled={status !== 'idle'}>
+              {status === 'loading' && <span className="btn-spinner" aria-hidden="true" />}
+              {status === 'loading' ? t('common.loading') : t('auth.signinTitle')}
+            </button>
+          </form>
+        )}
+
+        {mode === 'otp' && (
+          <form className="form-body" onSubmit={handleOtpSubmit}>
+            <div className="form-group">
+              <label className="form-label">{t('auth.mobile')} *</label>
+              <div className="otp-row">
+                <input
+                  type="tel"
+                  className="form-input"
+                  placeholder="10-digit mobile"
+                  value={otpPhone}
+                  onChange={(e) => setOtpPhone(e.target.value)}
+                  required
+                />
+                <button
+                  type="button"
+                  className="btn-small"
+                  style={{ background: '#15803d', whiteSpace: 'nowrap' }}
+                  onClick={handleSendOtp}
+                >
+                  {t('auth.sendOtp')}
+                </button>
+              </div>
+            </div>
+            {otpSent && (
+              <div className="form-group">
+                <label className="form-label">{t('auth.enterOtp')} *</label>
+                <input
+                  ref={otpInput}
+                  type="text"
+                  className="form-input"
+                  placeholder="6-digit OTP"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  required
+                />
+              </div>
+            )}
+            <button
+              type="submit"
+              className={`btn-form-submit btn-green ${status === 'loading' ? 'loading' : ''}`}
+              disabled={status !== 'idle' || !otpSent}
+            >
+              {status === 'loading' && <span className="btn-spinner" aria-hidden="true" />}
+              {status === 'loading' ? t('common.loading') : t('auth.signinOtp')}
+            </button>
+          </form>
+        )}
+
         <p className="auth-switch">
           {t('auth.dontHave')} <a href="#" onClick={(e) => { e.preventDefault(); navigate('signup'); }}>{t('auth.signupTitle')}</a>
         </p>
       </div>
     </div>
   );
-}
+}

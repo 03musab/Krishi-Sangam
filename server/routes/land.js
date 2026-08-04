@@ -119,8 +119,8 @@ router.post('/', authenticateToken, async (req, res) => {
     const result = await db.prepare(`
       INSERT INTO land_listings (owner_id, title, description, area_acres, lease_type,
         price_per_season, price_per_month, price_per_year, location, district, state,
-        soil_type, water_source, crop_history, photo_url)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        soil_type, water_source, crop_history, photo_url, status)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'approved')
     `).run(req.user.id, title, description || null, area_acres,
            lease_type || 'Per Season', price_per_season || null,
            price_per_month || null, price_per_year || null, location,
@@ -128,7 +128,7 @@ router.post('/', authenticateToken, async (req, res) => {
            water_source || null, crop_history || null, photo_url || null);
 
     const listing = await db.prepare('SELECT * FROM land_listings WHERE id = ?').get(result.lastInsertRowid);
-    res.status(201).json({ message: 'Land listing created! Awaiting admin approval.', listing });
+    res.status(201).json({ message: 'Land listing created!', listing });
   } catch (err) {
     console.error('Create land listing error:', err);
     res.status(500).json({ error: 'Server error creating listing.' });

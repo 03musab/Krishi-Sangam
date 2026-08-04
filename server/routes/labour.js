@@ -96,15 +96,15 @@ router.post('/', authenticateToken, async (req, res) => {
 
     const result = await db.prepare(`
       INSERT INTO labour_services (worker_id, title, description, skills,
-        experience_years, daily_rate, hourly_rate, location, district, state, photo_url)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        experience_years, daily_rate, hourly_rate, location, district, state, photo_url, status)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'approved')
     `).run(req.user.id, title, description || null, skills || null,
            experience_years || 0, daily_rate || null, hourly_rate || null,
            location, district || null, state || null, photo_url || null);
 
     const listing = await db.prepare('SELECT * FROM labour_services WHERE id = ?')
       .get(result.lastInsertRowid);
-    res.status(201).json({ message: 'Labour listing created! Awaiting approval.', listing });
+    res.status(201).json({ message: 'Labour listing created!', listing });
   } catch (err) {
     console.error('Create labour error:', err);
     res.status(500).json({ error: 'Server error.' });

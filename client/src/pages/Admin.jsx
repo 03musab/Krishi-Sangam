@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import PageBanner from '../components/PageBanner';
+import Icon from '../components/Icon';
 import { useToast } from '../context/ToastContext';
 import { useLanguage } from '../i18n/LanguageContext';
 import { getAdminStats, getPendingListings, approveListing, getAdminUsers, deleteUser } from '../lib/api';
@@ -13,7 +14,7 @@ const TAB_KEYS = {
 function StatBox({ icon, value, label, cls }) {
   return (
     <div className="admin-stat-box">
-      <span className="admin-stat-icon">{icon}</span>
+      <span className="admin-stat-icon"><Icon name={icon} size={24} /></span>
       <span className="admin-stat-bigval">{value}</span>
       <span className="admin-stat-desc">{label}</span>
     </div>
@@ -71,7 +72,7 @@ export default function Admin() {
 
   return (
     <>
-      <PageBanner title={`🛡️ ${t('admin.title')}`} color="slate" backTo="home" />
+      <PageBanner title={<><Icon name="shield" size={26} style={{ verticalAlign: '-6px', marginRight: '10px' }} />{t('admin.title')}</>} color="slate" backTo="home" />
       <div className="admin-card-container">
         <div className="admin-subnav-tabs">
           {Object.entries(TAB_KEYS).map(([key, labelKey]) => (
@@ -82,13 +83,13 @@ export default function Admin() {
         {tab === 'admin-analytics' && (
           <div className="tab-pane">
             <div className="admin-grid-4stats">
-              <StatBox icon="👥" value={stats ? stats.totalUsers : 0} label={t('admin.users')} />
-              <StatBox icon="📋" value={totalListings} label={t('admin.totalListings')} />
-              <StatBox icon="💰" value={stats ? `₹${(stats.totalRevenue || 0).toLocaleString()}` : '₹0'} label={t('admin.revenue')} />
-              <StatBox icon="📦" value={stats ? stats.totalBookings : 0} label={t('admin.bookings')} />
+              <StatBox icon="users" value={stats ? stats.totalUsers : 0} label={t('admin.users')} />
+              <StatBox icon="clipboard" value={totalListings} label={t('admin.totalListings')} />
+              <StatBox icon="money" value={stats ? `₹${(stats.totalRevenue || 0).toLocaleString()}` : '₹0'} label={t('admin.revenue')} />
+              <StatBox icon="package" value={stats ? stats.totalBookings : 0} label={t('admin.bookings')} />
             </div>
             <div className="admin-pending-alert">
-              <div className="pending-alert-title">⚠️ {t('admin.pendingReview')}</div>
+              <div className="pending-alert-title"><Icon name="alert" size={16} style={{ verticalAlign: '-3px', marginRight: '7px' }} />{t('admin.pendingReview')}</div>
               <div className="pending-alert-list">
                 <div>{t('admin.land')}: <strong>{stats ? stats.pendingLand : 0}</strong></div>
                 <div>{t('admin.equipment')}: <strong>{stats ? stats.pendingEquip : 0}</strong></div>

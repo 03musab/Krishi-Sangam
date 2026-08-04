@@ -12,7 +12,7 @@ export default function ListEquipment() {
   const { t } = useLanguage();
   const [photoUrl, setPhotoUrl] = useState(null);
   const [form, setForm] = useState({
-    name: '', type: 'Tractor', price_per_hour: '', price_per_day: '',
+    name: '', type: 'Tractor', price_per_hour: '', price_per_day: '', deposit: '',
     location: '', district: '', state: '', with_operator: false, description: ''
   });
 
@@ -25,6 +25,7 @@ export default function ListEquipment() {
         type: form.type,
         price_per_hour: form.price_per_hour ? Number(form.price_per_hour) : null,
         price_per_day: form.price_per_day ? Number(form.price_per_day) : null,
+        deposit: form.deposit ? Number(form.deposit) : null,
         location: form.location,
         district: form.district || null,
         state: form.state || null,
@@ -71,6 +72,10 @@ export default function ListEquipment() {
           <label className="form-label">{t('equip.perDay')}</label>
           <input type="number" className="form-input" placeholder="e.g. 3500" value={form.price_per_day} onChange={set('price_per_day')} />
         </div>
+      </div>
+      <div className="form-group">
+        <label className="form-label">{t('equip.deposit')} <span className="muted">({t('equip.depositHint')})</span></label>
+        <input type="number" className="form-input" placeholder={t('equip.depositPh')} value={form.deposit} onChange={set('deposit')} />
       </div>
       <div className="form-group">
         <label className="form-label">{t('equip.location')} *</label>

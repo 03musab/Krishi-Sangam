@@ -15,7 +15,7 @@ router.get('/', async (req, res) => {
     const db = getDb();
     const { search, district, state, crop, min_price, max_price } = req.query;
 
-    let query = `SELECT p.*, u.username as seller_name, u.phone as seller_phone
+    let query = `SELECT p.*, u.username as owner_name, u.phone as owner_phone
                  FROM produce_listings p
                  JOIN users u ON p.seller_id = u.id
                  WHERE p.status = 'approved'`;
@@ -72,7 +72,7 @@ router.get('/:id', async (req, res) => {
   try {
     const db = getDb();
     const listing = await db.prepare(
-      `SELECT p.*, u.username as seller_name, u.phone as seller_phone
+      `SELECT p.*, u.username as owner_name, u.phone as owner_phone
        FROM produce_listings p JOIN users u ON p.seller_id = u.id WHERE p.id = ?`
     ).get(req.params.id);
     if (!listing) return res.status(404).json({ error: 'Not found.' });
@@ -95,15 +95,15 @@ router.post('/', authenticateToken, async (req, res) => {
 
     const result = await db.prepare(`
       INSERT INTO produce_listings (seller_id, crop_name, description, quantity, unit,
-        price_per_unit, location, district, state, quality_grade, photo_url)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        price_per_unit, location, district, state, quality_grade, photo_url, status)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'approved')
     `).run(req.user.id, crop_name, description || null, quantity,
            unit || 'kg', price_per_unit, location,
            district || null, state || null, quality_grade || 'A', photo_url || null);
 
     const listing = await db.prepare('SELECT * FROM produce_listings WHERE id = ?')
       .get(result.lastInsertRowid);
-    res.status(201).json({ message: 'Produce listing created! Awaiting approval.', listing });
+    res.status(201).json({ message: 'Produce listing created!', listing });
   } catch (err) {
     console.error('Create produce error:', err);
     res.status(500).json({ error: 'Server error.' });

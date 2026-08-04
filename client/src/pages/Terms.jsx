@@ -1,9 +1,14 @@
+import { useNav } from '../context/NavContext';
 import { useLanguage } from '../i18n/LanguageContext';
 
 export default function Terms() {
+  const { back } = useNav();
   const { t } = useLanguage();
   return (
     <div style={{ paddingBottom: '60px' }}>
+      <div style={{ maxWidth: 'var(--container-max)', margin: '0 auto', padding: '16px 24px 0' }}>
+        <button className="btn-back-icon" onClick={back} aria-label="Back">←</button>
+      </div>
       <section className="section" style={{ background: 'var(--surface-2)', textAlign: 'center' }}>
         <h1 style={{ fontSize: '40px', fontWeight: '800', color: 'var(--text-dark)' }}>{t('terms.title')}</h1>
         <p style={{ fontSize: '18px', color: 'var(--text-mid)', marginTop: '20px' }}>

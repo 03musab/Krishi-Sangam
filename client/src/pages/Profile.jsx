@@ -18,7 +18,7 @@ export default function Profile() {
   const setPwField = (key) => (e) => setPw({ ...pw, [key]: e.target.value });
 
   useEffect(() => {
-    if (!user) { navigate('signin'); return; }
+    if (!user) { navigate('signin', { replace: true }); return; }
     getProfile()
       .then((d) => {
         const u = d.user;

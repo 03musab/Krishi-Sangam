@@ -3,19 +3,27 @@ import { useNav } from '../context/NavContext';
 import { useLanguage } from '../i18n/LanguageContext';
 import BookLabourTeam from '../components/BookLabourTeam';
 import ServiceBookingForm from '../components/ServiceBookingForm';
+import Icon from '../components/Icon';
 import { SERVICE_CATEGORIES } from '../data/services';
 
 export default function Labour() {
-  const { navigate } = useNav();
+  const { back } = useNav();
   const { t } = useLanguage();
   const [flow, setFlow] = useState({ view: 'home', category: null, service: null });
 
   if (flow.view === 'labour-team') {
-    return <BookLabourTeam />;
+    return <BookLabourTeam onBack={() => setFlow({ view: 'home' })} onSubmitted={() => setFlow({ view: 'home' })} />;
   }
 
   if (flow.view === 'service' && flow.category && flow.service) {
-    return <ServiceBookingForm category={flow.category} service={flow.service} />;
+    return (
+      <ServiceBookingForm
+        category={flow.category}
+        service={flow.service}
+        onBack={() => setFlow({ view: 'category', category: flow.category })}
+        onSubmitted={() => setFlow({ view: 'home' })}
+      />
+    );
   }
 
   if (flow.view === 'category' && flow.category) {
@@ -25,7 +33,7 @@ export default function Labour() {
         <div className="service-booking-wrap">
           <div className="service-booking-head">
             <button className="btn-back-icon" onClick={() => setFlow({ view: 'home' })}>←</button>
-            <span className="service-emoji">{category.emoji}</span>
+            <span className="service-emoji"><Icon name={category.icon} size={40} /></span>
             <div>
               <h1 className="service-booking-title">{category.name}</h1>
               <p className="service-booking-subtitle">{category.tagline}</p>
@@ -55,8 +63,8 @@ export default function Labour() {
   return (
     <>
       <div className="page-banner banner-purple">
-        <button className="btn-back-icon" onClick={() => navigate('home')}>←</button>
-        <h1 className="page-banner-title">👷 {t('labour.bookServices')}</h1>
+        <button className="btn-back-icon" onClick={back} aria-label="Back">←</button>
+        <h1 className="page-banner-title"><Icon name="worker" size={28} style={{ verticalAlign: '-6px', marginRight: '10px' }} />{t('labour.bookServices')}</h1>
         <button
           className="banner-action-btn purple"
           onClick={() => setFlow({ view: 'labour-team' })}
@@ -68,7 +76,7 @@ export default function Labour() {
       {/* Book Labour Team — top option */}
       <div className="section labour-top-section">
         <button className="labour-team-card" onClick={() => setFlow({ view: 'labour-team' })}>
-          <span className="labour-team-emoji">👷</span>
+          <span className="labour-team-emoji"><Icon name="worker" size={44} /></span>
           <div className="labour-team-text">
             <h3>{t('labour.bookLabourTeam')}</h3>
             <p>{t('labour.hireFarmWorkers')}</p>
@@ -79,7 +87,7 @@ export default function Labour() {
 
       {/* Agricultural Services — categories */}
       <section className="section agri-services-section">
-        <h2 className="section-title">🌾 {t('labour.agriServices')}</h2>
+        <h2 className="section-title"><Icon name="wheat" size={26} style={{ verticalAlign: '-4px', marginRight: '10px' }} />{t('labour.agriServices')}</h2>
         <p className="section-subtitle">{t('labour.pickCategory')}</p>
         <div className="service-category-grid">
           {SERVICE_CATEGORIES.map((cat) => (
@@ -88,7 +96,7 @@ export default function Labour() {
               className="service-category-card"
               onClick={() => setFlow({ view: 'category', category: cat })}
             >
-              <span className="service-category-emoji tip tip-left" data-tip={cat.desc || cat.tagline}>{cat.emoji}</span>
+              <span className="service-category-emoji tip tip-left" data-tip={cat.desc || cat.tagline}><Icon name={cat.icon} size={34} /></span>
               <span className="service-category-name">{cat.name}</span>
               <span className="service-category-tagline">{cat.tagline}</span>
               <span className="service-category-count">{t('labour.xServices', { n: cat.services.length })}</span>

@@ -69,6 +69,7 @@ export async function apiUpload(file) {
 /* Auth */
 export const signup = (data) => apiCall('/auth/signup', 'POST', data);
 export const signin = (data) => apiCall('/auth/signin', 'POST', data);
+export const signinOtp = (data) => apiCall('/auth/signin-otp', 'POST', data);
 export const signout = () => apiCall('/auth/signout', 'POST');
 export const fetchMe = () => apiCall('/auth/me');
 export const sendOtp = (data) => apiCall('/auth/send-otp', 'POST', data);

@@ -1,14 +1,13 @@
 import { useState } from 'react';
 import BookingCard from './BookingCard';
 import FarmLocationField from './FarmLocationField';
-import { useNav } from '../context/NavContext';
+import AreaField from './AreaField';
 import { useToast } from '../context/ToastContext';
 import { useLanguage } from '../i18n/LanguageContext';
 import { bookService } from '../lib/api';
 import { TEAM_TYPES, SKILL_LEVELS, DEFAULT_WORKER_RATE } from '../data/services';
 
-export default function BookLabourTeam() {
-  const { navigate } = useNav();
+export default function BookLabourTeam({ onBack, onSubmitted }) {
   const { showToast } = useToast();
   const { t } = useLanguage();
   const [form, setForm] = useState({
@@ -19,6 +18,7 @@ export default function BookLabourTeam() {
     start_date: '',
     location: '',
     description: '',
+    area_acres: '',
     rate: DEFAULT_WORKER_RATE
   });
   const [coords, setCoords] = useState(null);
@@ -40,11 +40,14 @@ export default function BookLabourTeam() {
         location: form.location,
         lat: coords?.lat,
         lng: coords?.lng,
-        description: form.description || null,
+        description: [
+          form.area_acres ? t('labour.fieldSizeNote', { a: form.area_acres }) : null,
+          form.description
+        ].filter(Boolean).join(' — ') || null,
         price: total
       });
       showToast(t('labour.requestSubmitted'));
-      navigate('labour');
+      if (onSubmitted) onSubmitted();
     } catch (err) {
       showToast(t('common.error', { msg: err.message }));
     }
@@ -54,8 +57,9 @@ export default function BookLabourTeam() {
     <BookingCard
       title={t('labour.bookLabourTeam')}
       subtitle={t('labour.teamSubtitle')}
-      emoji="👷"
-      backTo="labour"
+      icon="worker"
+      onBack={onBack}
+      onSubmitted={onSubmitted}
       submitLabel={t('labour.requestTeam')}
       onSubmit={handleSubmit}
     >
@@ -77,18 +81,24 @@ export default function BookLabourTeam() {
       </div>
 
       <div className="form-grid-row">
+        <AreaField
+          label={t('labour.fieldSize')}
+          value={form.area_acres}
+          onChange={(v) => setForm({ ...form, area_acres: v })}
+        />
         <div className="form-group">
           <label className="form-label">{t('labour.teamType')}</label>
           <select className="form-select" value={form.team_type} onChange={set('team_type')}>
             {TEAM_TYPES.map((type) => <option key={type} value={type}>{t('labour.' + type.toLowerCase() + 'Team')}</option>)}
           </select>
         </div>
-        <div className="form-group">
-          <label className="form-label">{t('labour.skillLevel')}</label>
-          <select className="form-select" value={form.skill_level} onChange={set('skill_level')}>
-            {SKILL_LEVELS.map((s) => <option key={s} value={s}>{s}</option>)}
-          </select>
-        </div>
+      </div>
+
+      <div className="form-group">
+        <label className="form-label">{t('labour.skillLevel')}</label>
+        <select className="form-select" value={form.skill_level} onChange={set('skill_level')}>
+          {SKILL_LEVELS.map((s) => <option key={s} value={s}>{s}</option>)}
+        </select>
       </div>
 
       <div className="form-group">

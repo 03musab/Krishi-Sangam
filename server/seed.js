@@ -74,22 +74,22 @@ async function seedEquipment() {
 
   const insert = db.prepare(`
     INSERT INTO equipment_listings
-      (owner_id, name, type, description, price_per_hour, price_per_day, location, district, state, with_operator, status)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'approved')
+      (owner_id, name, type, description, price_per_hour, price_per_day, deposit, location, district, state, with_operator, status)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'approved')
   `);
 
   await insert.run(owner1, 'Mahindra 575 Tractor', 'Tractor',
     '75 HP tractor with rotavator attachment, well maintained, available with operator on request.',
-    700, 4500, 'Latur, Maharashtra', 'Latur', 'Maharashtra', 1);
+    700, 4500, 15000, 'Latur, Maharashtra', 'Latur', 'Maharashtra', 1);
   await insert.run(owner1, 'John Deere Harvester', 'Harvester',
     'Self-propelled combine harvester for wheat, soybean and paddy. Full crew included.',
-    3500, 20000, 'Latur, Maharashtra', 'Latur', 'Maharashtra', 1);
+    3500, 20000, 50000, 'Latur, Maharashtra', 'Latur', 'Maharashtra', 1);
   await insert.run(owner2, 'Swaraj 744 FE Tractor', 'Tractor',
     '50 HP tractor with trolley, perfect for small and mid-size farms. Diesel included.',
-    500, 3500, 'Kolhapur, Maharashtra', 'Kolhapur', 'Maharashtra', 0);
+    500, 3500, 12000, 'Kolhapur, Maharashtra', 'Kolhapur', 'Maharashtra', 0);
   await insert.run(owner2, 'Power Sprayer 500L', 'Sprayer',
     'Tractor-mounted 500 litre power sprayer for pesticide and fertilizer application.',
-    400, 2500, 'Kolhapur, Maharashtra', 'Kolhapur', 'Maharashtra', 1);
+    400, 2500, 5000, 'Kolhapur, Maharashtra', 'Kolhapur', 'Maharashtra', 1);
 
   console.log('seeded equipment_listings: 4');
 }
@@ -122,7 +122,7 @@ async function seedLabour() {
     'irrigation, drip line, sprinkler', 6, 900, 'Nanded, Maharashtra', 'Nanded', 'Maharashtra');
   await insert.run(w2, 'Seasonal Harvesting Crew Member',
     'Part of a reliable harvesting team for paddy, wheat and pulses. Available for group bookings.',
-    'sowing, weeding, harvesting', 5, 700, 'Beed, Maharashtra', 'Beed', 'Maharashtra');
+    'sowing, weeding, harvesting', 5, 350, 'Beed, Maharashtra', 'Beed', 'Maharashtra');
 
   console.log('seeded labour_services: 3');
 }

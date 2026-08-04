@@ -1,7 +1,7 @@
 export const SERVICE_CATEGORIES = [
   {
     id: 'field-preparation',
-    emoji: '🌱',
+    icon: 'seedling',
     name: 'Field Preparation',
     tagline: 'Get your soil ready for planting',
     desc: 'Ploughing, rotavation and levelling of your land to create a fine, weed-free seedbed for sowing.',
@@ -15,7 +15,7 @@ export const SERVICE_CATEGORIES = [
   },
   {
     id: 'sowing-planting',
-    emoji: '🌾',
+    icon: 'wheat',
     name: 'Sowing & Planting',
     tagline: 'Plant seeds the right way',
     desc: 'Placing seeds and seedlings at the correct depth and spacing for healthy germination and strong crop stands.',
@@ -28,7 +28,7 @@ export const SERVICE_CATEGORIES = [
   },
   {
     id: 'crop-maintenance',
-    emoji: '🌿',
+    icon: 'leaf',
     name: 'Crop Maintenance',
     tagline: 'Keep your crop healthy all season',
     desc: 'Weeding, fertilising and protective spraying to keep your crop healthy and productive throughout the season.',
@@ -44,7 +44,7 @@ export const SERVICE_CATEGORIES = [
   },
   {
     id: 'drone-services',
-    emoji: '🚁',
+    icon: 'drone',
     name: 'Drone Services',
     tagline: 'Modern precision farming from the sky',
     desc: 'Precision aerial spraying, seeding and crop-health surveys using drones for fast, even coverage of large fields.',
@@ -57,7 +57,7 @@ export const SERVICE_CATEGORIES = [
   },
   {
     id: 'harvesting',
-    emoji: '🌽',
+    icon: 'corn',
     name: 'Harvesting',
     tagline: 'Bring in your crop on time',
     desc: 'Cutting, picking and collecting mature crops at peak ripeness to protect yield and quality.',
@@ -71,7 +71,7 @@ export const SERVICE_CATEGORIES = [
   },
   {
     id: 'post-harvest',
-    emoji: '🚛',
+    icon: 'truck',
     name: 'Post-Harvest',
     tagline: 'Process and move your produce',
     desc: 'Threshing, grading, packing and transporting your produce from the field to storage or market.',
@@ -85,7 +85,7 @@ export const SERVICE_CATEGORIES = [
   },
   {
     id: 'orchard-services',
-    emoji: '🌳',
+    icon: 'tree',
     name: 'Orchard Services',
     tagline: 'Care for your fruit trees',
     desc: 'Pruning, grafting and safe harvesting of fruit trees to keep orchards healthy and productive.',
@@ -98,7 +98,7 @@ export const SERVICE_CATEGORIES = [
   },
   {
     id: 'irrigation',
-    emoji: '💧',
+    icon: 'droplet',
     name: 'Irrigation',
     tagline: 'Water your crops efficiently',
     desc: 'Installation and repair of drip, sprinkler and pump systems to water crops efficiently and save water.',
@@ -111,7 +111,7 @@ export const SERVICE_CATEGORIES = [
   },
   {
     id: 'expert-services',
-    emoji: '👨‍🌾',
+    icon: 'farmer',
     name: 'Expert Services',
     tagline: 'Advice from agricultural experts',
     desc: 'One-on-one guidance from agronomists, soil testing and crop planning to improve your farming decisions.',
@@ -127,4 +127,72 @@ export const SERVICE_CATEGORIES = [
 export const TEAM_TYPES = ['Male', 'Female', 'Mixed'];
 export const SKILL_LEVELS = ['Unskilled', 'Semi-Skilled', 'Skilled'];
 
-export const DEFAULT_WORKER_RATE = 700;
+export const DEFAULT_WORKER_RATE = 350;
+
+/* Catalogue of rentable equipment, grouped by category (shown on the
+   Equipment Rental page for browsing). */
+export const EQUIPMENT_CATEGORIES = [
+  {
+    icon: 'shower',
+    label: 'Irrigation',
+    items: [
+      'Portable Sprinkler Kit',
+      'Rain Gun Sprinkler',
+      'Water Pump (Diesel/Electric)',
+      'Submersible Pump',
+      'Lay Flat Pipe',
+      'HDPE Delivery Pipe',
+      'Hose Reel',
+      'Water Tank (Portable)'
+    ]
+  },
+  {
+    icon: 'leaf',
+    label: 'Crop Protection',
+    items: [
+      'Battery Sprayer',
+      'Knapsack Sprayer',
+      'Power Sprayer',
+      'Mist Blower',
+      'Fogging Machine'
+    ]
+  },
+  {
+    icon: 'tree',
+    label: 'Orchard & Garden',
+    items: [
+      'Brush Cutter',
+      'Hedge Trimmer',
+      'Chainsaw',
+      'Pole Pruner',
+      'Fruit Picker'
+    ]
+  },
+  {
+    icon: 'wheat',
+    label: 'Harvest & Post-Harvest',
+    items: [
+      'Grain Moisture Meter',
+      'Grain Cleaner (portable)'
+    ]
+  },
+  {
+    icon: 'zap',
+    label: 'Utilities',
+    items: [
+      'Portable Generator',
+      'Portable LED Work Lights',
+      'Extension Cable Reel'
+    ]
+  },
+  {
+    icon: 'wrench',
+    label: 'Farm Maintenance',
+    items: [
+      'Pressure Washer',
+      'Water Transfer Pump',
+      'Portable Welding Machine',
+      'Portable Air Compressor'
+    ]
+  }
+];

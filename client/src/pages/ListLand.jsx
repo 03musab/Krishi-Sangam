@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import FormCard from '../components/FormCard';
 import PhotoUpload from '../components/PhotoUpload';
+import FarmLocationField from '../components/FarmLocationField';
+import AreaField from '../components/AreaField';
 import { useNav } from '../context/NavContext';
 import { useToast } from '../context/ToastContext';
 import { useLanguage } from '../i18n/LanguageContext';
@@ -48,7 +50,6 @@ export default function ListLand() {
       color="banner-green"
       backTo="land-leasing"
       submitLabel={t('land.submit')}
-      note={t('land.note')}
       onSubmit={handleSubmit}
     >
       <PhotoUpload onUploaded={setPhotoUrl} />
@@ -57,10 +58,12 @@ export default function ListLand() {
         <input type="text" className="form-input" placeholder={t('land.titlePh')} value={form.title} onChange={set('title')} required />
       </div>
       <div className="form-grid-row">
-        <div className="form-group">
-          <label className="form-label">{t('land.area')} *</label>
-          <input type="number" className="form-input" placeholder="e.g. 5" value={form.area_acres} onChange={set('area_acres')} required />
-        </div>
+        <AreaField
+          label={t('land.area')}
+          value={form.area_acres}
+          onChange={(v) => setForm({ ...form, area_acres: v })}
+          required
+        />
         <div className="form-group">
           <label className="form-label">{t('land.leaseType')}</label>
           <select className="form-select" value={form.lease_type} onChange={set('lease_type')}>
@@ -78,10 +81,7 @@ export default function ListLand() {
           <input type="number" className="form-input" placeholder="e.g. 50000" value={form.price_per_year} onChange={set('price_per_year')} />
         </div>
       </div>
-      <div className="form-group">
-        <label className="form-label">{t('land.location')} *</label>
-        <input type="text" className="form-input" placeholder="Village, Taluka" value={form.location} onChange={set('location')} required />
-      </div>
+      <FarmLocationField value={form.location} onChange={(v) => setForm({ ...form, location: v })} />
       <div className="form-grid-row">
         <div className="form-group">
           <label className="form-label">{t('auth.district')}</label>
