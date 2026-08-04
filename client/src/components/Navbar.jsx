@@ -8,6 +8,7 @@ import { signout } from '../lib/api';
 
 const NAV_ITEMS = [
   { id: 'land', labelKey: 'nav.land', view: 'land-leasing' },
+  { id: 'equipment', labelKey: 'nav.equipment', view: 'equipment-rental' },
   { id: 'labour', labelKey: 'nav.labour', view: 'labour' },
   { id: 'admin', labelKey: 'nav.admin', view: 'admin', adminOnly: true }
 ];
