@@ -80,25 +80,25 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Our Vision — separate feature block */}
-          <div className="vision-block hover-lift" style={{ marginTop: '55px' }}>
-            <div className="vision-icon">
-              <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            </div>
-            <div className="vision-text">
-              <h3>{t('home.visionTitle')}</h3>
-              <p>{t('home.visionBody')}</p>
-            </div>
-          </div>
-
           {/* Our Mission — paired feature block */}
-          <div className="vision-block hover-lift" style={{ marginTop: '24px' }}>
+          <div className="vision-block hover-lift" style={{ marginTop: '55px' }}>
             <div className="vision-icon">
               <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
             </div>
             <div className="vision-text">
               <h3>{t('about.mission')}</h3>
               <p>{t('about.missionBody')}</p>
+            </div>
+          </div>
+
+          {/* Our Vision — separate feature block */}
+          <div className="vision-block hover-lift" style={{ marginTop: '24px' }}>
+            <div className="vision-icon">
+              <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </div>
+            <div className="vision-text">
+              <h3>{t('home.visionTitle')}</h3>
+              <p>{t('home.visionBody')}</p>
             </div>
           </div>
 
