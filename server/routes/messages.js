@@ -75,13 +75,15 @@ router.get('/:userId', authenticateToken, async (req, res) => {
 router.post('/', authenticateToken, async (req, res) => {
   try {
     const db = getDb();
-    const { receiver_id, content, booking_id } = req.body;
+    const { receiver_id, content, booking_id, listing_type, listing_id } = req.body;
     if (!receiver_id || !content) return res.status(400).json({ error: 'Receiver and content required.' });
     if (receiver_id === req.user.id) return res.status(400).json({ error: 'Cannot message yourself.' });
     const receiver = await db.prepare('SELECT id FROM users WHERE id = ?').get(receiver_id);
     if (!receiver) return res.status(404).json({ error: 'User not found.' });
-    const result = await db.prepare(`INSERT INTO messages (sender_id, receiver_id, booking_id, content) VALUES (?, ?, ?, ?)`)
-      .run(req.user.id, receiver_id, booking_id || null, content);
+    const lType = ['land', 'equipment', 'labour', 'produce'].includes(listing_type) ? listing_type : null;
+    const lId = lType ? Number(listing_id) || null : null;
+    const result = await db.prepare(`INSERT INTO messages (sender_id, receiver_id, booking_id, listing_type, listing_id, content) VALUES (?, ?, ?, ?, ?, ?)`)
+      .run(req.user.id, receiver_id, booking_id || null, lType, lId, content);
     const message = await db.prepare('SELECT * FROM messages WHERE id = ?').get(result.lastInsertRowid);
     res.status(201).json({ message: 'Sent.', data: message });
   } catch (err) { res.status(500).json({ error: 'Server error.' }); }

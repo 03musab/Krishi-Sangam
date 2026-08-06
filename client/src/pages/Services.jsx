@@ -42,7 +42,7 @@ export default function Services() {
       <PageBanner title={t('services.title')} />
 
       <section className="section" style={{ maxWidth: 'var(--container-max)', margin: '0 auto' }}>
-        <p style={{ fontSize: '18px', color: 'var(--text-mid)', lineHeight: '1.7', textAlign: 'center', maxWidth: '800px', margin: '0 auto 32px' }}>
+        <p style={{ fontSize: 'var(--fs-md)', color: 'var(--text-mid)', lineHeight: '1.7', textAlign: 'center', maxWidth: '800px', margin: '0 auto 32px' }}>
           {t('services.subtitle')}
         </p>
 

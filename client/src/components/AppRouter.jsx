@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../i18n/LanguageContext';
 import PageLoader from './PageLoader';
 import MembersGate from './MembersGate';
+import Icon from './Icon';
 
 const Home = lazy(() => import('../pages/Home'));
 const Services = lazy(() => import('../pages/Services'));
@@ -22,6 +23,7 @@ const Profile = lazy(() => import('../pages/Profile'));
 const Admin = lazy(() => import('../pages/Admin'));
 const SignIn = lazy(() => import('../pages/SignIn'));
 const SignUp = lazy(() => import('../pages/SignUp'));
+const ForgotPassword = lazy(() => import('../pages/ForgotPassword'));
 const About = lazy(() => import('../pages/About'));
 const Terms = lazy(() => import('../pages/Terms'));
 
@@ -43,6 +45,7 @@ const VIEWS = {
   admin: Admin,
   signin: SignIn,
   signup: SignUp,
+  'forgot-password': ForgotPassword,
   about: About,
   terms: Terms
 };
@@ -56,7 +59,7 @@ const MEMBERS_ONLY_VIEWS = {
 };
 
 export default function AppRouter() {
-  const { view } = useNav();
+  const { view, navigate } = useNav();
   const { user, loading } = useAuth();
   const { t } = useLanguage();
   const ViewComponent = VIEWS[view] || Home;
@@ -74,6 +77,35 @@ export default function AppRouter() {
             description={t(gate.descKey)}
             color={gate.color}
           />
+        )}
+      </div>
+    );
+  }
+
+  // Admin panel is restricted to users with the admin role.
+  if (view === 'admin' && (!user || user.role !== 'admin')) {
+    return (
+      <div className="page-view" key={view}>
+        {loading ? (
+          <PageLoader />
+        ) : (
+          <div className="members-gate">
+            <div className="members-gate-card">
+              <div className="members-gate-icon" aria-hidden="true"><Icon name="shield" size={44} /></div>
+              <span className="members-gate-badge"><Icon name="lock" size={13} style={{ verticalAlign: '-2px', marginRight: '6px' }} />{t('admin.denied')}</span>
+              <h2 className="members-gate-title">{t('admin.denied')}</h2>
+              <p className="members-gate-desc">{t('admin.deniedDesc')}</p>
+              {!user ? (
+                <button className="members-gate-btn" onClick={() => navigate('signin')}>
+                  {t('nav.signin')} →
+                </button>
+              ) : (
+                <button className="members-gate-btn" onClick={() => navigate('home')}>
+                  {t('nav.home')} →
+                </button>
+              )}
+            </div>
+          </div>
         )}
       </div>
     );

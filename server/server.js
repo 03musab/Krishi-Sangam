@@ -110,6 +110,14 @@ async function init() {
     await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS id_type TEXT');
     await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS id_number TEXT');
     await pool.query('ALTER TABLE equipment_listings ADD COLUMN IF NOT EXISTS deposit INTEGER');
+    // OTP delivery tracking (provider, request_id, delivery status)
+    await pool.query('ALTER TABLE otp_verifications ADD COLUMN IF NOT EXISTS provider TEXT');
+    await pool.query('ALTER TABLE otp_verifications ADD COLUMN IF NOT EXISTS request_id TEXT');
+    await pool.query('ALTER TABLE otp_verifications ADD COLUMN IF NOT EXISTS delivery_status TEXT');
+    await pool.query('ALTER TABLE otp_verifications ADD COLUMN IF NOT EXISTS delivery_checked_at TIMESTAMPTZ');
+    // Messages can reference the listing they were sent about (for "view listing" links in chat)
+    await pool.query('ALTER TABLE messages ADD COLUMN IF NOT EXISTS listing_type TEXT');
+    await pool.query('ALTER TABLE messages ADD COLUMN IF NOT EXISTS listing_id BIGINT');
     const deleted = await pool.query("DELETE FROM sessions WHERE expires_at < NOW()");
     if (deleted.rowCount > 0) {
       console.log(`🧹 Cleaned up ${deleted.rowCount} expired session(s)`);

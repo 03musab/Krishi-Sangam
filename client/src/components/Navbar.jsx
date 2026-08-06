@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import krishiSangamLogo from '../assets/krishisangam_logo.png';
+import dpiitBadge from '../assets/dpiit-badge.jpeg';
 import { useNav } from '../context/NavContext';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
@@ -84,11 +85,17 @@ export default function Navbar() {
 
   return (
     <nav className="navbar">
-      <div className={`nav-brand ${view === 'home' ? 'active' : ''}`} title="Go to Home" onClick={() => { navigate('home'); setMenuOpen(false); }}>
-        <div className="brand-logo">
-          <img src={krishiSangamLogo} alt="Krishi Sangam" className="brand-logo-img" />
+      <div className="nav-brand-group">
+        <div className={`nav-brand ${view === 'home' ? 'active' : ''}`} title="Go to Home" onClick={() => { navigate('home'); setMenuOpen(false); }}>
+          <div className="brand-main">
+            <div className="brand-logo">
+              <img src={krishiSangamLogo} alt="Krishi Sangam" className="brand-logo-img" />
+            </div>          <span className="brand-name">Krishi Sangam</span>
         </div>
-        <span className="brand-name">Krishi Sangam</span>
+      </div>
+        <div className="brand-dpiit" title="Recognised & Supported by DPIIT — Startup India (Govt. of India)" aria-label="Recognised & Supported by DPIIT — Startup India (Govt. of India)">
+          <img src={dpiitBadge} alt="Recognised & Supported by DPIIT — Startup India" className="brand-dpiit-img" />
+        </div>
       </div>
 
       <ul className={`nav-links ${menuOpen ? 'show' : ''}`}>

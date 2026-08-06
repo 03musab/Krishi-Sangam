@@ -4,6 +4,7 @@ import { useLanguage } from '../i18n/LanguageContext';
 import ContactSection from '../components/ContactSection';
 import Chatbot from '../components/Chatbot';
 import Icon from '../components/Icon';
+import dpiitLogo from '../assets/dpiit.jpeg';
 
 const WHY_CARDS = [
   { key: 'why1', color: 'var(--green-mid)', bg: 'var(--green-light)', icon: <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg> },
@@ -40,17 +41,17 @@ export default function Home() {
           <div className="hero-overlay"></div>
         </div>
         <div className="hero-content" style={{ maxWidth: '900px' }}>
-          <h1 className="hero-title" style={{ fontSize: 'clamp(36px, 5vw, 56px)' }}>
+          <h1 className="hero-title" style={{ fontSize: 'var(--fs-6xl)' }}>
             {t('home.hero.title')}
           </h1>
-          <p className="hero-subtitle" style={{ fontSize: 'clamp(16px, 2vw, 20px)', marginTop: '24px', lineHeight: '1.6' }}>
+          <p className="hero-subtitle" style={{ fontSize: 'var(--fs-xl)', marginTop: '24px', lineHeight: '1.6' }}>
             {t('home.hero.subtitle')}
           </p>
           <div className="hero-actions" style={{ marginTop: '40px' }}>
-            <button className="btn-hero" style={{ background: 'var(--green-mid)', color: 'white', border: 'none', padding: '14px 32px' }} onClick={handleGetStarted}>
+            <button className="btn-hero" style={{ background: 'var(--green-mid)', color: 'white', border: 'none', padding: 'clamp(10px, 2vw, 14px) clamp(22px, 4.5vw, 32px)' }} onClick={handleGetStarted}>
               {t('home.getStarted')}
             </button>
-            <button className="btn-hero btn-outline" style={{ padding: '14px 32px' }} onClick={() => document.getElementById('services').scrollIntoView({ behavior: 'smooth' })}>
+            <button className="btn-hero btn-outline" style={{ padding: 'clamp(10px, 2vw, 14px) clamp(22px, 4.5vw, 32px)' }} onClick={() => document.getElementById('services').scrollIntoView({ behavior: 'smooth' })}>
               {t('home.exploreServices')}
             </button>
           </div>
@@ -80,8 +81,19 @@ export default function Home() {
             </div>
           </div>
 
+          {/* DPIIT / Startup India recognition — sits before Mission & Vision */}
+          <div className="dpiit-block hover-lift">
+            <div className="dpiit-badge">
+              <img src={dpiitLogo} alt="DPIIT — Startup India" />
+            </div>
+            <div className="dpiit-text">
+              <h3>{t('home.dpiitTitle')} <span className="dpiit-tag">Govt. of India</span></h3>
+              <p>{t('home.dpiitBody')}</p>
+            </div>
+          </div>
+
           {/* Our Mission — paired feature block */}
-          <div className="vision-block hover-lift" style={{ marginTop: '55px' }}>
+          <div className="vision-block hover-lift" style={{ marginTop: '24px' }}>
             <div className="vision-icon">
               <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
             </div>
@@ -105,7 +117,7 @@ export default function Home() {
           <div style={{ textAlign: 'center', marginTop: '40px' }}>
             <button
               className="btn-hero"
-              style={{ background: 'var(--green-mid)', color: 'white', border: 'none', padding: '14px 32px', fontSize: '16px', boxShadow: '0 8px 20px rgba(34, 197, 94, 0.35)' }}
+              style={{ background: 'var(--green-mid)', color: 'white', border: 'none', padding: 'clamp(10px, 2vw, 14px) clamp(22px, 4.5vw, 32px)', fontSize: 'clamp(14px, 2vw, 16px)', boxShadow: '0 8px 20px rgba(34, 197, 94, 0.35)' }}
               onClick={() => navigate('about')}
             >
               {t('home.aboutCta')} <span aria-hidden="true">→</span>
@@ -192,7 +204,7 @@ export default function Home() {
                   {s.icon}
                   <div style={{ position: 'absolute', top: '-10px', right: '-10px', width: '28px', height: '28px', background: 'var(--text-dark)', color: 'white', borderRadius: '50%', fontSize: '14px', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid white' }}>{s.step}</div>
                 </div>
-                <h4 style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-dark)', lineHeight: '1.5' }}>{s.title}</h4>
+                <h4 style={{ fontSize: 'var(--fs-lg)', fontWeight: '600', color: 'var(--text-dark)', lineHeight: '1.5' }}>{s.title}</h4>
               </div>
             ))}
           </div>
@@ -201,7 +213,7 @@ export default function Home() {
 
       {/* CTA */}
       <section className="section" style={{ marginTop: '32px' }}>
-        <div style={{ position: 'relative', overflow: 'hidden', padding: '64px 40px', background: 'linear-gradient(135deg, rgba(20, 83, 45, 0.9), rgba(15, 63, 33, 0.93))', borderRadius: 'var(--radius-xl)', textAlign: 'center', color: 'white', boxShadow: '0 20px 40px rgba(22, 101, 52, 0.3)' }}>
+        <div style={{ position: 'relative', overflow: 'hidden', padding: 'clamp(36px, 6vw, 64px) clamp(20px, 4vw, 40px)', background: 'linear-gradient(135deg, rgba(20, 83, 45, 0.9), rgba(15, 63, 33, 0.93))', borderRadius: 'var(--radius-xl)', textAlign: 'center', color: 'white', boxShadow: '0 20px 40px rgba(22, 101, 52, 0.3)' }}>
           <img
             src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1400&q=80"
             alt=""
@@ -210,11 +222,11 @@ export default function Home() {
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
           />
           <div style={{ position: 'relative', zIndex: 1 }}>
-            <h2 style={{ fontSize: '36px', color: 'white', marginBottom: '16px' }}>{t('home.ctaTitle')}</h2>
-            <p style={{ fontSize: '18px', maxWidth: '700px', margin: '0 auto 32px', opacity: '0.95', lineHeight: '1.6' }}>
+            <h2 style={{ fontSize: 'var(--fs-4xl)', color: 'white', marginBottom: '16px' }}>{t('home.ctaTitle')}</h2>
+            <p style={{ fontSize: 'clamp(15px, 2.2vw, 18px)', maxWidth: '700px', margin: '0 auto 32px', opacity: '0.95', lineHeight: '1.6' }}>
               {t('home.ctaBody')}
             </p>
-            <button className="btn-hero" style={{ background: 'white', color: 'var(--green-dark)', padding: '16px 40px', fontSize: '18px', border: 'none', boxShadow: '0 8px 24px rgba(0,0,0,0.15)' }} onClick={handleGetStarted}>
+            <button className="btn-hero" style={{ background: 'white', color: 'var(--green-dark)', padding: 'clamp(11px, 2.2vw, 16px) clamp(26px, 5vw, 40px)', fontSize: 'clamp(15px, 2.2vw, 18px)', border: 'none', boxShadow: '0 8px 24px rgba(0,0,0,0.15)' }} onClick={handleGetStarted}>
               {t('home.ctaButton')}
             </button>
           </div>
@@ -233,10 +245,12 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer style={{ background: '#0f172a', color: '#94a3b8', padding: '64px 24px 32px', marginTop: '48px' }}>
+      <footer style={{ background: '#0f172a', color: '#94a3b8', padding: 'clamp(40px, 6vw, 64px) 20px 32px', marginTop: '48px' }}>
         <div style={{ maxWidth: 'var(--container-max)', margin: '0 auto', display: 'flex', flexWrap: 'wrap', gap: '32px', justifyContent: 'space-between', borderBottom: '1px solid #334155', paddingBottom: '32px' }}>
           <div style={{ flex: '1 1 300px' }}>
-            <h3 style={{ color: 'white', fontSize: '24px', marginBottom: '15px' }}>Krishi Sangam</h3>
+            <div style={{ marginBottom: '16px' }}>
+              <h3 style={{ color: 'white', fontSize: 'var(--fs-2xl)', margin: 0 }}>Krishi Sangam</h3>
+            </div>
             <p style={{ lineHeight: '1.6', marginBottom: '20px' }}>{t('home.footer.tagline')}</p>
             <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
               <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('services'); }}>{t('nav.services')}</a>
@@ -247,7 +261,7 @@ export default function Home() {
           </div>
 
           <div style={{ flex: '1 1 300px' }}>
-            <h4 style={{ color: 'white', fontSize: '18px', marginBottom: '15px' }}>{t('home.footer.contact')}</h4>
+            <h4 style={{ color: 'white', fontSize: 'var(--fs-lg)', marginBottom: '15px' }}>{t('home.footer.contact')}</h4>
             <p style={{ lineHeight: '1.6', marginBottom: '10px' }}>
               <strong>{t('home.footer.regOffice')}</strong><br />
               S.No. 192/2A & 2B, Cosmos, Horizen,<br />

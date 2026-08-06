@@ -18,5 +18,15 @@ services:
         sync: false
       - key: SUPABASE_SERVICE_ROLE_KEY
         sync: false
+      - key: TFACTOR_API_KEY
+        sync: false
+      - key: TEXTBEE_API_KEY
+        sync: false
+      - key: TEXTBEE_DEVICE_ID
+        sync: false
+      - key: MSG91_AUTH_KEY
+        sync: false
+      - key: MSG91_OTP_TEMPLATE_ID
+        sync: false
       - key: NODE_VERSION
         value: 22.19.0

@@ -6,7 +6,7 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const { getDb } = require('../db');
-const { sendOtp: sendOtpSms } = require('../lib/sms');
+const { sendOtp: sendOtpSms, checkOtpDelivery } = require('../lib/sms');
 const { authenticateToken, generateToken } = require('../middleware/auth');
 
 const router = express.Router();
@@ -49,18 +49,79 @@ router.post('/send-otp', async (req, res) => {
     await db.prepare('INSERT INTO otp_verifications (phone, otp, expires_at) VALUES (?, ?, ?)')
       .run(phoneStr, otp, expiresAt);
 
-    // Deliver via Knock SMS in production; fall back to returning the OTP in
-    // the response when no KNOCK_API_KEY is configured (local dev / demo).
+    // Deliver via TextBee (or Msg91 fallback) when configured; otherwise
+    // return the OTP in the response (local dev / demo).
     const result = await sendOtpSms(phoneStr, otp);
     if (result.delivered) {
-      res.json({ message: 'OTP sent successfully.' });
+      // Terminal (non-retryable) failure statuses the provider may report.
+      const TERMINAL_FAILURES = ['FAILED', 'UNDELIVERED', 'INVALID_NUMBER', 'BOUNCED'];
+
+      // Persist provider + provider request_id so we can audit delivery.
+      await db.prepare(
+        'UPDATE otp_verifications SET provider = ?, request_id = ? WHERE phone = ? AND otp = ?'
+      ).run(result.provider, result.requestId || null, phoneStr, otp);
+
+      // One immediate best-effort status check (fast, so the response can
+      // carry a delivery hint). Not every provider plan exposes status — we
+      // degrade gracefully if it doesn't.
+      let delivery = { checked: false, status: 'UNKNOWN', reason: 'not-checked' };
+      try {
+        delivery = await checkOtpDelivery(result.requestId, phoneStr, result.provider);
+      } catch (err) {
+        delivery = { checked: false, status: 'UNKNOWN', reason: err.message };
+      }
+      if (!delivery.status) delivery.status = 'UNKNOWN';
+
+      // Fire-and-forget background poll: keep checking a few more seconds
+      // and record the final result in the DB (does NOT block the response).
+      (async () => {
+        let d = delivery;
+        for (let attempt = 2; attempt <= 5; attempt++) {
+          // Stop when we have a final answer or the endpoint is unavailable.
+          if ((d.checked && (d.status === 'DELIVERED' || TERMINAL_FAILURES.includes(d.status)))) break;
+          if (!d.checked && /unauthorized|invalid|auth|no-status-endpoint/i.test(d.reason || '')) break; // endpoint locked/unavailable
+          await new Promise((r) => setTimeout(r, 1500));
+          try {
+            d = await checkOtpDelivery(result.requestId, phoneStr, result.provider);
+          } catch (err) {
+            d = { checked: false, status: 'UNKNOWN', reason: err.message };
+          }
+          if (!d.status) d.status = 'UNKNOWN';
+        }
+        try {
+          await db.prepare(
+            'UPDATE otp_verifications SET delivery_status = ?, delivery_checked_at = NOW() WHERE phone = ? AND otp = ?'
+          ).run(d.status, phoneStr, otp);
+        } catch (err) {
+          console.warn('[OTP] Failed to write delivery audit:', err.message);
+        }
+        console.log(`[OTP] Final delivery for ${phoneStr}: ${d.status}${d.checked ? '' : ` (unavailable: ${d.reason})`}`);
+      })();
+
+      console.log(`[OTP] Delivered via ${result.provider} requestId=${result.requestId} delivery=${delivery.status}`);
+
+      // Only surface an error when the provider already reports a definitive
+      // non-delivery; otherwise assume delivery is in progress.
+      if (TERMINAL_FAILURES.includes(delivery.status)) {
+        return res.status(502).json({
+          error: 'OTP could not be delivered (SMS provider reported a failure). Please try again.',
+          delivery: delivery.status,
+          deliveryChecked: delivery.checked
+        });
+      }
+
+      return res.json({
+        message: 'OTP sent successfully.',
+        delivery: delivery.checked ? delivery.status : 'SENT',
+        deliveryChecked: delivery.checked
+      });
     } else {
       console.log(`[OTP] Dev mode — OTP for ${phone}: ${otp}`);
       res.json({ message: 'OTP sent successfully.', devOtp: result.devOtp });
     }
   } catch (err) {
     console.error('Send OTP error:', err);
-    res.status(500).json({ error: 'Server error sending OTP.' });
+    res.status(500).json({ error: err.publicMessage || 'Server error sending OTP.' });
   }
 });
 
@@ -368,6 +429,54 @@ router.post('/signin-otp', async (req, res) => {
   } catch (err) {
     console.error('Signin OTP error:', err);
     res.status(500).json({ error: 'Server error during signin.' });
+  }
+});
+
+/* ── POST /api/auth/reset-password ─────────── */
+// Forgot-password flow: verify the phone OTP, then set a new password.
+// Also invalidates every existing session so old tokens can't be reused.
+router.post('/reset-password', async (req, res) => {
+  try {
+    const { phone, otp, newPassword } = req.body;
+    if (!phone || !/^\d{10}$/.test(String(phone)) || !otp || !newPassword) {
+      return res.status(400).json({ error: 'Phone, OTP and new password are required.' });
+    }
+    if (String(newPassword).length < 6) {
+      return res.status(400).json({ error: 'Password must be at least 6 characters.' });
+    }
+
+    const db = getDb();
+    const record = await db.prepare(
+      'SELECT * FROM otp_verifications WHERE phone = ? ORDER BY id DESC LIMIT 1'
+    ).get(String(phone));
+
+    if (!record) {
+      return res.status(400).json({ error: 'No OTP request found for this number.' });
+    }
+    if (new Date(record.expires_at) < new Date()) {
+      return res.status(400).json({ error: 'OTP has expired. Please request a new one.' });
+    }
+    if (record.otp !== String(otp)) {
+      return res.status(400).json({ error: 'Invalid OTP. Please try again.' });
+    }
+
+    const user = await db.prepare('SELECT id FROM users WHERE phone = ?').get(String(phone));
+    if (!user) {
+      return res.status(404).json({ error: 'No account found for this number.' });
+    }
+
+    const passwordHash = bcrypt.hashSync(String(newPassword), SALT_ROUNDS);
+    await db.prepare('UPDATE users SET password_hash = ?, updated_at = NOW() WHERE id = ?')
+      .run(passwordHash, user.id);
+    await db.prepare('DELETE FROM otp_verifications WHERE phone = ?').run(String(phone));
+
+    // Invalidate existing sessions so previously issued tokens stop working
+    await db.prepare('DELETE FROM sessions WHERE user_id = ?').run(user.id);
+
+    res.json({ message: 'Password reset successfully. Please sign in.' });
+  } catch (err) {
+    console.error('Reset password error:', err);
+    res.status(500).json({ error: 'Server error during password reset.' });
   }
 });
 

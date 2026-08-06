@@ -5,6 +5,8 @@ import { useToast } from '../context/ToastContext';
 import { useLanguage } from '../i18n/LanguageContext';
 import { signin, signinOtp, sendOtp } from '../lib/api';
 import WelcomeOverlay from '../components/WelcomeOverlay';
+import OtpInput from '../components/OtpInput';
+import OtpResend from '../components/OtpResend';
 
 export default function SignIn() {
   const { navigate, back } = useNav();
@@ -24,7 +26,6 @@ export default function SignIn() {
 
   const [status, setStatus] = useState('idle'); // 'idle' | 'loading' | 'success'
   const [welcomeName, setWelcomeName] = useState('');
-  const otpInput = useRef(null);
   const navTimer = useRef(null);
 
   // Clear the pending navigation timer if the user navigates away mid-animation
@@ -75,38 +76,46 @@ export default function SignIn() {
     }
   };
 
-  const handleSendOtp = async (e) => {
-    e.preventDefault();
+  const doSendOtp = async () => {
     if (!/^\d{10}$/.test(otpPhone.trim())) {
       showToast(t('auth.phoneInvalid'));
       return;
     }
+    const res = await sendOtp({ phone: otpPhone.trim() });
+    setOtpSent(true);
+    if (res.devOtp) {
+      // Dev mode: SMS provider not configured — surface the code in a toast.
+      showToast(t('auth.otpSent', { otp: res.devOtp }), 5000);
+    } else {
+      showToast(t('auth.otpSentReal'));
+    }
+  };
+
+  const handleSendOtp = async (e) => {
+    e.preventDefault();
     try {
-      const res = await sendOtp({ phone: otpPhone.trim() });
-      setOtpSent(true);
-      if (res.devOtp) {
-        // Dev mode: SMS provider not configured — surface the code in a toast.
-        showToast(t('auth.otpSent', { otp: res.devOtp }), 5000);
-      } else {
-        showToast(t('auth.otpSentReal'));
-      }
-      setTimeout(() => otpInput.current?.focus(), 100);
+      await doSendOtp();
     } catch (err) {
+      showToast(t('common.error', { msg: err.message }));
+    }
+  };
+
+  const submitOtpCode = async (code) => {
+    const codeToCheck = (code || otp).trim();
+    if (!otpSent || codeToCheck.length !== 6) return;
+    setStatus('loading');
+    try {
+      const data = await signinOtp({ phone: otpPhone.trim(), otp: codeToCheck });
+      finishLogin(data);
+    } catch (err) {
+      setStatus('idle');
       showToast(t('common.error', { msg: err.message }));
     }
   };
 
   const handleOtpSubmit = async (e) => {
     e.preventDefault();
-    if (!otpSent || !otp.trim()) return;
-    setStatus('loading');
-    try {
-      const data = await signinOtp({ phone: otpPhone.trim(), otp: otp.trim() });
-      finishLogin(data);
-    } catch (err) {
-      setStatus('idle');
-      showToast(t('common.error', { msg: err.message }));
-    }
+    await submitOtpCode();
   };
 
   const switchMode = (m) => {
@@ -171,6 +180,9 @@ export default function SignIn() {
               {status === 'loading' && <span className="btn-spinner" aria-hidden="true" />}
               {status === 'loading' ? t('common.loading') : t('auth.signinTitle')}
             </button>
+            <p className="auth-switch">
+              <a href="#" onClick={(e) => { e.preventDefault(); navigate('forgot-password'); }}>{t('auth.forgotPassword')}</a>
+            </p>
           </form>
         )}
 
@@ -200,15 +212,10 @@ export default function SignIn() {
             {otpSent && (
               <div className="form-group">
                 <label className="form-label">{t('auth.enterOtp')} *</label>
-                <input
-                  ref={otpInput}
-                  type="text"
-                  className="form-input"
-                  placeholder="6-digit OTP"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                  required
-                />
+                <OtpInput value={otp} onChange={setOtp} autoFocus onComplete={submitOtpCode} />
+                <div className="otp-resend-row">
+                  <OtpResend onResend={doSendOtp} />
+                </div>
               </div>
             )}
             <button

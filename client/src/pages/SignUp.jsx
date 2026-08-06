@@ -8,6 +8,8 @@ import PhotoUpload from '../components/PhotoUpload';
 import LocationSelects from '../components/LocationSelects';
 import FarmLocationField from '../components/FarmLocationField';
 import WelcomeOverlay from '../components/WelcomeOverlay';
+import OtpInput from '../components/OtpInput';
+import OtpResend from '../components/OtpResend';
 import Icon from '../components/Icon';
 
 const ROLES = [
@@ -91,9 +93,9 @@ export default function SignUp() {
   const [farmLoc, setFarmLoc] = useState('');
   const [otp, setOtp] = useState('');
   const [otpSent, setOtpSent] = useState(false);
+  const [otpVerified, setOtpVerified] = useState(false);
   const [status, setStatus] = useState('idle'); // 'idle' | 'loading' | 'success'
   const [welcomeName, setWelcomeName] = useState('');
-  const otpInput = useRef(null);
   const navTimer = useRef(null);
 
   // Clear the pending navigation timer if the user navigates away mid-animation
@@ -103,35 +105,40 @@ export default function SignUp() {
 
   const isDetailed = role === 'labourer' || role === 'owner';
 
-  const handleSendOtp = async (e) => {
-    e.preventDefault();
+  const doSendOtp = async () => {
     if (!/^\d{10}$/.test(form.phone)) {
       showToast(t('auth.phoneInvalid'));
       return;
     }
+    const res = await sendOtp({ phone: form.phone });
+    setOtpSent(true);
+    if (res.devOtp) {
+      // Dev mode: SMS provider not configured — surface the code in a toast.
+      showToast(t('auth.otpSent', { otp: res.devOtp }), 5000);
+    } else {
+      showToast(t('auth.otpSentReal'));
+    }
+  };
+
+  const handleSendOtp = async (e) => {
+    e.preventDefault();
     try {
-      const res = await sendOtp({ phone: form.phone });
-      setOtpSent(true);
-      if (res.devOtp) {
-        // Dev mode: SMS provider not configured — surface the code in a toast.
-        showToast(t('auth.otpSent', { otp: res.devOtp }), 5000);
-      } else {
-        showToast(t('auth.otpSentReal'));
-      }
-      setTimeout(() => otpInput.current?.focus(), 100);
+      await doSendOtp();
     } catch (err) {
       showToast(t('common.error', { msg: err.message }));
     }
   };
 
-  const handleVerifyOtp = async (e) => {
-    e.preventDefault();
+  const verifyOtpCode = async (code) => {
+    const codeToCheck = (code || otp).trim();
+    if (codeToCheck.length !== 6 || otpVerified) return;
     try {
-      await verifyOtp({ phone: form.phone, otp });
+      await verifyOtp({ phone: form.phone, otp: codeToCheck });
+      setOtpVerified(true);
       showToast(t('auth.phoneVerified'));
-      setOtpSent(false);
-      setStep(2);
+      setTimeout(() => { setOtpSent(false); setStep(2); }, 800);
     } catch (err) {
+      setOtp('');
       showToast(t('common.error', { msg: err.message }));
     }
   };
@@ -230,12 +237,26 @@ export default function SignUp() {
             {otpSent && (
               <div className="form-group">
                 <label className="form-label">{t('auth.enterOtp')} *</label>
-                <div className="otp-row">
-                  <input ref={otpInput} type="text" className="form-input" placeholder="6-digit OTP" value={otp} onChange={(e) => setOtp(e.target.value)} required />
-                  <button type="button" className="btn-small" style={{ background: '#0d9488', whiteSpace: 'nowrap' }} onClick={handleVerifyOtp}>
-                    {t('auth.verify')}
-                  </button>
-                </div>
+                {otpVerified ? (
+                  <div className="phone-verified-badge">
+                    <Icon name="check" size={16} /> {t('auth.phoneVerifiedBadge')}
+                  </div>
+                ) : (
+                  <>
+                    <OtpInput value={otp} onChange={setOtp} autoFocus onComplete={verifyOtpCode} />
+                    <div className="otp-resend-row">
+                      <OtpResend onResend={doSendOtp} />
+                      <button
+                        type="button"
+                        className="btn-small"
+                        style={{ background: '#0d9488', whiteSpace: 'nowrap' }}
+                        onClick={() => verifyOtpCode(otp)}
+                      >
+                        {t('auth.verify')}
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
             )}
             <button type="button" className="btn-form-submit btn-slate" onClick={() => setStep(0)}>{t('common.back')}</button>

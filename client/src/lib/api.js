@@ -74,6 +74,7 @@ export const signout = () => apiCall('/auth/signout', 'POST');
 export const fetchMe = () => apiCall('/auth/me');
 export const sendOtp = (data) => apiCall('/auth/send-otp', 'POST', data);
 export const verifyOtp = (data) => apiCall('/auth/verify-otp', 'POST', data);
+export const resetPassword = (data) => apiCall('/auth/reset-password', 'POST', data);
 export const register = (data) => apiCall('/auth/register', 'POST', data);
 export const checkUsername = (username) => apiCall(`/auth/check-username?username=${encodeURIComponent(username)}`);
 
@@ -84,6 +85,7 @@ export const updateService = (id, data) => apiCall(`/services/${id}`, 'PUT', dat
 
 /* Land */
 export const getLand = (params = '') => apiCall(`/land${params ? '?' + params : ''}`);
+export const getLandById = (id) => apiCall(`/land/${id}`);
 export const getMyLand = () => apiCall('/land/my');
 export const createLand = (data) => apiCall('/land', 'POST', data);
 export const updateLand = (id, data) => apiCall(`/land/${id}`, 'PUT', data);
@@ -91,6 +93,7 @@ export const deleteLand = (id) => apiCall(`/land/${id}`, 'DELETE');
 
 /* Equipment */
 export const getEquipment = (params = '') => apiCall(`/equipment${params ? '?' + params : ''}`);
+export const getEquipmentById = (id) => apiCall(`/equipment/${id}`);
 export const getMyEquipment = () => apiCall('/equipment/my');
 export const createEquipment = (data) => apiCall('/equipment', 'POST', data);
 export const updateEquipment = (id, data) => apiCall(`/equipment/${id}`, 'PUT', data);
@@ -98,6 +101,7 @@ export const deleteEquipment = (id) => apiCall(`/equipment/${id}`, 'DELETE');
 
 /* Labour */
 export const getLabour = (params = '') => apiCall(`/labour${params ? '?' + params : ''}`);
+export const getLabourById = (id) => apiCall(`/labour/${id}`);
 export const getMyLabour = () => apiCall('/labour/my');
 export const createLabour = (data) => apiCall('/labour', 'POST', data);
 export const updateLabour = (id, data) => apiCall(`/labour/${id}`, 'PUT', data);
@@ -105,6 +109,7 @@ export const deleteLabour = (id) => apiCall(`/labour/${id}`, 'DELETE');
 
 /* Produce */
 export const getProduce = (params = '') => apiCall(`/produce${params ? '?' + params : ''}`);
+export const getProduceById = (id) => apiCall(`/produce/${id}`);
 export const getMyProduce = () => apiCall('/produce/my');
 export const createProduce = (data) => apiCall('/produce', 'POST', data);
 export const updateProduce = (id, data) => apiCall(`/produce/${id}`, 'PUT', data);
@@ -138,5 +143,14 @@ export const changePassword = (data) => apiCall('/profile/password', 'PUT', data
 export const getAdminStats = () => apiCall('/admin/stats');
 export const getPendingListings = (type = '') => apiCall(`/admin/listings/pending${type ? '?type=' + type : ''}`);
 export const approveListing = (type, id, status) => apiCall(`/admin/approve/${type}/${id}`, 'PUT', { status });
+export const getAdminListings = (type = '', status = '') => {
+  const params = new URLSearchParams();
+  if (type) params.set('type', type);
+  if (status) params.set('status', status);
+  const qs = params.toString();
+  return apiCall(`/admin/listings${qs ? '?' + qs : ''}`);
+};
+export const deleteAdminListing = (type, id) => apiCall(`/admin/listings/${type}/${id}`, 'DELETE');
 export const getAdminUsers = (params = '') => apiCall(`/admin/users${params ? '?' + params : ''}`);
+export const updateUserRole = (id, role) => apiCall(`/admin/users/${id}/role`, 'PUT', { role });
 export const deleteUser = (id) => apiCall(`/admin/users/${id}`, 'DELETE');

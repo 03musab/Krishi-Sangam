@@ -10,8 +10,8 @@ export default function Terms() {
         <button className="btn-back-icon" onClick={back} aria-label="Back">←</button>
       </div>
       <section className="section" style={{ background: 'var(--surface-2)', textAlign: 'center' }}>
-        <h1 style={{ fontSize: '40px', fontWeight: '800', color: 'var(--text-dark)' }}>{t('terms.title')}</h1>
-        <p style={{ fontSize: '18px', color: 'var(--text-mid)', marginTop: '20px' }}>
+        <h1 style={{ fontSize: 'var(--fs-5xl)', fontWeight: '800', color: 'var(--text-dark)' }}>{t('terms.title')}</h1>
+        <p style={{ fontSize: 'clamp(15px, 2.2vw, 18px)', color: 'var(--text-mid)', marginTop: '20px' }}>
           {t('terms.subtitle')}
         </p>
       </section>

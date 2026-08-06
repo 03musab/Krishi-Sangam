@@ -56,7 +56,7 @@ export default function ContactSection({ showImage = false }) {
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '32px', alignItems: 'start' }}>
       {/* Contact form — React 19 form action */}
-      <form action={formAction} style={{ background: 'var(--white)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-sm)', padding: '32px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      <form action={formAction} style={{ background: 'var(--white)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-sm)', padding: 'clamp(20px, 4vw, 32px)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
         <div>
           <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px', color: 'var(--text-dark)', fontSize: '15px' }}>{t('contact.name')}</label>
           <input
@@ -87,7 +87,7 @@ export default function ContactSection({ showImage = false }) {
             style={{ width: '100%', padding: '12px 14px', border: '1.5px solid var(--border)', borderRadius: '10px', fontSize: '15px', outline: 'none', resize: 'vertical', fontFamily: 'inherit' }}
           />
         </div>
-        <button type="submit" disabled={isPending} className="btn-hero" style={{ background: 'linear-gradient(135deg, var(--green-mid), var(--green-dark))', color: 'white', border: 'none', padding: '14px 28px', fontSize: '16px', alignSelf: 'flex-start' }}>
+        <button type="submit" disabled={isPending} className="btn-hero" style={{ background: 'linear-gradient(135deg, var(--green-mid), var(--green-dark))', color: 'white', border: 'none', padding: 'clamp(10px, 2.2vw, 14px) clamp(20px, 4vw, 28px)', fontSize: 'clamp(14px, 2.2vw, 16px)', alignSelf: 'flex-start' }}>
           {isPending && <span className="btn-spinner" aria-hidden="true" />}
           {isPending ? t('contact.sending') : t('contact.send')}
         </button>

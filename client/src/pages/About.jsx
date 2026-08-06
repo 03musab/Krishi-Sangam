@@ -24,7 +24,7 @@ export default function About() {
         <button className="btn-back-icon" onClick={back} aria-label="Back">←</button>
       </div>
       {/* Header */}
-      <section className="section" style={{ position: 'relative', overflow: 'hidden', background: 'linear-gradient(135deg, rgba(20, 83, 45, 0.88), rgba(15, 63, 33, 0.9))', textAlign: 'center', padding: '56px 24px' }}>
+      <section className="section" style={{ position: 'relative', overflow: 'hidden', background: 'linear-gradient(135deg, rgba(20, 83, 45, 0.88), rgba(15, 63, 33, 0.9))', textAlign: 'center', padding: 'clamp(36px, 6vw, 56px) clamp(16px, 4vw, 24px)' }}>
         <img
           src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=1600&q=80"
           alt=""
@@ -32,8 +32,8 @@ export default function About() {
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
         />
         <div style={{ position: 'relative', zIndex: 1 }}>
-          <h1 style={{ fontSize: '40px', fontWeight: '800', color: 'white', textShadow: '0 4px 16px rgba(0,0,0,0.3)' }}>{t('about.title')}</h1>
-          <p style={{ fontSize: '18px', color: 'rgba(255,255,255,0.92)', marginTop: '20px', maxWidth: '800px', margin: '20px auto 0', textShadow: '0 2px 8px rgba(0,0,0,0.25)' }}>
+          <h1 style={{ fontSize: 'var(--fs-5xl)', fontWeight: '800', color: 'white', textShadow: '0 4px 16px rgba(0,0,0,0.3)' }}>{t('about.title')}</h1>
+          <p style={{ fontSize: 'clamp(15px, 2.2vw, 18px)', color: 'rgba(255,255,255,0.92)', marginTop: '20px', maxWidth: '800px', margin: '20px auto 0', textShadow: '0 2px 8px rgba(0,0,0,0.25)' }}>
             {t('about.subtitle')}
           </p>
         </div>
@@ -43,9 +43,11 @@ export default function About() {
       <section className="section" style={{ maxWidth: '1120px', margin: '12px auto 0', padding: '24px 24px' }}>
         <h2 className="section-title">{t('about.whatIsTitle')}</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '32px', alignItems: 'center' }}>
-          <p style={{ fontSize: '17px', color: 'var(--text-mid)', lineHeight: '1.85' }}>
-            {t('about.whatIsBody')}
-          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {t('about.whatIsBody').split('\n').filter(Boolean).map((para, i) => (
+              <p key={i} style={{ fontSize: '17px', color: 'var(--text-mid)', lineHeight: '1.85' }}>{para}</p>
+            ))}
+          </div>
           <img
             src="https://images.unsplash.com/photo-1550989460-0adf9ea622e2?auto=format&fit=crop&w=900&q=80"
             alt="Rows of crops in a farm field"
@@ -106,7 +108,7 @@ export default function About() {
             <span style={{ position: 'absolute', bottom: '4px', right: '4px', background: 'var(--green-mid)', color: 'white', fontSize: '12px', fontWeight: '700', padding: '5px 12px', borderRadius: '999px', boxShadow: '0 4px 10px rgba(22, 101, 52, 0.35)', display: 'flex', alignItems: 'center', gap: '6px' }}><Icon name="seedling" size={14} /></span>
           </div>
           <div style={{ textAlign: 'center' }}>
-            <h3 style={{ fontSize: '26px', color: 'var(--text-dark)', marginBottom: '4px' }}>{t('about.founderName')}</h3>
+            <h3 style={{ fontSize: 'var(--fs-2xl)', color: 'var(--text-dark)', marginBottom: '4px' }}>{t('about.founderName')}</h3>
             <p style={{ color: 'var(--green-dark)', fontWeight: '700', fontSize: '17px', marginBottom: '20px' }}>{t('about.founderTitle')}</p>
             <div style={{ color: 'var(--text-mid)', fontSize: '16px', lineHeight: '1.8', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '720px' }}>
               <p>{t('about.founderP1')}</p>
@@ -118,7 +120,7 @@ export default function About() {
 
       {/* CTA */}
       <section className="section" style={{ maxWidth: '1120px', margin: '12px auto 0', padding: '24px 24px' }}>
-        <div style={{ position: 'relative', overflow: 'hidden', padding: '56px 40px', background: 'linear-gradient(135deg, rgba(255,255,255,0.94), rgba(240,253,244,0.96))', borderRadius: 'var(--radius-xl)', textAlign: 'center', color: '#0b0f0c', boxShadow: '0 16px 32px rgba(22, 101, 52, 0.18)' }}>
+        <div style={{ position: 'relative', overflow: 'hidden', padding: 'clamp(32px, 5.5vw, 56px) clamp(20px, 4vw, 40px)', background: 'linear-gradient(135deg, rgba(255,255,255,0.94), rgba(240,253,244,0.96))', borderRadius: 'var(--radius-xl)', textAlign: 'center', color: '#0b0f0c', boxShadow: '0 16px 32px rgba(22, 101, 52, 0.18)' }}>
           <img
             src="https://images.unsplash.com/photo-1523741543316-beb7fc7023d8?auto=format&fit=crop&w=1400&q=80"
             alt=""
@@ -127,11 +129,11 @@ export default function About() {
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
           />
           <div style={{ position: 'relative', zIndex: 1 }}>
-            <h2 style={{ fontSize: '28px', color: '#0b0f0c', marginBottom: '16px' }}>{t('home.ctaTitle')}</h2>
-            <p style={{ fontSize: '17px', maxWidth: '680px', margin: '0 auto 32px', color: '#111827', lineHeight: '1.6' }}>
+            <h2 style={{ fontSize: 'var(--fs-3xl)', color: '#0b0f0c', marginBottom: '16px' }}>{t('home.ctaTitle')}</h2>
+            <p style={{ fontSize: 'clamp(15px, 2.2vw, 17px)', maxWidth: '680px', margin: '0 auto 32px', color: '#111827', lineHeight: '1.6' }}>
               {t('home.ctaBody')}
             </p>
-            <button className="btn-hero" style={{ background: '#ffffff', color: '#0b0f0c', padding: '14px 36px', fontSize: '16px', border: '2px solid #0b0f0c', boxShadow: '0 8px 24px rgba(0,0,0,0.18)' }} onClick={() => navigate(user ? 'profile' : 'signup')}>
+            <button className="btn-hero" style={{ background: '#ffffff', color: '#0b0f0c', padding: 'clamp(11px, 2.2vw, 14px) clamp(24px, 4.5vw, 36px)', fontSize: 'clamp(14px, 2.2vw, 16px)', border: '2px solid #0b0f0c', boxShadow: '0 8px 24px rgba(0,0,0,0.18)' }} onClick={() => navigate(user ? 'profile' : 'signup')}>
               {t('home.ctaButton')}
             </button>
           </div>

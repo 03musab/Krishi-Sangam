@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useLanguage } from '../i18n/LanguageContext';
+import { useAuth } from '../context/AuthContext';
+import { useNav } from '../context/NavContext';
+import { useToast } from '../context/ToastContext';
+import { sendMessage } from '../lib/api';
 import { memberDeposit } from '../lib/trust';
 import Icon from './Icon';
 
@@ -18,12 +22,26 @@ export default function ListingDetailsModal({
   description,
   ownerName,
   ownerPhone,
+  ownerId,
   deposit,
   trustTier,
-  onClose
+  listingType,
+  listingId,
+  onClose,
+  onOpenListing,
+  onMessageSent
 }) {
   const { t } = useLanguage();
+  const { user } = useAuth();
+  const { navigate } = useNav();
+  const { showToast } = useToast();
   const [closing, setClosing] = useState(false);
+  const [msgOpen, setMsgOpen] = useState(false);
+  // Pre-fill the composer with a friendly default so the sender can just hit
+  // send — the listing context line is appended automatically on submit.
+  const [msgText, setMsgText] = useState(() => t('card.msgGreeting'));
+  const [msgSending, setMsgSending] = useState(false);
+  const [msgSent, setMsgSent] = useState(false);
   const closeTimer = useRef(null);
 
   // Every close path plays the exit animation first, then unmounts.
@@ -117,7 +135,82 @@ export default function ListingDetailsModal({
                     {t('card.call')}
                   </a>
                 )}
+                {ownerId && (
+                  <button className="modal-msg-btn" onClick={() => {
+                    if (!user) {
+                      showToast(t('common.pleaseSignin'));
+                      navigate('signin');
+                      return;
+                    }
+                    if (Number(ownerId) === Number(user.id)) {
+                      showToast(t('card.msgSelf'));
+                      return;
+                    }
+                    setMsgOpen((o) => !o);
+                  }}>
+                    <Icon name="chat" size={15} />
+                    {t('card.message')}
+                  </button>
+                )}
               </div>
+            </div>
+          )}
+
+          {ownerId && msgOpen && (
+            <div className="modal-block">
+              <h4 className="modal-block-title"><Icon name="send" size={15} style={{ verticalAlign: '-2px', marginRight: '7px' }} />{t('card.messageTitle')}</h4>
+              {msgSent ? (
+                <div className="modal-msg-sent">
+                  <span><Icon name="check" size={14} style={{ verticalAlign: '-2px', marginRight: '6px' }} />{t('card.msgSent')}</span>
+                  <button className="btn-small" style={{ background: 'var(--accent-teal)' }} onClick={() => navigate('messages')}>
+                    {t('card.openMessages')} →
+                  </button>
+                </div>
+              ) : (
+                <div className="modal-composer">
+                  <textarea
+                    className="form-textarea"
+                    rows="3"
+                    placeholder={t('card.msgPlaceholder')}
+                    value={msgText}
+                    onChange={(e) => setMsgText(e.target.value)}
+                  />
+                  <button
+                    className="modal-msg-send"
+                    disabled={!msgText.trim() || msgSending}
+                    onClick={async () => {
+                      setMsgSending(true);
+                      try {
+                        // Always attach the listing context so the owner knows
+                        // exactly which post this message is about.
+                        const fullLocation = [location, district].filter(Boolean).join(', ');
+                        const listingLine = t('card.msgListing', {
+                          title,
+                          location: fullLocation || t('card.untitled'),
+                          price: `₹ ${Number(price.price || 0).toLocaleString()}${price.period || ''}`
+                        });
+                        const content = `${msgText.trim()}\n\n${listingLine}`;
+                        await sendMessage({
+                          receiver_id: ownerId,
+                          content,
+                          listing_type: listingType || null,
+                          listing_id: listingId || null
+                        });
+                        setMsgSent(true);
+                        showToast(t('card.msgSent'));
+                        if (typeof onMessageSent === 'function') onMessageSent();
+                      } catch (err) {
+                        showToast(t('common.error', { msg: err.message }));
+                      } finally {
+                        setMsgSending(false);
+                      }
+                    }}
+                  >
+                    {msgSending ? <span className="btn-spinner btn-spinner-sm" aria-hidden="true" /> : <Icon name="send" size={14} style={{ verticalAlign: '-2px', marginRight: '6px' }} />}
+                    {msgSending ? t('common.loading') : t('msg.send')}
+                  </button>
+                </div>
+              )}
             </div>
           )}
 

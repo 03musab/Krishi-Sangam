@@ -6,6 +6,7 @@ import { useLanguage } from '../i18n/LanguageContext';
 import { createBooking } from '../lib/api';
 import { memberDeposit } from '../lib/trust';
 import ListingDetailsModal from './ListingDetailsModal';
+import { listingToModalProps } from '../lib/listingProps.jsx';
 import Icon from './Icon';
 
 function escapeHtml(s) {
@@ -45,53 +46,14 @@ export default function ListingCard({ listing, type, onBook, trustTier }) {
     });
   };
 
-  const getTagContent = () => {
-    if (type === 'land') {
-      const tags = [];
-      if (listing.area_acres) tags.push({ cls: 'tag-green', text: t('card.acres', { n: listing.area_acres }) });
-      if (listing.soil_type) tags.push({ cls: 'tag-orange', text: listing.soil_type });
-      if (listing.water_source) tags.push({ cls: 'tag-blue', text: <><Icon name="droplet" size={13} style={{ verticalAlign: '-2px', marginRight: '5px' }} />{listing.water_source}</> });
-      return tags;
-    }
-    if (type === 'equipment') {
-      return [{ cls: 'tag-orange', text: listing.type }];
-    }
-    if (type === 'labour') {
-      if (listing.skills) return [{ cls: 'tag-purple', text: listing.skills }];
-      return [];
-    }
-    if (type === 'produce') {
-      const tags = [];
-      if (listing.quantity != null && listing.unit) tags.push({ cls: 'tag-amber', text: `${listing.quantity} ${listing.unit}` });
-      if (listing.quality_grade) tags.push({ cls: 'tag-slate', text: t('produce.gradeTag', { g: listing.quality_grade }) });
-      return tags;
-    }
-    return [];
-  };
-
-  const getPrice = () => {
-    if (type === 'land') {
-      const price = listing.price_per_season || listing.price_per_month || listing.price_per_year || 0;
-      const period = listing.lease_type ? listing.lease_type.toLowerCase() : 'season';
-      return { price, period: `/${period}`, color: '#16a34a' };
-    }
-    if (type === 'equipment') {
-      return { price: listing.price_per_hour || 0, period: t('card.perHour'), secondary: `₹ ${(listing.price_per_day || 0).toLocaleString()}${t('card.perDay')}`, color: '#ea580c' };
-    }
-    if (type === 'labour') {
-      return { price: listing.daily_rate || 0, period: t('card.perDay'), color: '#7c3aed' };
-    }
-    if (type === 'produce') {
-      return { price: listing.price_per_unit || 0, period: `/${listing.unit || 'kg'}`, color: '#d97706' };
-    }
-    return { price: 0, period: '', color: '#16a34a' };
-  };
-
-  const price = getPrice();
-  const title = listing.title || listing.name || listing.crop_name || t('card.untitled');
-  const location = listing.location || '';
-  const district = listing.district || '';
-  const placeholderIcon = type === 'land' ? 'wheat' : type === 'equipment' ? 'tractor' : type === 'labour' ? 'worker' : 'seedling';
+  const modalProps = listingToModalProps(listing, type);
+  const price = modalProps.price;
+  const title = modalProps.title;
+  const location = modalProps.location;
+  const district = modalProps.district;
+  const placeholderIcon = modalProps.icon;
+  const tags = modalProps.tags;
+  const accent = modalProps.accent;
   const isPending = optimisticStatus === 'pending';
   const isBooked = optimisticStatus === 'booked';
   // Land, equipment & produce can't be booked directly — users get full details and owner contact instead
@@ -99,18 +61,12 @@ export default function ListingCard({ listing, type, onBook, trustTier }) {
   const baseLabel = isDetailsType ? t('card.getDetails') : type === 'labour' ? t('card.hire') : t('card.buy');
   const btnLabel = isDetailsType ? baseLabel : (isBooked ? t('card.booked') : isPending ? t('card.booking') : baseLabel);
   const btnColor = price.color;
-  const accent = type === 'land' ? 'linear-gradient(135deg, #16a34a, #4ade80)'
-    : type === 'equipment' ? 'linear-gradient(135deg, #ea580c, #fb923c)'
-    : type === 'labour' ? 'linear-gradient(135deg, #7c3aed, #a78bfa)'
-    : 'linear-gradient(135deg, #d97706, #fbbf24)';
 
   const handleButtonClick = (e) => {
     e.stopPropagation();
     if (isDetailsType) { setDetailsOpen(true); return; }
     handleBook(e);
   };
-
-  const tags = getTagContent();
 
   return (
     <div className="listing-card">
@@ -166,18 +122,9 @@ export default function ListingCard({ listing, type, onBook, trustTier }) {
 
       {detailsOpen && (
         <ListingDetailsModal
-          title={title}
-          location={location}
-          district={district}
-          image={listing.photo_url}
-          icon={placeholderIcon}
-          accent={accent}
-          price={price}
-          tags={tags}
-          description={listing.description}
-          ownerName={listing.owner_name}
-          ownerPhone={listing.owner_phone}
-          deposit={Number(listing.deposit) || 0}
+          {...modalProps}
+          listingType={type}
+          listingId={listing.id}
           trustTier={trustTier}
           onClose={() => setDetailsOpen(false)}
         />

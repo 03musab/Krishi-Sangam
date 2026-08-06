@@ -122,6 +122,50 @@ router.get('/listings/pending', async (req, res) => {
   }
 });
 
+/* ── GET /api/admin/listings — All listings (manage tab, filter by type/status) ── */
+router.get('/listings', async (req, res) => {
+  try {
+    const db = getDb();
+    const { type, status } = req.query;
+
+    const statusClause = status && ['pending', 'approved', 'rejected'].includes(status)
+      ? "AND l.status = '" + status + "'"
+      : '';
+    const order = 'ORDER BY l.created_at DESC LIMIT 200';
+
+    const out = {};
+    if (!type || type === 'land') {
+      out.land = await db.prepare(`
+        SELECT l.*, u.username as owner_name FROM land_listings l
+        JOIN users u ON l.owner_id = u.id WHERE 1=1 ${statusClause} ${order}
+      `).all();
+    }
+    if (!type || type === 'equipment') {
+      out.equipment = await db.prepare(`
+        SELECT e.*, u.username as owner_name FROM equipment_listings e
+        JOIN users u ON e.owner_id = u.id WHERE 1=1 ${statusClause} ${order}
+      `).all();
+    }
+    if (!type || type === 'labour') {
+      out.labour = await db.prepare(`
+        SELECT l.*, u.username as worker_name FROM labour_services l
+        JOIN users u ON l.worker_id = u.id WHERE 1=1 ${statusClause} ${order}
+      `).all();
+    }
+    if (!type || type === 'produce') {
+      out.produce = await db.prepare(`
+        SELECT p.*, u.username as seller_name FROM produce_listings p
+        JOIN users u ON p.seller_id = u.id WHERE 1=1 ${statusClause} ${order}
+      `).all();
+    }
+
+    res.json(out);
+  } catch (err) {
+    console.error('Admin listings error:', err);
+    res.status(500).json({ error: 'Server error.' });
+  }
+});
+
 /* ── PUT /api/admin/approve/:type/:id ── */
 router.put('/approve/:type/:id', async (req, res) => {
   try {
