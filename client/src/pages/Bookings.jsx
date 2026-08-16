@@ -21,8 +21,8 @@ const STATUS_KEYS = {
 };
 
 function BookingItem({ booking, onStatusChange }) {
-  const { t } = useLanguage();
-  const title = booking.listing_title || booking.listing_type;
+  const rawTitle = booking.listing_title || booking.listing_type;
+  const title = t(`seed.${rawTitle}`, rawTitle);
 
   return (
     <div className="booking-card">

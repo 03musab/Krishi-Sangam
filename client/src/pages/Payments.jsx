@@ -27,7 +27,7 @@ export default function Payments() {
         {payments.map((p) => (
           <div key={p.id} className="payment-card">
             <div>
-              <strong>{p.listing_title || p.listing_type}</strong>
+              <strong>{t(`seed.${p.listing_title}`, p.listing_title || p.listing_type)}</strong>
               <br />
               <span className="muted">{p.transaction_ref || ''}</span>
             </div>

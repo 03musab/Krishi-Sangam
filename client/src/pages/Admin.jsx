@@ -244,7 +244,8 @@ export default function Admin() {
                 <div key={g.key}>
                   <h3 className="pending-group-title">{t(g.labelKey)} ({items.length})</h3>
                   {items.map((i) => {
-                    const nm = i.title || i.name || i.crop_name || i.worker_name;
+                    const rawNm = i.title || i.name || i.crop_name || i.worker_name;
+                    const nm = t(`seed.${rawNm}`, rawNm);
                     const loc = i.location || '';
                     return (
                       <div key={i.id} className="pending-item">
@@ -299,7 +300,8 @@ export default function Admin() {
             {manageLoading && <div className="listings-empty">{t('common.loading')}</div>}
             {!manageLoading && !manageItems.length && <div className="listings-empty">{t('admin.noListings')}</div>}
             {!manageLoading && manageItems.map((i) => {
-              const nm = i.title || i.name || i.crop_name || i.worker_name;
+              const rawNm = i.title || i.name || i.crop_name || i.worker_name;
+              const nm = t(`seed.${rawNm}`, rawNm);
               const owner = i.owner_name || i.worker_name || i.seller_name;
               const loc = i.location || '';
               return (
