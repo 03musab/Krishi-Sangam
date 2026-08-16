@@ -110,8 +110,8 @@ export default function Labour() {
               onClick={() => setFlow({ view: 'category', category: cat })}
             >
               <span className="service-category-emoji tip tip-left" data-tip={cat.desc || cat.tagline}><Icon name={cat.icon} size={34} /></span>
-              <span className="service-category-name">{cat.name}</span>
-              <span className="service-category-tagline">{cat.tagline}</span>
+              <span className="service-category-name">{t(`cat.${cat.id}.name`, cat.name)}</span>
+              <span className="service-category-tagline">{t(`cat.${cat.id}.tagline`, cat.tagline)}</span>
               <span className="service-category-count">{t('labour.xServices', { n: cat.services.length })}</span>
             </button>
           ))}
