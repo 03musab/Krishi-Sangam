@@ -644,7 +644,6 @@ img {
 }
 
 .stat-card:hover {
-  transform: translateY(-4px);
   box-shadow: var(--shadow-lg);
 }
 
@@ -706,7 +705,6 @@ img {
 }
 
 .action-card:hover {
-  transform: translateY(-5px);
   box-shadow: var(--shadow-lg);
 }
 
@@ -843,6 +841,81 @@ img {
   box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.12);
 }
 
+/* Location prompt — compact single-line box asking users to allow
+   location access so listings can be sorted by distance from their area */
+.location-prompt {
+  max-width: var(--container-max);
+  margin: 12px auto 0;
+  padding: 8px 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #ecfdf5, #eff6ff);
+  border: 1px solid #a7f3d0;
+  border-radius: 999px;
+  box-shadow: var(--shadow-sm);
+  font-size: 13px;
+  color: var(--text-mid);
+  line-height: 1.4;
+}
+
+.location-prompt.granted {
+  background: var(--green-pale);
+  border-color: #86efac;
+  color: var(--green-dark);
+}
+
+.location-prompt-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--green-primary);
+  flex-shrink: 0;
+}
+
+.location-prompt.granted .location-prompt-icon {
+  color: var(--green-dark);
+}
+
+.location-prompt-text {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.location-prompt-btn {
+  padding: 6px 16px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--green-mid), var(--green-dark));
+  color: var(--white);
+  font-size: 12.5px;
+  font-weight: 600;
+  box-shadow: 0 3px 10px rgba(22, 101, 52, 0.28);
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.location-prompt-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 14px rgba(22, 101, 52, 0.4);
+}
+
+.location-prompt-spinner {
+  border-color: rgba(22, 101, 52, 0.25);
+  border-top-color: var(--green-mid);
+}
+
+/* Distance text shown on listing cards when location is enabled */
+.listing-distance {
+  color: var(--green-primary);
+  font-weight: 600;
+  margin-left: 6px;
+  white-space: nowrap;
+}
+
 .listings-count-label {
   max-width: var(--container-max);
   margin: 12px auto 0;
@@ -888,7 +961,6 @@ img {
 }
 
 .listing-card:hover {
-  transform: translateY(-4px);
   box-shadow: var(--shadow-lg);
 }
 
@@ -1306,7 +1378,9 @@ img {
   .nav-progress,
   .members-gate-card,
   .modal-backdrop,
-  .modal-card {
+  .modal-card,
+  .chatbot-notif,
+  .chatbot-notif-dot::after {
     animation: none !important;
   }
 }
@@ -1817,6 +1891,220 @@ img {
   transform: translateY(-1px);
 }
 
+/* Sender name shown above support replies when multiple admins can answer */
+.help-sender-name {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+/* Image attachments inside chat bubbles (Messages + Help) */
+.message-image {
+  max-width: 220px;
+  max-height: 180px;
+  width: auto;
+  height: auto;
+  border-radius: 12px;
+  margin-bottom: 8px;
+  display: block;
+  object-fit: cover;
+  box-shadow: var(--shadow-sm);
+  background: var(--surface-2);
+}
+
+/* ===========================
+   Help & Support
+   =========================== */
+.help-wrap {
+  max-width: var(--container-max);
+  margin: 16px auto 32px;
+  padding: 0 24px;
+}
+
+.help-chat {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.help-chat-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  background: linear-gradient(135deg, var(--green-dark), var(--green-deep));
+  color: var(--white);
+}
+
+.help-chat-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.help-chat-meta {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.4;
+}
+
+.help-chat-meta strong {
+  font-size: 15px;
+}
+
+.help-chat-meta span {
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+.help-chat-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  min-height: 380px;
+  max-height: 520px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.help-fallback {
+  margin: auto;
+  max-width: 460px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 15px;
+  line-height: 1.7;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.help-chat-input {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-top: 1px solid var(--border);
+}
+
+.help-attach-btn {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--border);
+  border-radius: 50%;
+  background: var(--white);
+  color: var(--text-mid);
+  transition: all var(--transition-fast);
+}
+
+.help-attach-btn:hover:not(:disabled) {
+  border-color: var(--green-mid);
+  color: var(--green-dark);
+}
+
+.help-attach-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.help-input-box {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.help-input-box > input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
+  font-size: 14px;
+  color: var(--text-dark);
+  transition: all var(--transition-fast);
+}
+
+.help-input-box > input:focus {
+  outline: none;
+  border-color: var(--green-mid);
+}
+
+.help-input-box > input:disabled {
+  opacity: 0.6;
+}
+
+.help-pending-img {
+  position: relative;
+  align-self: flex-start;
+}
+
+.help-pending-img img {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  display: block;
+}
+
+.help-pending-img button {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  width: 20px;
+  height: 20px;
+  border: none;
+  border-radius: 50%;
+  background: var(--text-dark);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.help-send-btn {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #14b8a6, var(--accent-teal));
+  color: var(--white);
+  transition: all var(--transition-fast);
+}
+
+.help-send-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.4);
+}
+
+.help-send-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* ===========================
    Admin
    =========================== */
@@ -1845,7 +2133,6 @@ img {
 }
 
 .admin-stat-box:hover {
-  transform: translateY(-3px);
   box-shadow: var(--shadow-md);
 }
 
@@ -2052,9 +2339,12 @@ img {
   margin-bottom: 16px;
 }
 
-/* Book Labour Team card (top option) */
+/* Book Labour Team / Book Equipment with Operator cards (top options) */
 .labour-top-section {
   padding-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
 }
 
 .labour-team-card {
@@ -2074,8 +2364,16 @@ img {
 }
 
 .labour-team-card:hover {
-  transform: translateY(-3px);
   box-shadow: 0 16px 40px rgba(124, 58, 237, 0.45);
+}
+
+.labour-team-card.equipment {
+  background: linear-gradient(135deg, #0d9488, #115e59);
+  box-shadow: 0 12px 32px rgba(13, 148, 136, 0.35);
+}
+
+.labour-team-card.equipment:hover {
+  box-shadow: 0 16px 40px rgba(13, 148, 136, 0.45);
 }
 
 .labour-team-emoji {
@@ -2125,7 +2423,6 @@ img {
 }
 
 .service-category-card:hover {
-  transform: translateY(-4px);
   box-shadow: var(--shadow-lg);
   border-color: var(--green-mid);
 }
@@ -2942,7 +3239,6 @@ img {
 }
 
 .hover-lift:hover {
-  transform: translateY(-8px);
   box-shadow: 0 16px 36px rgba(15, 23, 42, 0.12);
 }
 
@@ -3599,6 +3895,99 @@ img {
   line-height: 1.5;
 }
 
+/* ═══════════════════════════════════════════
+   Auth gate modal (create-account prompt)
+   ═══════════════════════════════════════════ */
+.auth-gate-card {
+  max-width: 440px;
+  text-align: center;
+  overflow: visible;
+}
+
+.auth-gate-body {
+  padding: 44px 36px 36px;
+}
+
+.auth-gate-icon {
+  width: 74px;
+  height: 74px;
+  margin: 0 auto 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--green-primary);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, var(--green-pale), #e0f2fe);
+  box-shadow: var(--shadow-md);
+}
+
+.auth-gate-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--green-light);
+  color: var(--green-dark);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.auth-gate-title {
+  font-size: var(--fs-2xl);
+  font-weight: 800;
+  color: var(--text-dark);
+  margin-bottom: 12px;
+}
+
+.auth-gate-desc {
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--text-mid);
+  margin: 0 auto 28px;
+  max-width: 340px;
+}
+
+.auth-gate-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.auth-gate-btn {
+  padding: 13px 34px;
+  font-size: 15px;
+}
+
+.auth-gate-switch {
+  margin-top: 18px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.auth-gate-link {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--green-primary);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+.auth-gate-link:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+  .auth-gate-body {
+    padding: 36px 20px 28px;
+  }
+}
+
 @keyframes modalFade {
   from { opacity: 0; }
   to   { opacity: 1; }
@@ -3807,7 +4196,6 @@ img {
 }
 
 .equip-browse-card:hover {
-  transform: translateY(-3px);
   box-shadow: var(--shadow-md);
 }
 
@@ -3947,6 +4335,84 @@ img {
 /* ═══════════════════════════════════════════
    Chatbot — floating FAQ widget (bottom-right)
    ═══════════════════════════════════════════ */
+
+/* "I'm a chatbot" notification bubble — pops in to the left of the toggle,
+   points at it, and gently nudges to draw attention */
+.chatbot-notif {
+  position: fixed;
+  bottom: 36px;
+  right: 92px;
+  z-index: 9997;
+  max-width: 264px;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 14px;
+  background: #ffffff;
+  color: var(--text-dark);
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.5;
+  text-align: left;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.2);
+  cursor: pointer;
+  animation: chatbotNotifPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), chatbotNotifNudge 2.6s ease-in-out 1.2s infinite;
+  transform-origin: right center;
+}
+
+.chatbot-notif:hover {
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.26);
+}
+
+.chatbot-notif-tail {
+  position: absolute;
+  top: 50%;
+  right: -6px;
+  width: 12px;
+  height: 12px;
+  background: #ffffff;
+  transform: translateY(-50%) rotate(45deg);
+  border-radius: 2px;
+  box-shadow: 4px -4px 8px rgba(15, 23, 42, 0.08);
+}
+
+@keyframes chatbotNotifPop {
+  from { opacity: 0; transform: translateX(14px) scale(0.9); }
+  to   { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+@keyframes chatbotNotifNudge {
+  0%, 88%, 100% { transform: translateX(0) scale(1); }
+  91% { transform: translateX(-4px) scale(1.02); }
+  94% { transform: translateX(3px) scale(1.02); }
+  97% { transform: translateX(-1px) scale(1); }
+}
+
+/* Red notification dot on the toggle while the bubble is showing */
+.chatbot-notif-dot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #ef4444;
+  border: 2px solid #ffffff;
+  z-index: 1;
+}
+
+.chatbot-notif-dot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: #ef4444;
+  animation: chatbotPing 1.4s ease-out infinite;
+}
+
+@keyframes chatbotPing {
+  0%   { transform: scale(1); opacity: 0.85; }
+  80%, 100% { transform: scale(2.4); opacity: 0; }
+}
 
 /* Toggle button (floating action button) */
 .chatbot-toggle {
@@ -4612,5 +5078,53 @@ img {
     padding: 5px 10px;
     font-size: 11px;
     gap: 4px;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   WhatsApp — floating contact button (bottom-right)
+   Sits above the chatbot toggle so both stay reachable
+   ═══════════════════════════════════════════ */
+.whatsapp-float {
+  position: fixed;
+  bottom: 90px;
+  right: 24px;
+  z-index: 9996;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #25d366;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 20px rgba(37, 211, 102, 0.45);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.whatsapp-float:hover {
+  transform: scale(1.08);
+  box-shadow: 0 8px 28px rgba(37, 211, 102, 0.6);
+}
+
+.whatsapp-float svg {
+  display: block;
+}
+
+@media (max-width: 480px) {
+  .whatsapp-float {
+    bottom: 82px;
+    right: 16px;
+    width: 50px;
+    height: 50px;
+  }
+
+  .chatbot-notif {
+    bottom: 28px;
+    right: 84px;
+    max-width: 220px;
+    font-size: 12.5px;
+    padding: 10px 14px;
   }
 }

@@ -96,6 +96,9 @@ const FAQS = [
 const GREETING = 'chatbot.greeting';
 const SUGGESTION = 'chatbot.suggestion';
 const TYPING_DELAY = 600; // ms
+const NOTIF_FIRST_DELAY = 2500;   // ms before the first bubble
+const NOTIF_REPEAT = 3 * 60 * 1000; // reappear every 3 minutes
+const NOTIF_VISIBLE_MS = 12000;   // how long each bubble stays
 
 // ── Helper: get a human-readable listing count from the API ──
 async function fetchListingCounts() {
@@ -117,6 +120,33 @@ async function fetchListingCounts() {
   }
 }
 
+// ── Soft two-tone notification chime (Web Audio, no asset needed) ──
+// Autoplay policies may block it until the user interacts with the page;
+// in that case it fails silently and the visual bubble still shows.
+function playChime() {
+  try {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return;
+    const ctx = new Ctx();
+    const now = ctx.currentTime;
+    const notes = [880, 1318.5]; // A5 → E6, a friendly "ding-ding"
+    notes.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const start = now + i * 0.18;
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(0.1, start + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.5);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(start);
+      osc.stop(start + 0.55);
+    });
+    setTimeout(() => ctx.close().catch(() => {}), 1400);
+  } catch { /* blocked or unsupported — ignore */ }
+}
+
 export default function Chatbot() {
   const { t } = useLanguage();
   const { navigate, view } = useNav();
@@ -127,8 +157,10 @@ export default function Chatbot() {
   const [input, setInput] = useState('');
   const [faqFilter, setFaqFilter] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [notifVisible, setNotifVisible] = useState(false);
   const listRef = useRef(null);
   const inputRef = useRef(null);
+  const engagedRef = useRef(false); // user opened the chat — stop reminding
 
   // ── Greeting ──
   useEffect(() => {
@@ -143,6 +175,47 @@ export default function Chatbot() {
       ]);
     }
   }, [open, messages.length, t, user]);
+
+  // ── "I'm a chatbot" notification ──
+  // Pops up shortly after the page loads (if the chat isn't open), plays a
+  // soft chime, auto-hides after a while, and reappears every few minutes
+  // until the user opens the chat or clicks the bubble.
+  useEffect(() => {
+    if (open) return;
+    let hideTimer = null;
+
+    const show = () => {
+      if (engagedRef.current) return;
+      setNotifVisible(true);
+      playChime();
+      hideTimer = setTimeout(() => setNotifVisible(false), NOTIF_VISIBLE_MS);
+    };
+
+    const showTimer = setTimeout(show, NOTIF_FIRST_DELAY);
+    const repeatTimer = setInterval(show, NOTIF_REPEAT);
+
+    return () => {
+      clearTimeout(showTimer);
+      clearInterval(repeatTimer);
+      if (hideTimer) clearTimeout(hideTimer);
+    };
+  }, [open]);
+
+  const dismissNotif = () => {
+    engagedRef.current = true;
+    setNotifVisible(false);
+  };
+
+  const handleToggle = () => {
+    const next = !open;
+    if (next) dismissNotif();
+    setOpen(next);
+  };
+
+  const openFromNotif = () => {
+    dismissNotif();
+    setOpen(true);
+  };
 
   // Scroll to bottom
   useEffect(() => {
@@ -326,8 +399,6 @@ export default function Chatbot() {
     setOpen(false);
   };
 
-  const handleToggle = () => setOpen((o) => !o);
-
   // Filter FAQs
   const filteredFaqs = getContextBoostedFaqs().filter((faq) => {
     if (!faqFilter.trim()) return true;
@@ -373,12 +444,21 @@ export default function Chatbot() {
 
   return (
     <>
+      {/* Notification bubble inviting users to try the chatbot */}
+      {!open && notifVisible && (
+        <button className="chatbot-notif" onClick={openFromNotif}>
+          <span className="chatbot-notif-text">{t('chatbot.notifText')}</span>
+          <span className="chatbot-notif-tail" aria-hidden="true" />
+        </button>
+      )}
+
       {/* Toggle button */}
       <button
         className={`chatbot-toggle ${open ? 'is-open' : ''}`}
         onClick={handleToggle}
         aria-label={open ? 'Close chat' : 'Open chat'}
       >
+        {!open && notifVisible && <span className="chatbot-notif-dot" aria-hidden="true" />}
         {open ? (
           <Icon name="x" size={24} strokeWidth={2.2} />
         ) : (

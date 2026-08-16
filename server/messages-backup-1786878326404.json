@@ -1,0 +1,67 @@
+[
+  {
+    "id": 5,
+    "sender_id": 25,
+    "receiver_id": 22,
+    "booking_id": null,
+    "content": "hi",
+    "is_read": 1,
+    "created_at": "2026-08-06T12:33:55.717Z",
+    "listing_type": null,
+    "listing_id": null,
+    "image_url": null,
+    "help_uid": null
+  },
+  {
+    "id": 6,
+    "sender_id": 25,
+    "receiver_id": 22,
+    "booking_id": null,
+    "content": "hey",
+    "is_read": 1,
+    "created_at": "2026-08-06T12:34:02.874Z",
+    "listing_type": null,
+    "listing_id": null,
+    "image_url": null,
+    "help_uid": null
+  },
+  {
+    "id": 7,
+    "sender_id": 22,
+    "receiver_id": 25,
+    "booking_id": null,
+    "content": "heya",
+    "is_read": 1,
+    "created_at": "2026-08-06T12:34:54.534Z",
+    "listing_type": null,
+    "listing_id": null,
+    "image_url": null,
+    "help_uid": null
+  },
+  {
+    "id": 8,
+    "sender_id": 25,
+    "receiver_id": 22,
+    "booking_id": null,
+    "content": "hi\n\nRequested help for: test (Byculla West, Maharashtra, fgdfg) — ₹ 555/per season",
+    "is_read": 1,
+    "created_at": "2026-08-06T12:38:03.659Z",
+    "listing_type": null,
+    "listing_id": null,
+    "image_url": null,
+    "help_uid": null
+  },
+  {
+    "id": 9,
+    "sender_id": 25,
+    "receiver_id": 22,
+    "booking_id": null,
+    "content": "Hi, I'm interested in this listing\n\nRequested help for: test (Pimpri-Chinchwad, Haveli Subdistrict, Maharashtra) — ₹ 0/per season",
+    "is_read": 1,
+    "created_at": "2026-08-06T13:24:46.540Z",
+    "listing_type": null,
+    "listing_id": null,
+    "image_url": null,
+    "help_uid": null
+  }
+]

@@ -246,22 +246,48 @@ export default function Home() {
 
       {/* Footer */}
       <footer style={{ background: '#0f172a', color: '#94a3b8', padding: 'clamp(40px, 6vw, 64px) 20px 32px', marginTop: '48px' }}>
-        <div style={{ maxWidth: 'var(--container-max)', margin: '0 auto', display: 'flex', flexWrap: 'wrap', gap: '32px', justifyContent: 'space-between', borderBottom: '1px solid #334155', paddingBottom: '32px' }}>
-          <div style={{ flex: '1 1 300px' }}>
+        <div style={{ maxWidth: 'var(--container-max)', margin: '0 auto', display: 'flex', flexWrap: 'wrap', gap: '40px', justifyContent: 'space-between', borderBottom: '1px solid #334155', paddingBottom: '40px' }}>
+          {/* Brand + tagline */}
+          <div style={{ flex: '1 1 300px', maxWidth: '360px' }}>
             <div style={{ marginBottom: '16px' }}>
               <h3 style={{ color: 'white', fontSize: 'var(--fs-2xl)', margin: 0 }}>Krishi Sangam</h3>
             </div>
-            <p style={{ lineHeight: '1.6', marginBottom: '20px' }}>{t('home.footer.tagline')}</p>
-            <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-              <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('services'); }}>{t('nav.services')}</a>
-              <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('about'); }}>{t('home.footer.aboutUs')}</a>
+            <p style={{ lineHeight: '1.6', marginBottom: '12px', fontWeight: '600', color: '#cbd5e1' }}>{t('home.footer.tagline')}</p>
+            <p style={{ lineHeight: '1.7', marginBottom: '20px', fontSize: '14px' }}>{t('home.footer.description')}</p>
+          </div>
+
+          {/* Quick Links */}
+          <div style={{ flex: '1 1 180px', maxWidth: '240px' }}>
+            <h4 style={{ color: 'white', fontSize: 'var(--fs-md)', marginBottom: '15px' }}>{t('home.footer.quickLinks')}</h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '14px' }}>
+              <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('home'); }}>{t('nav.home')}</a>
+              <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('about'); }}>{t('nav.about')}</a>
+              <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('land-leasing'); }}>{t('nav.land')}</a>
+              <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('equipment-rental'); }}>{t('nav.equipment')}</a>
+              <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('agri-services'); }}>{t('nav.labour')}</a>
+              <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('farmers'); }}>{t('home.footer.forFarmers')}</a>
+              <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('landowners'); }}>{t('home.footer.forLandowners')}</a>
+              <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('equipment-owners'); }}>{t('home.footer.forEquipmentOwners')}</a>
+              <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('service-providers'); }}>{t('home.footer.forServiceProviders')}</a>
               <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); document.getElementById('contact').scrollIntoView({ behavior: 'smooth' }); }}>{t('nav.contact')}</a>
-              <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('terms'); }}>{t('home.footer.terms')}</a>
             </div>
           </div>
 
-          <div style={{ flex: '1 1 300px' }}>
-            <h4 style={{ color: 'white', fontSize: 'var(--fs-lg)', marginBottom: '15px' }}>{t('home.footer.contact')}</h4>
+          {/* Policies */}
+          <div style={{ flex: '1 1 180px', maxWidth: '240px' }}>
+            <h4 style={{ color: 'white', fontSize: 'var(--fs-md)', marginBottom: '15px' }}>{t('home.footer.policies')}</h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '14px' }}>
+              <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('privacy'); }}>{t('home.footer.privacy')}</a>
+              <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('terms'); }}>{t('home.footer.terms')}</a>
+              <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('refund-policy'); }}>{t('home.footer.refund')}</a>
+              <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('cancellation-policy'); }}>{t('home.footer.cancellation')}</a>
+            </div>
+          </div>
+
+          {/* Contact */}
+          <div style={{ flex: '1 1 260px', maxWidth: '340px' }}>
+            <h4 style={{ color: 'white', fontSize: 'var(--fs-md)', marginBottom: '15px' }}>{t('home.footer.contact')}</h4>
+            <p style={{ lineHeight: '1.6', marginBottom: '10px', fontWeight: '600', color: '#cbd5e1' }}>{t('home.footer.company')}</p>
             <p style={{ lineHeight: '1.6', marginBottom: '10px' }}>
               <strong>{t('home.footer.regOffice')}</strong><br />
               S.No. 192/2A & 2B, Cosmos, Horizen,<br />

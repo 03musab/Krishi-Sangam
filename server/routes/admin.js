@@ -297,4 +297,49 @@ router.delete('/listings/:type/:id', async (req, res) => {
   }
 });
 
+/* ── GET /api/admin/help-conversations — Help Requests ──
+   Conversations between the admin and regular (non-admin) users — i.e. the
+   chats users start from the Help & Support page (or anywhere else). */
+router.get('/help-conversations', async (req, res) => {
+  try {
+    const db = getDb();
+    const userId = req.user.id;
+    const conversations = await db.prepare(`
+      SELECT
+        c.other_user_id,
+        u.username AS other_username,
+        u.role AS other_role,
+        c.last_message,
+        c.last_message_time,
+        c.unread_count
+      FROM (
+        SELECT
+          x.other_user_id,
+          (SELECT content FROM messages m2
+            WHERE (m2.sender_id = ? AND m2.receiver_id = x.other_user_id)
+               OR (m2.receiver_id = ? AND m2.sender_id = x.other_user_id)
+            ORDER BY m2.created_at DESC LIMIT 1) AS last_message,
+          (SELECT created_at FROM messages m2
+            WHERE (m2.sender_id = ? AND m2.receiver_id = x.other_user_id)
+               OR (m2.receiver_id = ? AND m2.sender_id = x.other_user_id)
+            ORDER BY m2.created_at DESC LIMIT 1) AS last_message_time,
+          (SELECT COUNT(*) FROM messages m2
+            WHERE m2.sender_id = x.other_user_id AND m2.receiver_id = ? AND m2.is_read = 0) AS unread_count
+        FROM (
+          SELECT DISTINCT
+            CASE WHEN sender_id = ? THEN receiver_id ELSE sender_id END AS other_user_id
+          FROM messages
+          WHERE sender_id = ? OR receiver_id = ?
+        ) x
+      ) c
+      JOIN users u ON u.id = c.other_user_id
+      WHERE u.role <> 'admin'
+      ORDER BY c.last_message_time DESC NULLS LAST
+    `).all(userId, userId, userId, userId, userId, userId, userId, userId);
+    res.json({ conversations });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error.' });
+  }
+});
+
 module.exports = router;

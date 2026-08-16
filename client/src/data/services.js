@@ -129,6 +129,9 @@ export const SKILL_LEVELS = ['Unskilled', 'Semi-Skilled', 'Skilled'];
 
 export const DEFAULT_WORKER_RATE = 350;
 
+/* Default daily rate for equipment rented WITH an operator (₹ per day). */
+export const DEFAULT_EQUIPMENT_RATE = 1500;
+
 /* Catalogue of rentable equipment, grouped by category (shown on the
    Equipment Rental page for browsing). */
 export const EQUIPMENT_CATEGORIES = [

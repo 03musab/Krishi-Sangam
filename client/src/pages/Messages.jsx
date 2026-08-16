@@ -169,12 +169,17 @@ export default function Messages() {
               return (
                 <div key={m.id} className={`message-row ${isMe ? 'me' : 'them'}`}>
                   <div className="message-bubble">
-                    <MessageContent
-                      content={m.content}
-                      listingType={m.listing_type}
-                      listingId={m.listing_id}
-                      onOpenListing={openListing}
-                    />
+                    {m.image_url && (
+                      <img className="message-image" src={m.image_url} alt="" loading="lazy" />
+                    )}
+                    {m.content && (
+                      <MessageContent
+                        content={m.content}
+                        listingType={m.listing_type}
+                        listingId={m.listing_id}
+                        onOpenListing={openListing}
+                      />
+                    )}
                   </div>
                 </div>
               );

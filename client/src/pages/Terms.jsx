@@ -1,168 +1,135 @@
-import { useNav } from '../context/NavContext';
+import InfoPage, { InfoBlock, InfoP, InfoList } from '../components/InfoPage';
 import { useLanguage } from '../i18n/LanguageContext';
 
 export default function Terms() {
-  const { back } = useNav();
   const { t } = useLanguage();
   return (
-    <div style={{ paddingBottom: '60px' }}>
-      <div style={{ maxWidth: 'var(--container-max)', margin: '0 auto', padding: '16px 24px 0' }}>
-        <button className="btn-back-icon" onClick={back} aria-label="Back">←</button>
-      </div>
-      <section className="section" style={{ background: 'var(--surface-2)', textAlign: 'center' }}>
-        <h1 style={{ fontSize: 'var(--fs-5xl)', fontWeight: '800', color: 'var(--text-dark)' }}>{t('terms.title')}</h1>
-        <p style={{ fontSize: 'clamp(15px, 2.2vw, 18px)', color: 'var(--text-mid)', marginTop: '20px' }}>
-          {t('terms.subtitle')}
-        </p>
-      </section>
+    <InfoPage title={t('terms.title')} subtitle={t('terms.subtitle')}>
+      <InfoBlock title="1. Platform Role">
+        <InfoP>Krishi Sangam is a digital platform designed to facilitate connections between:</InfoP>
+        <InfoList items={[
+          'Farmers',
+          'Landowners',
+          'Equipment owners',
+          'Agricultural service providers'
+        ]} />
+        <InfoP>Krishi Sangam may facilitate discovery, enquiries and communication between users. Unless specifically stated otherwise, Krishi Sangam is not itself the owner of the agricultural land or equipment listed by users and is not itself the provider of every agricultural service listed on the platform.</InfoP>
+      </InfoBlock>
 
-      <section className="section" style={{ maxWidth: '900px', margin: '32px auto' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', fontSize: '16px', color: 'var(--text-mid)', lineHeight: '1.8' }}>
-          
-          <div>
-            <h3 style={{ color: 'var(--text-dark)', marginBottom: '10px' }}>{t('terms.s1')}</h3>
-            <p>Welcome to Krishi Sangam. By accessing or using our website or mobile application, you agree to comply with and be bound by these Terms & Conditions. If you do not agree with any part of these terms, please discontinue using our platform immediately.</p>
-          </div>
+      <InfoBlock title="2. User Responsibilities">
+        <InfoP>Users must:</InfoP>
+        <InfoList items={[
+          'Provide accurate information',
+          'Keep their listings updated',
+          'Use the platform lawfully',
+          'Provide genuine information',
+          'Respect other users',
+          'Avoid fraudulent or misleading listings',
+          'Comply with applicable laws'
+        ]} />
+      </InfoBlock>
 
-          <div>
-            <h3 style={{ color: 'var(--text-dark)', marginBottom: '10px' }}>{t('terms.s2')}</h3>
-            <p>Krishi Sangam is a digital platform that connects farmers, landowners, equipment owners, agricultural service providers, and other stakeholders within the agricultural ecosystem. We facilitate connections between users but are not a party to agreements entered into between users unless explicitly stated.</p>
-          </div>
+      <InfoBlock title="3. Landowner Responsibilities">
+        <InfoP>Landowners are responsible for:</InfoP>
+        <InfoList items={[
+          'Providing accurate land information',
+          'Having appropriate rights or authority to list the land',
+          'Providing accurate availability information',
+          'Disclosing relevant information about the land',
+          'Discussing lease terms honestly with interested farmers'
+        ]} />
+      </InfoBlock>
 
-          <div>
-            <h3 style={{ color: 'var(--text-dark)', marginBottom: '10px' }}>{t('terms.s3')}</h3>
-            <p>By using Krishi Sangam, you confirm that:</p>
-            <ul style={{ paddingLeft: '20px', marginTop: '10px' }}>
-              <li>You are at least 18 years of age or legally capable of entering into contracts.</li>
-              <li>The information you provide is accurate and up to date.</li>
-              <li>You will use the platform only for lawful purposes.</li>
-            </ul>
-          </div>
+      <InfoBlock title="4. Equipment Owner Responsibilities">
+        <InfoP>Equipment owners are responsible for:</InfoP>
+        <InfoList items={[
+          'Providing accurate equipment information',
+          'Maintaining equipment in appropriate working condition',
+          'Providing accurate availability',
+          'Disclosing relevant equipment requirements or limitations',
+          'Agreeing rental terms directly with the customer'
+        ]} />
+      </InfoBlock>
 
-          <div>
-            <h3 style={{ color: 'var(--text-dark)', marginBottom: '10px' }}>{t('terms.s4')}</h3>
-            <p>Users are responsible for maintaining the confidentiality of their login credentials.</p>
-            <p style={{ marginTop: '10px' }}>You agree to:</p>
-            <ul style={{ paddingLeft: '20px', marginTop: '10px' }}>
-              <li>Provide accurate registration details.</li>
-              <li>Update your information whenever necessary.</li>
-              <li>Immediately notify us of any unauthorized access to your account.</li>
-            </ul>
-            <p style={{ marginTop: '10px' }}>Krishi Sangam reserves the right to suspend or terminate accounts found to contain false or misleading information.</p>
-          </div>
+      <InfoBlock title="5. Service Provider Responsibilities">
+        <InfoP>Service providers are responsible for:</InfoP>
+        <InfoList items={[
+          'Providing accurate service information',
+          'Maintaining reasonable service standards',
+          'Honouring confirmed arrangements',
+          'Providing accurate pricing information where applicable',
+          'Following applicable safety and legal requirements'
+        ]} />
+      </InfoBlock>
 
-          <div>
-            <h3 style={{ color: 'var(--text-dark)', marginBottom: '10px' }}>{t('terms.s5')}</h3>
-            <p>Krishi Sangam currently offers services including:</p>
-            <ul style={{ paddingLeft: '20px', marginTop: '10px' }}>
-              <li>Agricultural land leasing</li>
-              <li>Farm equipment rentals</li>
-              <li>Agricultural labour and farm services</li>
-            </ul>
-            <p style={{ marginTop: '10px' }}>Additional services may be introduced in the future.</p>
-          </div>
+      <InfoBlock title="6. Listing Options">
+        <InfoP>Krishi Sangam may provide different listing options.</InfoP>
+        <InfoP><strong>Standard Listing:</strong> Available free of cost where applicable.</InfoP>
+        <InfoP><strong>Priority Listing:</strong> An optional paid feature providing enhanced visibility to eligible listings.</InfoP>
+        <InfoP>Priority Listing does not guarantee:</InfoP>
+        <InfoList items={[
+          'A transaction',
+          'A lease',
+          'A rental',
+          'A service booking',
+          'A specific number of enquiries',
+          'A specific financial return'
+        ]} />
+      </InfoBlock>
 
-          <div>
-            <h3 style={{ color: 'var(--text-dark)', marginBottom: '10px' }}>{t('terms.s6')}</h3>
-            <p>Users agree to:</p>
-            <ul style={{ paddingLeft: '20px', marginTop: '10px' }}>
-              <li>Provide truthful information.</li>
-              <li>Honour commitments made through the platform.</li>
-              <li>Treat other users respectfully.</li>
-              <li>Comply with all applicable laws and regulations.</li>
-              <li>Avoid fraudulent, misleading, or illegal activities.</li>
-            </ul>
-          </div>
+      <InfoBlock title="7. Listing Accuracy">
+        <InfoP>Krishi Sangam reserves the right to review, modify, restrict or remove listings that:</InfoP>
+        <InfoList items={[
+          'Contain misleading information',
+          'Violate applicable laws',
+          'Are fraudulent',
+          'Contain prohibited content',
+          'Violate Krishi Sangam policies',
+          'Create a risk to users or the platform'
+        ]} />
+      </InfoBlock>
 
-          <div>
-            <h3 style={{ color: 'var(--text-dark)', marginBottom: '10px' }}>{t('terms.s7')}</h3>
-            <p>Where applicable:</p>
-            <ul style={{ paddingLeft: '20px', marginTop: '10px' }}>
-              <li>Payments must be made using approved payment methods.</li>
-              <li>Applicable service charges, taxes, and fees will be displayed before confirmation.</li>
-              <li>Krishi Sangam reserves the right to modify pricing with prior notice.</li>
-            </ul>
-          </div>
+      <InfoBlock title="8. Payments">
+        <InfoP>Where payments are processed through Krishi Sangam, users must provide accurate payment information. Payment terms, applicable fees, refunds and cancellations will be governed by the relevant transaction and platform policies.</InfoP>
+      </InfoBlock>
 
-          <div>
-            <h3 style={{ color: 'var(--text-dark)', marginBottom: '10px' }}>{t('terms.s8')}</h3>
-            <p>Cancellation and refund policies may vary depending on the service booked.</p>
-            <p style={{ marginTop: '10px' }}>Refunds, where applicable, will be processed according to our Refund Policy.</p>
-          </div>
+      <InfoBlock title="9. Disputes">
+        <InfoP>Users should first attempt to resolve transaction-related disputes directly with the relevant party. Krishi Sangam may assist with communication or dispute resolution where appropriate but does not guarantee resolution of every dispute.</InfoP>
+      </InfoBlock>
 
-          <div>
-            <h3 style={{ color: 'var(--text-dark)', marginBottom: '10px' }}>{t('terms.s9')}</h3>
-            <p>Krishi Sangam may verify user identities, documents, land ownership details, equipment ownership, or business information.</p>
-            <p style={{ marginTop: '10px' }}>However, verification does not constitute a guarantee of authenticity, ownership, quality, or future performance.</p>
-            <p style={{ marginTop: '10px' }}>Users should exercise their own judgment before entering into any transaction.</p>
-          </div>
+      <InfoBlock title="10. Prohibited Activities">
+        <InfoP>Users must not:</InfoP>
+        <InfoList items={[
+          'Create fraudulent listings',
+          'Provide false information',
+          'Misuse another person&apos;s identity',
+          'Attempt unauthorized access',
+          'Use the platform for illegal activities',
+          'Harass or threaten other users',
+          'Upload harmful or malicious content'
+        ]} />
+      </InfoBlock>
 
-          <div>
-            <h3 style={{ color: 'var(--text-dark)', marginBottom: '10px' }}>{t('terms.s10')}</h3>
-            <p>Krishi Sangam acts as a technology platform connecting users.</p>
-            <p style={{ marginTop: '10px' }}>We do not guarantee:</p>
-            <ul style={{ paddingLeft: '20px', marginTop: '10px' }}>
-              <li>Completion of transactions</li>
-              <li>Quality of equipment or services</li>
-              <li>Crop yields</li>
-              <li>Land productivity</li>
-              <li>Availability of labour</li>
-              <li>Accuracy of information provided by users</li>
-            </ul>
-            <p style={{ marginTop: '10px' }}>Krishi Sangam shall not be liable for any direct, indirect, incidental, consequential, or financial losses arising from the use of the platform.</p>
-          </div>
+      <InfoBlock title="11. Account Suspension">
+        <InfoP>Krishi Sangam may suspend, restrict or terminate accounts where there is evidence of:</InfoP>
+        <InfoList items={[
+          'Fraud',
+          'Misuse',
+          'Repeated violations',
+          'False information',
+          'Abuse of the platform',
+          'Illegal activity',
+          'Other conduct that may harm users or the platform'
+        ]} />
+      </InfoBlock>
 
-          <div>
-            <h3 style={{ color: 'var(--text-dark)', marginBottom: '10px' }}>{t('terms.s11')}</h3>
-            <p>All content on Krishi Sangam, including logos, trademarks, text, graphics, software, and design, is the intellectual property of Krishi Sangam unless otherwise stated.</p>
-            <p style={{ marginTop: '10px' }}>Unauthorized reproduction or distribution is prohibited.</p>
-          </div>
+      <InfoBlock title="12. Limitation of Liability">
+        <InfoP>Krishi Sangam provides a platform for discovery and connection between users. Users are responsible for independently evaluating listings, users, land, equipment, services, pricing, documentation and agreements before proceeding with a transaction.</InfoP>
+      </InfoBlock>
 
-          <div>
-            <h3 style={{ color: 'var(--text-dark)', marginBottom: '10px' }}>{t('terms.s12')}</h3>
-            <p>Your use of Krishi Sangam is also governed by our Privacy Policy.</p>
-            <p style={{ marginTop: '10px' }}>By using the platform, you consent to the collection and processing of information as described in that policy.</p>
-          </div>
-
-          <div>
-            <h3 style={{ color: 'var(--text-dark)', marginBottom: '10px' }}>{t('terms.s13')}</h3>
-            <p>Users must not:</p>
-            <ul style={{ paddingLeft: '20px', marginTop: '10px' }}>
-              <li>Provide false information.</li>
-              <li>Upload unlawful or offensive content.</li>
-              <li>Attempt unauthorized access to our systems.</li>
-              <li>Interfere with platform operations.</li>
-              <li>Engage in fraudulent transactions.</li>
-              <li>Misrepresent ownership of land, equipment, or services.</li>
-            </ul>
-            <p style={{ marginTop: '10px' }}>Violation of these terms may result in suspension or permanent termination of your account.</p>
-          </div>
-
-          <div>
-            <h3 style={{ color: 'var(--text-dark)', marginBottom: '10px' }}>{t('terms.s14')}</h3>
-            <p>Krishi Sangam may integrate third-party payment gateways, mapping services, verification providers, or logistics partners.</p>
-            <p style={{ marginTop: '10px' }}>We are not responsible for the services, policies, or actions of third-party providers.</p>
-          </div>
-
-          <div>
-            <h3 style={{ color: 'var(--text-dark)', marginBottom: '10px' }}>{t('terms.s15')}</h3>
-            <p>Krishi Sangam reserves the right to modify, suspend, discontinue, or improve any feature or service without prior notice.</p>
-          </div>
-
-          <div>
-            <h3 style={{ color: 'var(--text-dark)', marginBottom: '10px' }}>{t('terms.s16')}</h3>
-            <p>We may update these Terms & Conditions from time to time.</p>
-            <p style={{ marginTop: '10px' }}>Continued use of the platform after changes are published constitutes acceptance of the revised Terms.</p>
-          </div>
-
-          <div>
-            <h3 style={{ color: 'var(--text-dark)', marginBottom: '10px' }}>{t('terms.s17')}</h3>
-            <p>These Terms & Conditions shall be governed by and interpreted in accordance with the laws of India.</p>
-            <p style={{ marginTop: '10px' }}>Any disputes shall be subject to the exclusive jurisdiction of the courts located in Nanded, Maharashtra, unless otherwise required by applicable law.</p>
-          </div>
-
-        </div>
-      </section>
-    </div>
+      <InfoBlock title="13. Changes to Terms">
+        <InfoP>Krishi Sangam may update these Terms &amp; Conditions from time to time. Continued use of the platform after updates may constitute acceptance of the revised terms.</InfoP>
+      </InfoBlock>
+    </InfoPage>
   );
 }

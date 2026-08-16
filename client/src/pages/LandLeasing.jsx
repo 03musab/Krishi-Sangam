@@ -1,20 +1,29 @@
 import { useDeferredValue, useEffect, useState } from 'react';
 import PageBanner from '../components/PageBanner';
 import ListingCard from '../components/ListingCard';
+import AuthGateModal from '../components/AuthGateModal';
+import LocationPrompt from '../components/LocationPrompt';
 import { useNav } from '../context/NavContext';
+import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../i18n/LanguageContext';
+import { useLocation } from '../context/LocationContext';
 import { getLand } from '../lib/api';
+import { sortListingsByProximity } from '../lib/geo';
 
 export default function LandLeasing() {
   const { navigate } = useNav();
+  const { user } = useAuth();
   const { t } = useLanguage();
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
   const [count, setCount] = useState(0);
+  const [gateOpen, setGateOpen] = useState(false);
+  const [sortedListings, setSortedListings] = useState([]);
   // Defer the search value so the input stays responsive while results update
   const deferredSearch = useDeferredValue(search);
+  const { status: locStatus, coords: locCoords, place: locPlace } = useLocation();
 
   useEffect(() => {
     let cancelled = false;
@@ -31,9 +40,30 @@ export default function LandLeasing() {
     return () => { cancelled = true; };
   }, [deferredSearch]);
 
+  // Sort by distance from the user once location is available
+  useEffect(() => {
+    let cancelled = false;
+    if (!listings.length) {
+      setSortedListings(listings);
+      return;
+    }
+    if (locStatus === 'granted' && locCoords) {
+      sortListingsByProximity(listings, locCoords.lat, locCoords.lng, locPlace)
+        .then((sorted) => !cancelled && setSortedListings(sorted))
+        .catch(() => !cancelled && setSortedListings(listings));
+    } else {
+      setSortedListings(listings);
+    }
+    return () => { cancelled = true; };
+  }, [listings, locStatus, locCoords, locPlace]);
+
   return (
     <>
-      <PageBanner title={t('land.title')} color="green" actionLabel={t('land.action')} onAction={() => navigate('list-land')} />
+      <PageBanner title={t('land.title')} color="green" actionLabel={t('land.action')} onAction={() => {
+        if (!user) { setGateOpen(true); return; }
+        navigate('list-land');
+      }} />
+      <LocationPrompt />
       <div className="search-filter-bar">
         <div className="search-input-wrapper">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2">
@@ -49,10 +79,18 @@ export default function LandLeasing() {
         <div className="listings-empty">{t('land.noListings')}</div>
       )}
       <div className="grid-cards-2col">
-        {listings.map((l) => (
+        {sortedListings.map((l) => (
           <ListingCard key={l.id} listing={l} type="land" />
         ))}
       </div>
+
+      {gateOpen && (
+        <AuthGateModal
+          title={t('land.action')}
+          description={t('gate.listDesc')}
+          onClose={() => setGateOpen(false)}
+        />
+      )}
     </>
   );
 }

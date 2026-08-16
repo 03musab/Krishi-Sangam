@@ -1,0 +1,69 @@
+✅ PostgreSQL database connected
+
+🌾 Krishi Sangam API Server
+   └── Running on http://localhost:3001
+   └── Health: http://localhost:3001/api/health
+   └── Auth:     http://localhost:3001/api/auth
+   └── Land:     http://localhost:3001/api/land
+   └── Equip:    http://localhost:3001/api/equipment
+   └── Labour:   http://localhost:3001/api/labour
+   └── Produce:  http://localhost:3001/api/produce
+   └── Bookings: http://localhost:3001/api/bookings
+   └── Messages: http://localhost:3001/api/messages
+   └── Payments: http://localhost:3001/api/payments
+   └── Profile:  http://localhost:3001/api/profile
+   └── Upload:   http://localhost:3001/api/upload
+   └── Admin:    http://localhost:3001/api/admin
+   └── Services: http://localhost:3001/api/services
+   └── App:    http://localhost:3001
+
+[2026-08-16T11:19:19.773Z] GET /api/health
+[2026-08-16T11:22:33.827Z] GET /api/equipment
+[2026-08-16T11:22:33.829Z] GET /api/bookings
+[2026-08-16T11:22:33.928Z] GET /api/equipment
+[2026-08-16T11:22:33.936Z] GET /api/bookings
+[2026-08-16T11:23:49.366Z] GET /api/equipment
+[2026-08-16T11:23:49.368Z] GET /api/bookings
+[2026-08-16T11:23:49.477Z] GET /api/equipment
+[2026-08-16T11:23:49.511Z] GET /api/bookings
+[2026-08-16T11:23:50.985Z] GET /api/equipment
+[2026-08-16T11:23:50.986Z] GET /api/bookings
+[2026-08-16T11:23:51.002Z] GET /api/equipment
+[2026-08-16T11:23:51.018Z] GET /api/equipment
+[2026-08-16T11:23:51.023Z] GET /api/bookings
+[2026-08-16T11:23:51.054Z] GET /api/bookings
+[2026-08-16T11:24:05.508Z] GET /api/equipment
+[2026-08-16T11:24:05.509Z] GET /api/bookings
+[2026-08-16T11:24:05.561Z] GET /api/equipment
+[2026-08-16T11:24:05.574Z] GET /api/bookings
+[2026-08-16T11:24:05.575Z] GET /api/equipment
+[2026-08-16T11:24:05.607Z] GET /api/bookings
+[2026-08-16T11:24:21.486Z] GET /api/equipment
+[2026-08-16T11:24:21.487Z] GET /api/bookings
+[2026-08-16T11:24:21.504Z] GET /api/equipment
+[2026-08-16T11:24:21.530Z] GET /api/bookings
+[2026-08-16T11:33:18.227Z] GET /api/auth/me
+[2026-08-16T11:33:18.575Z] GET /api/auth/me
+[2026-08-16T11:33:18.603Z] GET /api/auth/me
+[2026-08-16T11:33:18.629Z] GET /api/auth/me
+[2026-08-16T11:51:04.289Z] GET /api/auth/me
+[2026-08-16T11:51:04.421Z] GET /api/auth/me
+[2026-08-16T11:51:04.428Z] GET /api/equipment
+[2026-08-16T11:51:04.429Z] GET /api/bookings
+[2026-08-16T11:51:04.498Z] GET /api/equipment
+[2026-08-16T11:51:04.508Z] GET /api/bookings
+[2026-08-16T11:51:04.545Z] GET /api/bookings
+[2026-08-16T11:51:09.857Z] GET /api/admin/stats
+[2026-08-16T11:51:10.002Z] GET /api/admin/stats
+[2026-08-16T11:51:10.670Z] GET /api/equipment
+[2026-08-16T11:51:10.671Z] GET /api/bookings
+[2026-08-16T11:51:10.686Z] GET /api/equipment
+[2026-08-16T11:51:10.701Z] GET /api/bookings
+[2026-08-16T11:51:11.617Z] GET /api/land
+[2026-08-16T11:51:11.633Z] GET /api/land
+[2026-08-16T11:51:12.871Z] GET /api/bookings
+[2026-08-16T11:51:12.873Z] GET /api/equipment
+[2026-08-16T11:51:12.886Z] GET /api/equipment
+[2026-08-16T11:51:12.900Z] GET /api/bookings
+[2026-08-16T11:51:15.119Z] GET /api/land
+[2026-08-16T11:51:15.134Z] GET /api/land

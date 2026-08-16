@@ -118,6 +118,18 @@ async function init() {
     // Messages can reference the listing they were sent about (for "view listing" links in chat)
     await pool.query('ALTER TABLE messages ADD COLUMN IF NOT EXISTS listing_type TEXT');
     await pool.query('ALTER TABLE messages ADD COLUMN IF NOT EXISTS listing_id BIGINT');
+    // Messages can carry an attached image (help chats, screenshots, etc.)
+    await pool.query('ALTER TABLE messages ADD COLUMN IF NOT EXISTS image_url TEXT');
+    // Groups the fan-out copies of a user's help message (one per admin)
+    await pool.query('ALTER TABLE messages ADD COLUMN IF NOT EXISTS help_uid TEXT');
+    // service_bookings can now be an equipment-with-operator request too
+    await pool.query(`
+      DO $$ BEGIN
+        ALTER TABLE service_bookings DROP CONSTRAINT IF EXISTS service_bookings_kind_check;
+        ALTER TABLE service_bookings ADD CONSTRAINT service_bookings_kind_check
+          CHECK (kind IN ('labour_team','service','equipment'));
+      EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+    `);
     const deleted = await pool.query("DELETE FROM sessions WHERE expires_at < NOW()");
     if (deleted.rowCount > 0) {
       console.log(`🧹 Cleaned up ${deleted.rowCount} expired session(s)`);

@@ -127,21 +127,16 @@ export default function ListingDetailsModal({
                 <div className="modal-owner-avatar">{String(ownerName).charAt(0).toUpperCase()}</div>
                 <div className="modal-owner-info">
                   <span className="modal-owner-name">{ownerName}</span>
-                  {ownerPhone && <span className="modal-owner-phone">{ownerPhone}</span>}
+                  {user && ownerPhone && <span className="modal-owner-phone">{ownerPhone}</span>}
                 </div>
-                {ownerPhone && (
+                {user && ownerPhone && (
                   <a className="modal-call-btn" href={`tel:${ownerPhone}`}>
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                     {t('card.call')}
                   </a>
                 )}
-                {ownerId && (
+                {user && ownerId && (
                   <button className="modal-msg-btn" onClick={() => {
-                    if (!user) {
-                      showToast(t('common.pleaseSignin'));
-                      navigate('signin');
-                      return;
-                    }
                     if (Number(ownerId) === Number(user.id)) {
                       showToast(t('card.msgSelf'));
                       return;
@@ -152,11 +147,17 @@ export default function ListingDetailsModal({
                     {t('card.message')}
                   </button>
                 )}
+                {!user && ownerId && (
+                  <button className="modal-msg-btn" onClick={() => navigate('signup')}>
+                    <Icon name="lock" size={15} />
+                    {t('gate.contactCta')}
+                  </button>
+                )}
               </div>
             </div>
           )}
 
-          {ownerId && msgOpen && (
+          {user && ownerId && msgOpen && (
             <div className="modal-block">
               <h4 className="modal-block-title"><Icon name="send" size={15} style={{ verticalAlign: '-2px', marginRight: '7px' }} />{t('card.messageTitle')}</h4>
               {msgSent ? (

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import PageBanner from '../components/PageBanner';
 import Icon from '../components/Icon';
 import { useToast } from '../context/ToastContext';
@@ -6,14 +6,15 @@ import { useLanguage } from '../i18n/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import {
   getAdminStats, getPendingListings, approveListing, getAdminListings, deleteAdminListing,
-  getAdminUsers, updateUserRole, deleteUser
+  getAdminUsers, updateUserRole, deleteUser, getAdminHelpConversations, getThread, sendMessage
 } from '../lib/api';
 
 const TAB_KEYS = {
   'admin-analytics': 'admin.tabAnalytics',
   'admin-pending': 'admin.tabPending',
   'admin-manage': 'admin.tabManage',
-  'admin-users': 'admin.tabUsers'
+  'admin-users': 'admin.tabUsers',
+  'admin-help': 'admin.tabHelp'
 };
 
 const TYPE_KEYS = { land: 'admin.land', equipment: 'admin.equipment', labour: 'admin.labour', produce: 'admin.produce' };
@@ -63,9 +64,50 @@ export default function Admin() {
   const [manage, setManage] = useState({ land: [], equipment: [], labour: [], produce: [] });
   const [manageLoading, setManageLoading] = useState(false);
 
+  // Help Requests tab state
+  const [helpConvos, setHelpConvos] = useState([]);
+  const [helpLoading, setHelpLoading] = useState(false);
+  const [activeHelp, setActiveHelp] = useState(null);
+  const [helpThread, setHelpThread] = useState([]);
+  const [helpMsg, setHelpMsg] = useState('');
+  const [helpSending, setHelpSending] = useState(false);
+  const helpThreadRef = useRef(null);
+
   const loadStats = () => getAdminStats().then((d) => setStats(d.stats)).catch(() => {});
   const loadPending = () => getPendingListings().then((d) => setPending(d)).catch(() => {});
   const loadUsers = () => getAdminUsers().then((d) => setUsers(d.users)).catch(() => {});
+  const loadHelp = () => {
+    setHelpLoading(true);
+    getAdminHelpConversations()
+      .then((d) => setHelpConvos(d.conversations || []))
+      .catch(() => {})
+      .finally(() => setHelpLoading(false));
+  };
+  const openHelp = async (otherUser) => {
+    setActiveHelp(otherUser);
+    try {
+      const d = await getThread(otherUser.id);
+      setHelpThread(d.messages || []);
+    } catch (err) {
+      showToast(t('common.error', { msg: err.message }));
+    }
+  };
+  const sendHelpReply = async () => {
+    const text = helpMsg.trim();
+    if (!text || !activeHelp || helpSending) return;
+    setHelpSending(true);
+    try {
+      await sendMessage({ receiver_id: activeHelp.id, content: text });
+      setHelpMsg('');
+      const d = await getThread(activeHelp.id);
+      setHelpThread(d.messages || []);
+      loadHelp();
+    } catch (err) {
+      showToast(t('common.error', { msg: err.message }));
+    } finally {
+      setHelpSending(false);
+    }
+  };
   const loadManage = () => {
     setManageLoading(true);
     getAdminListings(manageType, manageStatus)
@@ -79,8 +121,27 @@ export default function Admin() {
     if (tab === 'admin-pending') loadPending();
     if (tab === 'admin-manage') loadManage();
     if (tab === 'admin-users') loadUsers();
+    if (tab === 'admin-help') loadHelp();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab]);
+
+  // Keep an open help thread fresh so new user messages appear automatically
+  useEffect(() => {
+    if (tab !== 'admin-help' || !activeHelp) return;
+    const iv = setInterval(() => {
+      getThread(activeHelp.id)
+        .then((d) => setHelpThread(d.messages || []))
+        .catch(() => {});
+      getAdminHelpConversations()
+        .then((d) => setHelpConvos(d.conversations || []))
+        .catch(() => {});
+    }, 5000);
+    return () => clearInterval(iv);
+  }, [tab, activeHelp]);
+
+  useEffect(() => {
+    if (helpThreadRef.current) helpThreadRef.current.scrollTop = helpThreadRef.current.scrollHeight;
+  }, [helpThread]);
 
   // Reload the manage list whenever its type/status filters change
   useEffect(() => {
@@ -261,6 +322,71 @@ export default function Admin() {
                 </div>
               );
             })}
+          </div>
+        )}
+
+        {tab === 'admin-help' && (
+          <div className="tab-pane" style={{ padding: 0 }}>
+            <div className="messages-layout" style={{ margin: '0 auto' }}>
+              {/* Help requests list */}
+              <div className="conversations-list">
+                {helpLoading && <div className="listings-empty">{t('common.loading')}</div>}
+                {!helpLoading && helpConvos.length === 0 && (
+                  <div className="listings-empty">{t('admin.noHelp')}</div>
+                )}
+                {helpConvos.map((cv) => (
+                  <div
+                    key={cv.other_user_id}
+                    className={`conversation-item ${activeHelp && activeHelp.id === cv.other_user_id ? 'active' : ''}`}
+                    onClick={() => openHelp({ id: cv.other_user_id, username: cv.other_username })}
+                  >
+                    <div className="conversation-main">
+                      <strong>{cv.other_username}</strong>
+                      <span className="muted">{cv.last_message || t('admin.noMessagesYet')}</span>
+                    </div>
+                    {cv.unread_count > 0 && <span className="unread-badge">{cv.unread_count}</span>}
+                  </div>
+                ))}
+              </div>
+
+              {/* Thread */}
+              <div className="message-thread">
+                <div className="thread-header">
+                  {activeHelp ? activeHelp.username : t('admin.selectHelp')}
+                </div>
+                <div className="thread-messages" ref={helpThreadRef}>
+                  {activeHelp && helpThread.length === 0 && <div className="listings-empty">{t('msg.noMessages')}</div>}
+                  {helpThread.map((m) => {
+                    const isMe = m.sender_id === me?.id;
+                    return (
+                      <div key={m.id} className={`message-row ${isMe ? 'me' : 'them'}`}>
+                        <div className="message-bubble">
+                          {m.image_url && (
+                            <img className="message-image" src={m.image_url} alt="" loading="lazy" />
+                          )}
+                          {m.content && <span className="message-bubble-text">{m.content}</span>}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                {activeHelp && (
+                  <div className="thread-input">
+                    <input
+                      type="text"
+                      placeholder={t('msg.typeMessage')}
+                      value={helpMsg}
+                      onChange={(e) => setHelpMsg(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && sendHelpReply()}
+                      disabled={helpSending}
+                    />
+                    <button onClick={sendHelpReply} disabled={helpSending || !helpMsg.trim()}>
+                      {helpSending ? <span className="btn-spinner btn-spinner-sm" aria-hidden="true" /> : t('msg.send')}
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         )}
 

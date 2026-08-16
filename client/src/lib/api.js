@@ -127,6 +127,9 @@ export const getConversations = () => apiCall('/messages');
 export const getThread = (userId) => apiCall(`/messages/${userId}`);
 export const sendMessage = (data) => apiCall('/messages', 'POST', data);
 export const getUnreadCount = () => apiCall('/messages/unread/count');
+export const getHelpTarget = () => apiCall('/messages/help-target');
+export const getHelpThread = () => apiCall('/messages/help');
+export const sendHelpMessage = (data) => apiCall('/messages/help', 'POST', data);
 
 /* Payments */
 export const getMyPayments = () => apiCall('/payments');
@@ -152,5 +155,6 @@ export const getAdminListings = (type = '', status = '') => {
 };
 export const deleteAdminListing = (type, id) => apiCall(`/admin/listings/${type}/${id}`, 'DELETE');
 export const getAdminUsers = (params = '') => apiCall(`/admin/users${params ? '?' + params : ''}`);
+export const getAdminHelpConversations = () => apiCall('/admin/help-conversations');
 export const updateUserRole = (id, role) => apiCall(`/admin/users/${id}/role`, 'PUT', { role });
 export const deleteUser = (id) => apiCall(`/admin/users/${id}`, 'DELETE');

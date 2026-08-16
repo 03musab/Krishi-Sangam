@@ -1,12 +1,17 @@
 import { useDeferredValue, useEffect, useState } from 'react';
 import PageBanner from '../components/PageBanner';
 import ListingCard from '../components/ListingCard';
+import AuthGateModal from '../components/AuthGateModal';
+import LocationPrompt from '../components/LocationPrompt';
+import BookEquipmentWithOperator from '../components/BookEquipmentWithOperator';
 import { useNav } from '../context/NavContext';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../i18n/LanguageContext';
+import { useLocation } from '../context/LocationContext';
 import { getEquipment, getMyBookings } from '../lib/api';
+import { sortListingsByProximity } from '../lib/geo';
 import { EQUIPMENT_CATEGORIES } from '../data/services';
-import { TRUST_TIERS, getTrustTier, getNextTier } from '../lib/trust';
+import { getTrustTier } from '../lib/trust';
 import Icon from '../components/Icon';
 import { FEATURES } from '../config';
 
@@ -20,8 +25,13 @@ export default function EquipmentRental() {
   const [search, setSearch] = useState('');
   const [count, setCount] = useState(0);
   const [completedCount, setCompletedCount] = useState(0);
+  const [gateOpen, setGateOpen] = useState(false);
+  const [bookGateOpen, setBookGateOpen] = useState(false);
+  const [bookingOpen, setBookingOpen] = useState(false);
+  const [sortedListings, setSortedListings] = useState([]);
   // Defer the search value so the input stays responsive while results update
   const deferredSearch = useDeferredValue(search);
+  const { status: locStatus, coords: locCoords, place: locPlace } = useLocation();
 
   useEffect(() => {
     let cancelled = false;
@@ -38,6 +48,23 @@ export default function EquipmentRental() {
     return () => { cancelled = true; };
   }, [deferredSearch]);
 
+  // Sort by distance from the user once location is available
+  useEffect(() => {
+    let cancelled = false;
+    if (!listings.length) {
+      setSortedListings(listings);
+      return;
+    }
+    if (locStatus === 'granted' && locCoords) {
+      sortListingsByProximity(listings, locCoords.lat, locCoords.lng, locPlace)
+        .then((sorted) => !cancelled && setSortedListings(sorted))
+        .catch(() => !cancelled && setSortedListings(listings));
+    } else {
+      setSortedListings(listings);
+    }
+    return () => { cancelled = true; };
+  }, [listings, locStatus, locCoords, locPlace]);
+
   // Trust tier — count successful (completed) rentals for this member
   useEffect(() => {
     let cancelled = false;
@@ -52,51 +79,41 @@ export default function EquipmentRental() {
   }, [user]);
 
   const tier = getTrustTier(completedCount);
-  const nextTier = getNextTier(tier);
 
   const toggleItem = (item) => {
     setSearch((prev) => (prev === item ? '' : item));
   };
 
+  if (bookingOpen) {
+    return <BookEquipmentWithOperator onBack={() => setBookingOpen(false)} onSubmitted={() => setBookingOpen(false)} />;
+  }
+
   return (
     <>
-      <PageBanner title={t('equip.title')} color="orange" actionLabel={t('equip.action')} onAction={() => navigate('list-equipment')} />
+      <PageBanner title={t('equip.title')} color="orange" actionLabel={t('equip.action')} onAction={() => {
+        if (!user) { setGateOpen(true); return; }
+        navigate('list-equipment');
+      }} />
 
-      {/* Trust & Deposits — live member tier */}
-      <section className="trust-section">
-        <div className="trust-card">
-          <div className="trust-head">
-            <div className="trust-head-copy">
-              <h2 className="trust-title"><Icon name="shield" size={24} style={{ verticalAlign: '-5px', marginRight: '8px' }} />{t('trust.title')}</h2>
-              <p className="trust-sub">{t('trust.subtitle')}</p>
-            </div>
-            <div className="trust-level">
-              <span className="trust-level-label">{t('trust.yourLevel')}</span>
-              <span className={`trust-level-badge trust-level-${tier.level}`}>{t(tier.labelKey)}</span>
-              <span className="trust-level-count">{t('trust.rentals', { n: completedCount })}</span>
-            </div>
+      <LocationPrompt />
+
+      {/* Book Equipment with Operator — top option */}
+      <div className="section labour-top-section" style={{ paddingBottom: '8px' }}>
+        <button
+          className="labour-team-card equipment"
+          onClick={() => {
+            if (!user) { setBookGateOpen(true); return; }
+            setBookingOpen(true);
+          }}
+        >
+          <span className="labour-team-emoji"><Icon name="tractor" size={44} /></span>
+          <div className="labour-team-text">
+            <h3>{t('equipBook.title')}</h3>
+            <p>{t('equipBook.hireEquip')}</p>
+            <span className="labour-team-link">{t('labour.bookNow')}</span>
           </div>
-          <div className="trust-tiers">
-            {TRUST_TIERS.map((tr) => {
-              const isCurrent = tr.level === tier.level;
-              const reached = completedCount >= tr.min;
-              return (
-                <div key={tr.level} className={`trust-tier ${isCurrent ? 'current' : ''} ${reached ? 'reached' : ''}`}>
-                  <span className="trust-tier-name">{t(tr.labelKey)}</span>
-                  <span className="trust-tier-benefit">{t(tr.benefitKey)}</span>
-                </div>
-              );
-            })}
-          </div>
-          {nextTier ? (
-            <p className="trust-next">
-              {t('trust.nextTier', { n: nextTier.min - completedCount, tier: t(nextTier.labelKey) })}
-            </p>
-          ) : (
-            <p className="trust-next"><Icon name="star" size={18} style={{ verticalAlign: '-3px', marginRight: '6px' }} />{t('trust.topTier')}</p>
-          )}
-        </div>
-      </section>
+        </button>
+      </div>
 
       <div className="search-filter-bar">
         <div className="search-input-wrapper">
@@ -150,10 +167,26 @@ export default function EquipmentRental() {
         <div className="listings-empty">{search ? t('equip.noListingsFilter', { q: search }) : t('equip.noListings')}</div>
       )}
       <div className="grid-cards-2col">
-        {listings.map((l) => (
+        {sortedListings.map((l) => (
           <ListingCard key={l.id} listing={l} type="equipment" trustTier={tier} />
         ))}
       </div>
+
+      {gateOpen && (
+        <AuthGateModal
+          title={t('equip.action')}
+          description={t('gate.listDesc')}
+          onClose={() => setGateOpen(false)}
+        />
+      )}
+
+      {bookGateOpen && (
+        <AuthGateModal
+          title={t('equipBook.title')}
+          description={t('gate.labourDesc')}
+          onClose={() => setBookGateOpen(false)}
+        />
+      )}
     </>
   );
 }

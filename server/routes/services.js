@@ -9,7 +9,7 @@ const router = express.Router();
 
 /* ── POST /api/services/book ─────────────────
    Body:
-     kind: 'labour_team' | 'service'
+     kind: 'labour_team' | 'service' | 'equipment'
      category, service_name
      num_workers, days, team_type, skill_level, start_date
      location, lat, lng, description, price
@@ -23,13 +23,13 @@ router.post('/book', authenticateToken, async (req, res) => {
       lat, lng, description, price
     } = req.body;
 
-    if (!kind || !['labour_team', 'service'].includes(kind)) {
+    if (!kind || !['labour_team', 'service', 'equipment'].includes(kind)) {
       return res.status(400).json({ error: 'Valid booking kind is required.' });
     }
     if (!location) {
       return res.status(400).json({ error: 'Farm location is required.' });
     }
-    if (!service_name && kind === 'service') {
+    if (!service_name && (kind === 'service' || kind === 'equipment')) {
       return res.status(400).json({ error: 'Service name is required.' });
     }
 
@@ -57,7 +57,9 @@ router.post('/book', authenticateToken, async (req, res) => {
     res.status(201).json({
       message: kind === 'labour_team'
         ? 'Labour team request submitted!'
-        : 'Service request submitted!',
+        : kind === 'equipment'
+          ? 'Equipment request submitted!'
+          : 'Service request submitted!',
       booking
     });
   } catch (err) {

@@ -6,6 +6,7 @@ import { useLanguage } from '../i18n/LanguageContext';
 import { createBooking } from '../lib/api';
 import { memberDeposit } from '../lib/trust';
 import ListingDetailsModal from './ListingDetailsModal';
+import AuthGateModal from './AuthGateModal';
 import { listingToModalProps } from '../lib/listingProps.jsx';
 import Icon from './Icon';
 
@@ -22,6 +23,7 @@ export default function ListingCard({ listing, type, onBook, trustTier }) {
   const [status, setStatus] = useState('idle'); // 'idle' | 'booked'
   const [optimisticStatus, addOptimistic] = useOptimistic(status, (_, value) => value);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const [gateOpen, setGateOpen] = useState(false);
 
   const handleBook = (e) => {
     e.stopPropagation();
@@ -64,7 +66,13 @@ export default function ListingCard({ listing, type, onBook, trustTier }) {
 
   const handleButtonClick = (e) => {
     e.stopPropagation();
-    if (isDetailsType) { setDetailsOpen(true); return; }
+    if (isDetailsType) {
+      // Details (and owner contact) are for members — logged-out visitors are
+      // asked to create an account instead.
+      if (!user) { setGateOpen(true); return; }
+      setDetailsOpen(true);
+      return;
+    }
     handleBook(e);
   };
 
@@ -82,8 +90,11 @@ export default function ListingCard({ listing, type, onBook, trustTier }) {
       </div>
       <div className="listing-body">
         <h3 className="listing-title">{escapeHtml(title)}</h3>
-        <div className="listing-location"><Icon name="pin" size={14} style={{ verticalAlign: '-2px', marginRight: '6px' }} />{location}{district ? `, ${district}` : ''}</div>
+        <div className="listing-location"><Icon name="pin" size={14} style={{ verticalAlign: '-2px', marginRight: '6px' }} />{location}{district ? `, ${district}` : ''}{listing._distanceKm != null && (
+          <span className="listing-distance">{t('loc.distanceKm', { km: listing._distanceKm })}</span>
+        )}</div>
         <div className="listing-tags">
+          {listing._nearby && <span className="tag-pill tag-green">{t('loc.near')}</span>}
           {tags.map((t, i) => (
             <span key={i} className={`tag-pill ${t.cls}`}>{t.text}</span>
           ))}
@@ -127,6 +138,14 @@ export default function ListingCard({ listing, type, onBook, trustTier }) {
           listingId={listing.id}
           trustTier={trustTier}
           onClose={() => setDetailsOpen(false)}
+        />
+      )}
+
+      {gateOpen && (
+        <AuthGateModal
+          title={t('card.getDetails')}
+          description={t('gate.detailsDesc')}
+          onClose={() => setGateOpen(false)}
         />
       )}
     </div>

@@ -3,7 +3,6 @@ import { useNav } from '../context/NavContext';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../i18n/LanguageContext';
 import PageLoader from './PageLoader';
-import MembersGate from './MembersGate';
 import Icon from './Icon';
 
 const Home = lazy(() => import('../pages/Home'));
@@ -26,6 +25,16 @@ const SignUp = lazy(() => import('../pages/SignUp'));
 const ForgotPassword = lazy(() => import('../pages/ForgotPassword'));
 const About = lazy(() => import('../pages/About'));
 const Terms = lazy(() => import('../pages/Terms'));
+const Help = lazy(() => import('../pages/Help'));
+const PrivacyPolicy = lazy(() => import('../pages/PrivacyPolicy'));
+const RefundPolicy = lazy(() => import('../pages/RefundPolicy'));
+const CancellationPolicy = lazy(() => import('../pages/CancellationPolicy'));
+const ForFarmers = lazy(() => import('../pages/ForFarmers'));
+const ForLandowners = lazy(() => import('../pages/ForLandowners'));
+const ForEquipmentOwners = lazy(() => import('../pages/ForEquipmentOwners'));
+const ForServiceProviders = lazy(() => import('../pages/ForServiceProviders'));
+const AgriculturalServices = lazy(() => import('../pages/AgriculturalServices'));
+const HowItWorks = lazy(() => import('../pages/HowItWorks'));
 
 const VIEWS = {
   home: Home,
@@ -47,40 +56,27 @@ const VIEWS = {
   signup: SignUp,
   'forgot-password': ForgotPassword,
   about: About,
-  terms: Terms
+  terms: Terms,
+  help: Help,
+  privacy: PrivacyPolicy,
+  'refund-policy': RefundPolicy,
+  'cancellation-policy': CancellationPolicy,
+  farmers: ForFarmers,
+  landowners: ForLandowners,
+  'equipment-owners': ForEquipmentOwners,
+  'service-providers': ForServiceProviders,
+  'agri-services': AgriculturalServices,
+  'how-it-works': HowItWorks
 };
 
-// Views shown only to signed-in users. Logged-out visitors get a short
-// description plus a Sign Up CTA instead of the actual content.
-const MEMBERS_ONLY_VIEWS = {
-  'land-leasing': { icon: 'wheat', titleKey: 'land.title', descKey: 'services.landBody', color: 'green' },
-  'equipment-rental': { icon: 'tractor', titleKey: 'equip.title', descKey: 'services.equipmentBody', color: 'orange' },
-  labour: { icon: 'worker', titleKey: 'labour.bookServices', descKey: 'services.labourBody', color: 'purple' }
-};
-
+// Service pages (land, equipment, labour) are browsable by everyone — logged-out
+// visitors are asked to create an account when they try to view details or
+// request a service (see AuthGateModal). Only the admin panel is members-only.
 export default function AppRouter() {
   const { view, navigate } = useNav();
   const { user, loading } = useAuth();
   const { t } = useLanguage();
   const ViewComponent = VIEWS[view] || Home;
-  const gate = MEMBERS_ONLY_VIEWS[view];
-
-  if (gate && !user) {
-    return (
-      <div className="page-view" key={view}>
-        {loading ? (
-          <PageLoader />
-        ) : (
-          <MembersGate
-            icon={gate.icon}
-            title={t(gate.titleKey)}
-            description={t(gate.descKey)}
-            color={gate.color}
-          />
-        )}
-      </div>
-    );
-  }
 
   // Admin panel is restricted to users with the admin role.
   if (view === 'admin' && (!user || user.role !== 'admin')) {
