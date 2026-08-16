@@ -38,7 +38,8 @@ export function listingToModalProps(listing, type) {
   if (!listing) return null;
   const { t } = useLanguage();
 
-  const title = listing.title || listing.name || listing.crop_name || t('card.untitled');
+  const rawTitle = listing.title || listing.name || listing.crop_name || t('card.untitled');
+  const title = t(`seed.${rawTitle}`, rawTitle);
   const location = listing.location || '';
   const district = listing.district || '';
 
@@ -107,7 +108,7 @@ export function listingToModalProps(listing, type) {
     accent,
     price,
     tags,
-    description: listing.description || '',
+    description: t(`seedDesc.${rawTitle}`, listing.description || ''),
     ownerName,
     ownerPhone,
     ownerId,

@@ -717,7 +717,29 @@ const en = {
   'agriServices.p3': 'Receive relevant enquiries',
   'agriServices.p4': 'Manage availability',
   'agriServices.p5': 'Display service information',
-  'agriServices.p6': 'Expand their customer network'
+  'agriServices.p6': 'Expand their customer network',
+  'seed.5 Acre Irrigated Farm in Nashik': '5 Acre Irrigated Farm in Nashik',
+  'seed.8 Acre Grape Farm near Nashik': '8 Acre Grape Farm near Nashik',
+  'seed.3 Acre Organic Farmland in Pune': '3 Acre Organic Farmland in Pune',
+  'seed.Mahindra 575 Tractor': 'Mahindra 575 Tractor',
+  'seed.John Deere Harvester': 'John Deere Harvester',
+  'seed.Swaraj 744 FE Tractor': 'Swaraj 744 FE Tractor',
+  'seed.Power Sprayer 500L': 'Power Sprayer 500L',
+  'seed.Experienced Farm Worker — All Field Operations': 'Experienced Farm Worker — All Field Operations',
+  'seed.Irrigation & Drip Line Specialist': 'Irrigation & Drip Line Specialist',
+  'seed.Seasonal Harvesting Crew Member': 'Seasonal Harvesting Crew Member',
+  'seed.Nagpur Oranges': 'Nagpur Oranges',
+  'seed.Soybean (Black)': 'Soybean (Black)',
+  'seed.Fresh Tomatoes': 'Fresh Tomatoes',
+  'seed.Cotton (Kapas)': 'Cotton (Kapas)',
+  'seedDesc.5 Acre Irrigated Farm in Nashik': 'Well-irrigated fertile farmland near Sinnar, ideal for sugarcane, onion or vegetables. Borewell with drip irrigation, 2 km from main road.',
+  'seedDesc.8 Acre Grape Farm near Nashik': 'Established grape vineyard with drip irrigation, godown and labour quarters. Perfect for table grapes and wine varieties.',
+  'seedDesc.3 Acre Organic Farmland in Pune': 'Certified organic-friendly plot near Baramati. River water access, fencing provided, suitable for vegetables and horticulture.',
+  'seedDesc.Mahindra 575 Tractor': '75 HP tractor with rotavator attachment, well maintained, available with operator on request.',
+  'seedDesc.John Deere Harvester': 'Self-propelled combine harvester for wheat, soybean and paddy. Full crew included.',
+  'seedDesc.Swaraj 744 FE Tractor': '50 HP tractor with trolley, perfect for small and mid-size farms. Diesel included.',
+  'seedDesc.Power Sprayer 500L': 'Tractor-mounted 500 litre power sprayer for pesticide and fertilizer application.'
+
 
 };
 
@@ -1418,7 +1440,29 @@ const hi = {
   'agriServices.p3': 'प्रासंगिक पूछताछ प्राप्त करें',
   'agriServices.p4': 'उपलब्धता प्रबंधित करें',
   'agriServices.p5': 'सेवा की जानकारी प्रदर्शित करें',
-  'agriServices.p6': 'अपने ग्राहक नेटवर्क का विस्तार करें'
+  'agriServices.p6': 'अपने ग्राहक नेटवर्क का विस्तार करें',
+  'seed.5 Acre Irrigated Farm in Nashik': 'नाशिक में 5 एकड़ सिंचित खेत',
+  'seed.8 Acre Grape Farm near Nashik': 'नाशिक के पास 8 एकड़ अंगूर का बाग',
+  'seed.3 Acre Organic Farmland in Pune': 'पुणे में 3 एकड़ जैविक खेत',
+  'seed.Mahindra 575 Tractor': 'महिंद्रा 575 ट्रैक्टर',
+  'seed.John Deere Harvester': 'जॉन डियर हार्वेस्टर',
+  'seed.Swaraj 744 FE Tractor': 'स्वराज 744 FE ट्रैक्टर',
+  'seed.Power Sprayer 500L': 'पावर स्प्रेयर 500L',
+  'seed.Experienced Farm Worker — All Field Operations': 'अनुभवी कृषि कार्यकर्ता — सभी मैदानी कार्य',
+  'seed.Irrigation & Drip Line Specialist': 'सिंचाई और ड्रिप लाइन विशेषज्ञ',
+  'seed.Seasonal Harvesting Crew Member': 'मौसमी कटाई दल के सदस्य',
+  'seed.Nagpur Oranges': 'नागपुर संतरे',
+  'seed.Soybean (Black)': 'सोयाबीन (काला)',
+  'seed.Fresh Tomatoes': 'ताजा टमाटर',
+  'seed.Cotton (Kapas)': 'कपास (कपास)',
+  'seedDesc.5 Acre Irrigated Farm in Nashik': 'सिन्नर के पास अच्छी तरह से सिंचित उपजाऊ कृषि भूमि, गन्ना, प्याज या सब्जियों के लिए आदर्श। ड्रिप सिंचाई के साथ बोरवेल, मुख्य सड़क से 2 किमी।',
+  'seedDesc.8 Acre Grape Farm near Nashik': 'ड्रिप सिंचाई, गोदाम और मजदूर आवास के साथ स्थापित अंगूर का बाग। टेबल अंगूर और वाइन किस्मों के लिए बिल्कुल सही।',
+  'seedDesc.3 Acre Organic Farmland in Pune': 'बारामती के पास प्रमाणित जैविक अनुकूल भूखंड। नदी का पानी उपलब्ध, बाड़ उपलब्ध, सब्जियों और बागवानी के लिए उपयुक्त।',
+  'seedDesc.Mahindra 575 Tractor': 'रोटावेटर अटैचमेंट के साथ 75 एचपी ट्रैक्टर, अच्छी तरह से रखरखाव, अनुरोध पर ऑपरेटर के साथ उपलब्ध।',
+  'seedDesc.John Deere Harvester': 'गेहूं, सोयाबीन और धान के लिए स्व-संचालित कंबाइन हार्वेस्टर। पूरा दल शामिल है।',
+  'seedDesc.Swaraj 744 FE Tractor': 'ट्रॉली के साथ 50 एचपी ट्रैक्टर, छोटे और मध्यम आकार के खेतों के लिए एकदम सही। डीजल शामिल है।',
+  'seedDesc.Power Sprayer 500L': 'कीटनाशक और उर्वरक आवेदन के लिए ट्रैक्टर-माउंटेड 500 लीटर पावर स्प्रेयर।'
+
 
 
 };
@@ -2120,7 +2164,29 @@ const bn = {
   'agriServices.p3': 'অনুসন্ধান গ্রহণ করুন',
   'agriServices.p4': 'উপলব্ধতা পরিচালনা করুন',
   'agriServices.p5': 'সেবার তথ্য প্রদর্শন করুন',
-  'agriServices.p6': 'গ্রাহক নেটওয়ার্ক প্রসারিত করুন'
+  'agriServices.p6': 'গ্রাহক নেটওয়ার্ক প্রসারিত করুন',
+  'seed.5 Acre Irrigated Farm in Nashik': 'নাসিকে 5 একর সেচযুক্ত জমি',
+  'seed.8 Acre Grape Farm near Nashik': 'নাসিকের কাছে 8 একর আঙুরের বাগান',
+  'seed.3 Acre Organic Farmland in Pune': 'পুনেতে 3 একর জৈব কৃষি জমি',
+  'seed.Mahindra 575 Tractor': 'মহিন্দ্রা 575 ট্রাক্টর',
+  'seed.John Deere Harvester': 'জন ডিয়ার হার্ভেস্টার',
+  'seed.Swaraj 744 FE Tractor': 'স্বরাজ 744 FE ট্রাক্টর',
+  'seed.Power Sprayer 500L': 'পাওয়ার স্প্রেয়ার 500L',
+  'seed.Experienced Farm Worker — All Field Operations': 'অভিজ্ঞ খামার শ্রমিক — সমস্ত মাঠের কাজ',
+  'seed.Irrigation & Drip Line Specialist': 'সেচ ও ড্রিপ লাইন বিশেষজ্ঞ',
+  'seed.Seasonal Harvesting Crew Member': 'মৌসুমি ফসল কাটার দলের সদস্য',
+  'seed.Nagpur Oranges': 'নাগপুর কমলালেবু',
+  'seed.Soybean (Black)': 'সোয়াবিন (কালো)',
+  'seed.Fresh Tomatoes': 'তাজা টমেটো',
+  'seed.Cotton (Kapas)': 'তুলা (কপাস)',
+  'seedDesc.5 Acre Irrigated Farm in Nashik': 'সিন্নারের কাছে সেচযুক্ত উর্বর জমি, আখ, পেঁয়াজ বা শাকসবজির জন্য আদর্শ। ড্রিপ সেচ সহ বোরওয়েল।',
+  'seedDesc.8 Acre Grape Farm near Nashik': 'ড্রিপ সেচ এবং গুদাম সহ আঙুরের বাগান।',
+  'seedDesc.3 Acre Organic Farmland in Pune': 'বারামতির কাছে জৈব কৃষিজমি। নদীর জল এবং বেড়া উপলব্ধ।',
+  'seedDesc.Mahindra 575 Tractor': 'রোটাভেটর সহ 75 এইচপি ট্রাক্টর, ভালো অবস্থায় রক্ষিত।',
+  'seedDesc.John Deere Harvester': 'গম, সোয়াবিন এবং ধানের জন্য কম্বাইন হার্ভেস্টার।',
+  'seedDesc.Swaraj 744 FE Tractor': 'ট্রলি সহ 50 এইচপি ট্রাক্টর, ছোট ও মাঝারি খামারের জন্য উপযুক্ত।',
+  'seedDesc.Power Sprayer 500L': 'কীটনাশক ছিটানোর জন্য 500 লিটার স্প্রেয়ার।'
+
 
 
 };
@@ -2822,7 +2888,29 @@ const mr = {
   'agriServices.p3': 'संबंधित चौकशी मिळवा',
   'agriServices.p4': 'उपलब्धता व्यवस्थापित करा',
   'agriServices.p5': 'सेवा माहिती प्रदर्शित करा',
-  'agriServices.p6': 'ग्राहक नेटवर्क वाढवा'
+  'agriServices.p6': 'ग्राहक नेटवर्क वाढवा',
+  'seed.5 Acre Irrigated Farm in Nashik': 'नाशिकमध्ये 5 एकर बागायती शेत',
+  'seed.8 Acre Grape Farm near Nashik': 'नाशिकजवळ 8 एकर द्राक्ष बाग',
+  'seed.3 Acre Organic Farmland in Pune': 'पुण्यात 3 एकर सेंद्रिय शेतजमीन',
+  'seed.Mahindra 575 Tractor': 'महिंद्रा 575 ट्रॅक्टर',
+  'seed.John Deere Harvester': 'जॉन डियर हार्वेस्टर',
+  'seed.Swaraj 744 FE Tractor': 'स्वराज 744 FE ट्रॅक्टर',
+  'seed.Power Sprayer 500L': 'पावर फवारणी यंत्र 500L',
+  'seed.Experienced Farm Worker — All Field Operations': 'अनुभवी शेतमजूर — सर्व शेतीकामे',
+  'seed.Irrigation & Drip Line Specialist': 'सिंचन आणि ठिबक सिंचन तज्ज्ञ',
+  'seed.Seasonal Harvesting Crew Member': 'हंगामी काढणी पथक सदस्य',
+  'seed.Nagpur Oranges': 'नागपूर संत्री',
+  'seed.Soybean (Black)': 'सोयाबीन (काळा)',
+  'seed.Fresh Tomatoes': 'ताजे टोमॅटो',
+  'seed.Cotton (Kapas)': 'कापूस',
+  'seedDesc.5 Acre Irrigated Farm in Nashik': 'सिन्नरजवळ उत्तम बागायती सुपीक शेतजमीन, ऊस, कांदा किंवा भाजीपाल्यासाठी आदर्श. ठिबक सिंचनासह बोअरवेल, मुख्य रस्त्यापासून 2 किमी.',
+  'seedDesc.8 Acre Grape Farm near Nashik': 'ठिबक सिंचन, गोदामासह द्राक्ष बाग. टेबल ग्रेप्स आणि वाइन जातींसाठी योग्य.',
+  'seedDesc.3 Acre Organic Farmland in Pune': 'बारामतीजवळ सेंद्रिय शेतजमीन. नदीचे पाणी, कुंपण उपलब्ध, भाजीपाला आणि फळबागेसाठी योग्य.',
+  'seedDesc.Mahindra 575 Tractor': 'रोटाव्हेटरसह 75 एचपी ट्रॅक्टर, उत्तम स्थितीत, मागणीनुसार ऑपरेटरसह उपलब्ध.',
+  'seedDesc.John Deere Harvester': 'गव्हाणी, सोयाबीन आणि धानासाठी कंबाइन हार्वेस्टर. संपूर्ण पथक समाविष्ट.',
+  'seedDesc.Swaraj 744 FE Tractor': 'ट्रॉलीसह 50 एचपी ट्रॅक्टर, लहान व मध्यम शेतांसाठी योग्य. डिझेल समाविष्ट.',
+  'seedDesc.Power Sprayer 500L': 'कीटकनाशक व खत फवारणीसाठी ट्रॅक्टर-माउंट केलेले 500 लिटर फवारणी यंत्र.'
+
 
 
 };
@@ -3524,7 +3612,29 @@ const te = {
   'agriServices.p3': 'విచారణలు పొందడం',
   'agriServices.p4': 'లభ్యతను నిర్వహించడం',
   'agriServices.p5': 'సేవా సమాచారాన్ని చూపడం',
-  'agriServices.p6': 'కస్టమర్ నెట్‌వర్క్‌ను విస్తరించడం'
+  'agriServices.p6': 'కస్టమర్ నెట్‌వర్క్‌ను విస్తరించడం',
+  'seed.5 Acre Irrigated Farm in Nashik': 'నాశిక్‌లో 5 ఎకరాల సాగునీటి పొలం',
+  'seed.8 Acre Grape Farm near Nashik': 'నాశిక్ సమీపంలో 8 ఎకరాల ద్రాక్ష తోట',
+  'seed.3 Acre Organic Farmland in Pune': 'పుణెలో 3 ఎకరాల సేంద్రీయ వ్యవసాయ భూమి',
+  'seed.Mahindra 575 Tractor': 'మహీంద్రా 575 ట్రాక్టర్',
+  'seed.John Deere Harvester': 'జాన్ డియర్ హార్వెస్టర్',
+  'seed.Swaraj 744 FE Tractor': 'స్వరాజ్ 744 FE ట్రాక్టర్',
+  'seed.Power Sprayer 500L': 'పవర్ స్ప్రేయర్ 500L',
+  'seed.Experienced Farm Worker — All Field Operations': 'అనుభవజ్ఞుడైన వ్యవసాయ కూలీ — అన్ని పొలం పనులు',
+  'seed.Irrigation & Drip Line Specialist': 'నీటిపారుదల & డ్రిప్ లైన్ నిపుణుడు',
+  'seed.Seasonal Harvesting Crew Member': 'సౌజన్య కోత బృంద సభ్యుడు',
+  'seed.Nagpur Oranges': 'నాగపూర్ కమలాలు',
+  'seed.Soybean (Black)': 'సోయాబీన్ (నలుపు)',
+  'seed.Fresh Tomatoes': 'తాజా టమోటాలు',
+  'seed.Cotton (Kapas)': 'పత్తి (కపాస్)',
+  'seedDesc.5 Acre Irrigated Farm in Nashik': 'సిన్నార్ సమీపంలో నీటిపారుదల ఉన్న సారవంతమైన పొలం.',
+  'seedDesc.8 Acre Grape Farm near Nashik': 'డ్రిప్ నీటిపారుదలతో ద్రాక్ష తోట.',
+  'seedDesc.3 Acre Organic Farmland in Pune': 'బారామతి సమీపంలో సేంద్రీయ పొలం.',
+  'seedDesc.Mahindra 575 Tractor': 'రోటవేటర్‌తో 75 HP ట్రాక్టర్.',
+  'seedDesc.John Deere Harvester': 'గోధుమలు మరియు వరికి కంబైన్ హార్వెస్టర్.',
+  'seedDesc.Swaraj 744 FE Tractor': 'ట్రాలీతో 50 HP ట్రాక్టర్.',
+  'seedDesc.Power Sprayer 500L': '500 లీటర్ల పవర్ స్ప్రేయర్.'
+
 
 
 };
@@ -4226,7 +4336,29 @@ const ta = {
   'agriServices.p3': 'விசாரணைகளைப் பெறுதல்',
   'agriServices.p4': 'இருப்பைக் கட்டுப்படுத்துதல்',
   'agriServices.p5': 'தகவல்களைக் காட்டுதல்',
-  'agriServices.p6': 'வாடிக்கையாளர் பிணையத்தை விரிவாக்குதல்'
+  'agriServices.p6': 'வாடிக்கையாளர் பிணையத்தை விரிவாக்குதல்',
+  'seed.5 Acre Irrigated Farm in Nashik': 'நாசிக்கில் 5 ஏக்கர் பாசனப் பண்ணை',
+  'seed.8 Acre Grape Farm near Nashik': 'நாசிக் அருகில் 8 ஏக்கர் திராட்சைப் பண்ணை',
+  'seed.3 Acre Organic Farmland in Pune': 'பூனேயில் 3 ஏக்கர் இயற்கை பண்ணை நிலம்',
+  'seed.Mahindra 575 Tractor': 'மஹிந்திரா 575 ட்ராக்டர்',
+  'seed.John Deere Harvester': 'ஜான் டீர் ஹார்வெஸ்டர்',
+  'seed.Swaraj 744 FE Tractor': 'சுவராஜ் 744 FE ட்ராக்டர்',
+  'seed.Power Sprayer 500L': 'பவர் ஸ்ப்ரேயர் 500L',
+  'seed.Experienced Farm Worker — All Field Operations': 'அனுபவமிக்க பண்ணைத் தொழிலாளி — அனைத்து வயல் வேலைகளும்',
+  'seed.Irrigation & Drip Line Specialist': 'பாசனம் & சொட்டுநீர் நிபுணர்',
+  'seed.Seasonal Harvesting Crew Member': 'பருவக்கால அறுவடைக் குழு உறுப்பினர்',
+  'seed.Nagpur Oranges': 'நாக்பூர் ஆரஞ்சு',
+  'seed.Soybean (Black)': 'சோயாபீன் (கருப்பு)',
+  'seed.Fresh Tomatoes': 'புதிய தக்காளி',
+  'seed.Cotton (Kapas)': 'பருத்தி (கபாஸ்)',
+  'seedDesc.5 Acre Irrigated Farm in Nashik': 'சின்னார் அருகில் நல்ல பாசன வசதியுள்ள வளமான பண்ணை நிலம்.',
+  'seedDesc.8 Acre Grape Farm near Nashik': 'சொட்டுநீர் பாசன வசதியுடன் கூடிய திராட்சைத் தோட்டம்.',
+  'seedDesc.3 Acre Organic Farmland in Pune': 'பாராமதி அருகில் இயற்கை நிலம்.',
+  'seedDesc.Mahindra 575 Tractor': 'ரோட்டவேட்டருடன் 75 HP ட்ராக்டர்.',
+  'seedDesc.John Deere Harvester': 'கோதுமை மற்றும் நெல்லுக்கு ஹார்வெஸ்டர்.',
+  'seedDesc.Swaraj 744 FE Tractor': 'ட்ராலியுடன் 50 HP ட்ராக்டர்.',
+  'seedDesc.Power Sprayer 500L': '500 லிட்டர் பவர் ஸ்ப்ரேயர்.'
+
 
 
 };
@@ -4928,7 +5060,29 @@ const gu = {
   'agriServices.p3': 'પૂછપરછ મેળવો',
   'agriServices.p4': 'ઉપલબ્ધતા સંચાલિત કરો',
   'agriServices.p5': 'સેવા માહિતી દર્શાવો',
-  'agriServices.p6': 'ગ્રાહક નેટવર્ક વધારો'
+  'agriServices.p6': 'ગ્રાહક નેટવર્ક વધારો',
+  'seed.5 Acre Irrigated Farm in Nashik': 'નાસિકમાં 5 એકર પિયત ખેતર',
+  'seed.8 Acre Grape Farm near Nashik': 'નાસિક નજીક 8 એકર દ્રાક્ષની વાડી',
+  'seed.3 Acre Organic Farmland in Pune': 'પુણેમાં 3 એકર ઓર્ગેનિક ખેતર',
+  'seed.Mahindra 575 Tractor': 'મહિન્દ્રા 575 ટ્રેક્ટર',
+  'seed.John Deere Harvester': 'જોન ડીયર હાર્વેસ્ટર',
+  'seed.Swaraj 744 FE Tractor': 'સ્વરાજ 744 FE ટ્રેક્ટર',
+  'seed.Power Sprayer 500L': 'પાવર સ્પ્રેયર 500L',
+  'seed.Experienced Farm Worker — All Field Operations': 'અનુભવી ખેત મજૂર — બધી ખેતર કામગીરી',
+  'seed.Irrigation & Drip Line Specialist': 'સિંચાઈ અને ડ્રિપ લાઈન નિષ્ણાત',
+  'seed.Seasonal Harvesting Crew Member': 'મોસમી લણણી ટીમ સભ્ય',
+  'seed.Nagpur Oranges': 'નાગપુર સંતરા',
+  'seed.Soybean (Black)': 'સોયાબીન (કાળા)',
+  'seed.Fresh Tomatoes': 'તાજા ટામેટાં',
+  'seed.Cotton (Kapas)': 'કપાસ',
+  'seedDesc.5 Acre Irrigated Farm in Nashik': 'સિન્નર નજીક સારી રીતે પીવાયેલી ફળદ્રુપ ખેતીની જમીન.',
+  'seedDesc.8 Acre Grape Farm near Nashik': 'ડ્રિપ સિંચાઈ સાથે સ્થાપિત દ્રાક્ષની વાડી.',
+  'seedDesc.3 Acre Organic Farmland in Pune': 'બારામતી નજીક ઓર્ગેનિક ખેતર.',
+  'seedDesc.Mahindra 575 Tractor': 'રોટાવેટર સાથે 75 HP ટ્રેક્ટર.',
+  'seedDesc.John Deere Harvester': 'ઘઉં અને ડાંગર માટે હાર્વેસ્ટર.',
+  'seedDesc.Swaraj 744 FE Tractor': 'ટ્રોલી સાથે 50 HP ટ્રેક્ટર.',
+  'seedDesc.Power Sprayer 500L': '500 લીટર પાવર સ્પ્રેયર.'
+
 
 
 };
@@ -5630,7 +5784,29 @@ const ur = {
   'agriServices.p3': 'Receive relevant enquiries',
   'agriServices.p4': 'Manage availability',
   'agriServices.p5': 'Display service information',
-  'agriServices.p6': 'Expand their customer network'
+  'agriServices.p6': 'Expand their customer network',
+  'seed.5 Acre Irrigated Farm in Nashik': '5 Acre Irrigated Farm in Nashik',
+  'seed.8 Acre Grape Farm near Nashik': '8 Acre Grape Farm near Nashik',
+  'seed.3 Acre Organic Farmland in Pune': '3 Acre Organic Farmland in Pune',
+  'seed.Mahindra 575 Tractor': 'Mahindra 575 Tractor',
+  'seed.John Deere Harvester': 'John Deere Harvester',
+  'seed.Swaraj 744 FE Tractor': 'Swaraj 744 FE Tractor',
+  'seed.Power Sprayer 500L': 'Power Sprayer 500L',
+  'seed.Experienced Farm Worker — All Field Operations': 'Experienced Farm Worker — All Field Operations',
+  'seed.Irrigation & Drip Line Specialist': 'Irrigation & Drip Line Specialist',
+  'seed.Seasonal Harvesting Crew Member': 'Seasonal Harvesting Crew Member',
+  'seed.Nagpur Oranges': 'Nagpur Oranges',
+  'seed.Soybean (Black)': 'Soybean (Black)',
+  'seed.Fresh Tomatoes': 'Fresh Tomatoes',
+  'seed.Cotton (Kapas)': 'Cotton (Kapas)',
+  'seedDesc.5 Acre Irrigated Farm in Nashik': 'Well-irrigated fertile farmland near Sinnar, ideal for sugarcane, onion or vegetables. Borewell with drip irrigation, 2 km from main road.',
+  'seedDesc.8 Acre Grape Farm near Nashik': 'Established grape vineyard with drip irrigation, godown and labour quarters. Perfect for table grapes and wine varieties.',
+  'seedDesc.3 Acre Organic Farmland in Pune': 'Certified organic-friendly plot near Baramati. River water access, fencing provided, suitable for vegetables and horticulture.',
+  'seedDesc.Mahindra 575 Tractor': '75 HP tractor with rotavator attachment, well maintained, available with operator on request.',
+  'seedDesc.John Deere Harvester': 'Self-propelled combine harvester for wheat, soybean and paddy. Full crew included.',
+  'seedDesc.Swaraj 744 FE Tractor': '50 HP tractor with trolley, perfect for small and mid-size farms. Diesel included.',
+  'seedDesc.Power Sprayer 500L': 'Tractor-mounted 500 litre power sprayer for pesticide and fertilizer application.'
+
 
 
 };
@@ -6332,7 +6508,29 @@ const kn = {
   'agriServices.p3': 'Receive relevant enquiries',
   'agriServices.p4': 'Manage availability',
   'agriServices.p5': 'Display service information',
-  'agriServices.p6': 'Expand their customer network'
+  'agriServices.p6': 'Expand their customer network',
+  'seed.5 Acre Irrigated Farm in Nashik': '5 Acre Irrigated Farm in Nashik',
+  'seed.8 Acre Grape Farm near Nashik': '8 Acre Grape Farm near Nashik',
+  'seed.3 Acre Organic Farmland in Pune': '3 Acre Organic Farmland in Pune',
+  'seed.Mahindra 575 Tractor': 'Mahindra 575 Tractor',
+  'seed.John Deere Harvester': 'John Deere Harvester',
+  'seed.Swaraj 744 FE Tractor': 'Swaraj 744 FE Tractor',
+  'seed.Power Sprayer 500L': 'Power Sprayer 500L',
+  'seed.Experienced Farm Worker — All Field Operations': 'Experienced Farm Worker — All Field Operations',
+  'seed.Irrigation & Drip Line Specialist': 'Irrigation & Drip Line Specialist',
+  'seed.Seasonal Harvesting Crew Member': 'Seasonal Harvesting Crew Member',
+  'seed.Nagpur Oranges': 'Nagpur Oranges',
+  'seed.Soybean (Black)': 'Soybean (Black)',
+  'seed.Fresh Tomatoes': 'Fresh Tomatoes',
+  'seed.Cotton (Kapas)': 'Cotton (Kapas)',
+  'seedDesc.5 Acre Irrigated Farm in Nashik': 'Well-irrigated fertile farmland near Sinnar, ideal for sugarcane, onion or vegetables. Borewell with drip irrigation, 2 km from main road.',
+  'seedDesc.8 Acre Grape Farm near Nashik': 'Established grape vineyard with drip irrigation, godown and labour quarters. Perfect for table grapes and wine varieties.',
+  'seedDesc.3 Acre Organic Farmland in Pune': 'Certified organic-friendly plot near Baramati. River water access, fencing provided, suitable for vegetables and horticulture.',
+  'seedDesc.Mahindra 575 Tractor': '75 HP tractor with rotavator attachment, well maintained, available with operator on request.',
+  'seedDesc.John Deere Harvester': 'Self-propelled combine harvester for wheat, soybean and paddy. Full crew included.',
+  'seedDesc.Swaraj 744 FE Tractor': '50 HP tractor with trolley, perfect for small and mid-size farms. Diesel included.',
+  'seedDesc.Power Sprayer 500L': 'Tractor-mounted 500 litre power sprayer for pesticide and fertilizer application.'
+
 
 
 };
@@ -7034,7 +7232,29 @@ const or = {
   'agriServices.p3': 'Receive relevant enquiries',
   'agriServices.p4': 'Manage availability',
   'agriServices.p5': 'Display service information',
-  'agriServices.p6': 'Expand their customer network'
+  'agriServices.p6': 'Expand their customer network',
+  'seed.5 Acre Irrigated Farm in Nashik': '5 Acre Irrigated Farm in Nashik',
+  'seed.8 Acre Grape Farm near Nashik': '8 Acre Grape Farm near Nashik',
+  'seed.3 Acre Organic Farmland in Pune': '3 Acre Organic Farmland in Pune',
+  'seed.Mahindra 575 Tractor': 'Mahindra 575 Tractor',
+  'seed.John Deere Harvester': 'John Deere Harvester',
+  'seed.Swaraj 744 FE Tractor': 'Swaraj 744 FE Tractor',
+  'seed.Power Sprayer 500L': 'Power Sprayer 500L',
+  'seed.Experienced Farm Worker — All Field Operations': 'Experienced Farm Worker — All Field Operations',
+  'seed.Irrigation & Drip Line Specialist': 'Irrigation & Drip Line Specialist',
+  'seed.Seasonal Harvesting Crew Member': 'Seasonal Harvesting Crew Member',
+  'seed.Nagpur Oranges': 'Nagpur Oranges',
+  'seed.Soybean (Black)': 'Soybean (Black)',
+  'seed.Fresh Tomatoes': 'Fresh Tomatoes',
+  'seed.Cotton (Kapas)': 'Cotton (Kapas)',
+  'seedDesc.5 Acre Irrigated Farm in Nashik': 'Well-irrigated fertile farmland near Sinnar, ideal for sugarcane, onion or vegetables. Borewell with drip irrigation, 2 km from main road.',
+  'seedDesc.8 Acre Grape Farm near Nashik': 'Established grape vineyard with drip irrigation, godown and labour quarters. Perfect for table grapes and wine varieties.',
+  'seedDesc.3 Acre Organic Farmland in Pune': 'Certified organic-friendly plot near Baramati. River water access, fencing provided, suitable for vegetables and horticulture.',
+  'seedDesc.Mahindra 575 Tractor': '75 HP tractor with rotavator attachment, well maintained, available with operator on request.',
+  'seedDesc.John Deere Harvester': 'Self-propelled combine harvester for wheat, soybean and paddy. Full crew included.',
+  'seedDesc.Swaraj 744 FE Tractor': '50 HP tractor with trolley, perfect for small and mid-size farms. Diesel included.',
+  'seedDesc.Power Sprayer 500L': 'Tractor-mounted 500 litre power sprayer for pesticide and fertilizer application.'
+
 
 
 };
@@ -7736,7 +7956,29 @@ const ml = {
   'agriServices.p3': 'Receive relevant enquiries',
   'agriServices.p4': 'Manage availability',
   'agriServices.p5': 'Display service information',
-  'agriServices.p6': 'Expand their customer network'
+  'agriServices.p6': 'Expand their customer network',
+  'seed.5 Acre Irrigated Farm in Nashik': '5 Acre Irrigated Farm in Nashik',
+  'seed.8 Acre Grape Farm near Nashik': '8 Acre Grape Farm near Nashik',
+  'seed.3 Acre Organic Farmland in Pune': '3 Acre Organic Farmland in Pune',
+  'seed.Mahindra 575 Tractor': 'Mahindra 575 Tractor',
+  'seed.John Deere Harvester': 'John Deere Harvester',
+  'seed.Swaraj 744 FE Tractor': 'Swaraj 744 FE Tractor',
+  'seed.Power Sprayer 500L': 'Power Sprayer 500L',
+  'seed.Experienced Farm Worker — All Field Operations': 'Experienced Farm Worker — All Field Operations',
+  'seed.Irrigation & Drip Line Specialist': 'Irrigation & Drip Line Specialist',
+  'seed.Seasonal Harvesting Crew Member': 'Seasonal Harvesting Crew Member',
+  'seed.Nagpur Oranges': 'Nagpur Oranges',
+  'seed.Soybean (Black)': 'Soybean (Black)',
+  'seed.Fresh Tomatoes': 'Fresh Tomatoes',
+  'seed.Cotton (Kapas)': 'Cotton (Kapas)',
+  'seedDesc.5 Acre Irrigated Farm in Nashik': 'Well-irrigated fertile farmland near Sinnar, ideal for sugarcane, onion or vegetables. Borewell with drip irrigation, 2 km from main road.',
+  'seedDesc.8 Acre Grape Farm near Nashik': 'Established grape vineyard with drip irrigation, godown and labour quarters. Perfect for table grapes and wine varieties.',
+  'seedDesc.3 Acre Organic Farmland in Pune': 'Certified organic-friendly plot near Baramati. River water access, fencing provided, suitable for vegetables and horticulture.',
+  'seedDesc.Mahindra 575 Tractor': '75 HP tractor with rotavator attachment, well maintained, available with operator on request.',
+  'seedDesc.John Deere Harvester': 'Self-propelled combine harvester for wheat, soybean and paddy. Full crew included.',
+  'seedDesc.Swaraj 744 FE Tractor': '50 HP tractor with trolley, perfect for small and mid-size farms. Diesel included.',
+  'seedDesc.Power Sprayer 500L': 'Tractor-mounted 500 litre power sprayer for pesticide and fertilizer application.'
+
 
 
 };
@@ -8438,7 +8680,29 @@ const pa = {
   'agriServices.p3': 'Receive relevant enquiries',
   'agriServices.p4': 'Manage availability',
   'agriServices.p5': 'Display service information',
-  'agriServices.p6': 'Expand their customer network'
+  'agriServices.p6': 'Expand their customer network',
+  'seed.5 Acre Irrigated Farm in Nashik': '5 Acre Irrigated Farm in Nashik',
+  'seed.8 Acre Grape Farm near Nashik': '8 Acre Grape Farm near Nashik',
+  'seed.3 Acre Organic Farmland in Pune': '3 Acre Organic Farmland in Pune',
+  'seed.Mahindra 575 Tractor': 'Mahindra 575 Tractor',
+  'seed.John Deere Harvester': 'John Deere Harvester',
+  'seed.Swaraj 744 FE Tractor': 'Swaraj 744 FE Tractor',
+  'seed.Power Sprayer 500L': 'Power Sprayer 500L',
+  'seed.Experienced Farm Worker — All Field Operations': 'Experienced Farm Worker — All Field Operations',
+  'seed.Irrigation & Drip Line Specialist': 'Irrigation & Drip Line Specialist',
+  'seed.Seasonal Harvesting Crew Member': 'Seasonal Harvesting Crew Member',
+  'seed.Nagpur Oranges': 'Nagpur Oranges',
+  'seed.Soybean (Black)': 'Soybean (Black)',
+  'seed.Fresh Tomatoes': 'Fresh Tomatoes',
+  'seed.Cotton (Kapas)': 'Cotton (Kapas)',
+  'seedDesc.5 Acre Irrigated Farm in Nashik': 'Well-irrigated fertile farmland near Sinnar, ideal for sugarcane, onion or vegetables. Borewell with drip irrigation, 2 km from main road.',
+  'seedDesc.8 Acre Grape Farm near Nashik': 'Established grape vineyard with drip irrigation, godown and labour quarters. Perfect for table grapes and wine varieties.',
+  'seedDesc.3 Acre Organic Farmland in Pune': 'Certified organic-friendly plot near Baramati. River water access, fencing provided, suitable for vegetables and horticulture.',
+  'seedDesc.Mahindra 575 Tractor': '75 HP tractor with rotavator attachment, well maintained, available with operator on request.',
+  'seedDesc.John Deere Harvester': 'Self-propelled combine harvester for wheat, soybean and paddy. Full crew included.',
+  'seedDesc.Swaraj 744 FE Tractor': '50 HP tractor with trolley, perfect for small and mid-size farms. Diesel included.',
+  'seedDesc.Power Sprayer 500L': 'Tractor-mounted 500 litre power sprayer for pesticide and fertilizer application.'
+
 
 
 };
