@@ -266,13 +266,54 @@ router.put('/users/:id/role', async (req, res) => {
 /* ── DELETE /api/admin/users/:id — Delete user ── */
 router.delete('/users/:id', async (req, res) => {
   try {
-    const db = getDb();
-    if (Number(req.params.id) === req.user.id) {
+    const uid = Number(req.params.id);
+    if (uid === req.user.id) {
       return res.status(400).json({ error: 'Cannot delete yourself.' });
     }
-    await db.prepare('DELETE FROM users WHERE id = ?').run(req.params.id);
-    res.json({ message: 'User deleted.' });
+
+    // Use a transaction to cascade-delete all dependent records
+    const pool = getDb().getPool();
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+
+      // 1. Reviews (references bookings & users)
+      await client.query('DELETE FROM reviews WHERE reviewer_id = $1 OR reviewee_id = $1', [uid]);
+
+      // 2. Payments (references bookings & users)
+      await client.query('DELETE FROM payments WHERE payer_id = $1 OR payee_id = $1', [uid]);
+
+      // 3. Messages (references users & bookings)
+      await client.query('DELETE FROM messages WHERE sender_id = $1 OR receiver_id = $1', [uid]);
+
+      // 4. Bookings (references users)
+      await client.query('DELETE FROM bookings WHERE booker_id = $1 OR owner_id = $1', [uid]);
+
+      // 5. Service bookings
+      await client.query('DELETE FROM service_bookings WHERE user_id = $1', [uid]);
+
+      // 6. Listings
+      await client.query('DELETE FROM land_listings WHERE owner_id = $1', [uid]);
+      await client.query('DELETE FROM equipment_listings WHERE owner_id = $1', [uid]);
+      await client.query('DELETE FROM labour_services WHERE worker_id = $1', [uid]);
+      await client.query('DELETE FROM produce_listings WHERE seller_id = $1', [uid]);
+
+      // 7. Sessions (has ON DELETE CASCADE, but be explicit)
+      await client.query('DELETE FROM sessions WHERE user_id = $1', [uid]);
+
+      // 8. Finally, delete the user
+      await client.query('DELETE FROM users WHERE id = $1', [uid]);
+
+      await client.query('COMMIT');
+      res.json({ message: 'User and all associated data deleted.' });
+    } catch (txErr) {
+      await client.query('ROLLBACK');
+      throw txErr;
+    } finally {
+      client.release();
+    }
   } catch (err) {
+    console.error('Delete user error:', err);
     res.status(500).json({ error: 'Server error.' });
   }
 });
