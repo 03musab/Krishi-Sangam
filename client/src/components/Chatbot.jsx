@@ -27,19 +27,31 @@ const FAQS = [
     q: 'chatbot.faq3_q', a: 'chatbot.faq3_a',
     keywords: ['lease', 'land', 'rent land', 'farm land'],
     action: { labelKey: 'chatbot.actionLand', view: 'land-leasing' },
-    context: ['land-leasing', 'list-land']
+    context: ['land-leasing', 'list-land'],
+    followups: [
+      { q: 'chatbot.faq3_f1_q', a: 'chatbot.faq3_f1_a' },
+      { q: 'chatbot.faq3_f2_q', a: 'chatbot.faq3_f2_a' }
+    ]
   },
   {
     q: 'chatbot.faq4_q', a: 'chatbot.faq4_a',
     keywords: ['equipment', 'tractor', 'machine', 'rent equipment', 'harvester'],
     action: { labelKey: 'chatbot.actionEquip', view: 'equipment-rental' },
-    context: ['equipment-rental', 'list-equipment']
+    context: ['equipment-rental', 'list-equipment', 'farm-services'],
+    followups: [
+      { q: 'chatbot.faq4_f1_q', a: 'chatbot.faq4_f1_a' },
+      { q: 'chatbot.faq4_f2_q', a: 'chatbot.faq4_f2_a' }
+    ]
   },
   {
     q: 'chatbot.faq5_q', a: 'chatbot.faq5_a',
     keywords: ['labour', 'worker', 'hire', 'farm worker', 'labourer', 'mazdoor'],
     action: { labelKey: 'chatbot.actionLabour', view: 'labour' },
-    context: ['labour', 'list-labour']
+    context: ['labour', 'list-labour', 'farm-services'],
+    followups: [
+      { q: 'chatbot.faq5_f1_q', a: 'chatbot.faq5_f1_a' },
+      { q: 'chatbot.faq5_f2_q', a: 'chatbot.faq5_f2_a' }
+    ]
   },
   {
     q: 'chatbot.faq6_q', a: 'chatbot.faq6_a',
@@ -53,21 +65,34 @@ const FAQS = [
     q: 'chatbot.faq7_q', a: 'chatbot.faq7_a',
     keywords: ['sell', 'produce', 'crop', 'market', 'sell crop'],
     action: { labelKey: 'chatbot.actionProduce', view: 'list-produce' },
-    context: ['produce', 'list-produce']
+    context: ['produce', 'list-produce'],
+    followups: [
+      { q: 'chatbot.faq7_f1_q', a: 'chatbot.faq7_f1_a' },
+      { q: 'chatbot.faq7_f2_q', a: 'chatbot.faq7_f2_a' }
+    ]
   },
   {
     q: 'chatbot.faq8_q', a: 'chatbot.faq8_a',
     keywords: ['buy', 'produce', 'fresh', 'crop purchase', 'shop'],
-    action: { labelKey: 'chatbot.actionProduce', view: 'produce' }
+    action: { labelKey: 'chatbot.actionProduce', view: 'produce' },
+    followups: [
+      { q: 'chatbot.faq8_f1_q', a: 'chatbot.faq8_f1_a' }
+    ]
   },
   {
     q: 'chatbot.faq9_q', a: 'chatbot.faq9_a',
     keywords: ['sign up', 'account', 'register', 'create account', 'join'],
-    action: { labelKey: 'chatbot.actionSignup', view: 'signup' }
+    action: { labelKey: 'chatbot.actionSignup', view: 'signup' },
+    followups: [
+      { q: 'chatbot.faq9_f1_q', a: 'chatbot.faq9_f1_a' }
+    ]
   },
   {
     q: 'chatbot.faq10_q', a: 'chatbot.faq10_a',
-    keywords: ['privacy', 'safe', 'data', 'personal', 'secure', 'information']
+    keywords: ['privacy', 'safe', 'data', 'personal', 'secure', 'information'],
+    followups: [
+      { q: 'chatbot.faq10_f1_q', a: 'chatbot.faq10_f1_a' }
+    ]
   },
   {
     q: 'chatbot.faq11_q', a: 'chatbot.faq11_a',
@@ -79,17 +104,27 @@ const FAQS = [
   {
     q: 'chatbot.faq12_q', a: 'chatbot.faq12_a',
     keywords: ['booking', 'cancel', 'my booking', 'status'],
-    action: { labelKey: 'chatbot.actionBookings', view: 'bookings' }
+    action: { labelKey: 'chatbot.actionBookings', view: 'bookings' },
+    followups: [
+      { q: 'chatbot.faq12_f1_q', a: 'chatbot.faq12_f1_a' },
+      { q: 'chatbot.faq12_f2_q', a: 'chatbot.faq12_f2_a' }
+    ]
   },
   {
     q: 'chatbot.faq13_q', a: 'chatbot.faq13_a',
     keywords: ['list land', 'post land', 'add land'],
-    action: { labelKey: 'chatbot.actionListLand', view: 'list-land' }
+    action: { labelKey: 'chatbot.actionListLand', view: 'list-land' },
+    followups: [
+      { q: 'chatbot.faq13_f1_q', a: 'chatbot.faq13_f1_a' }
+    ]
   },
   {
     q: 'chatbot.faq14_q', a: 'chatbot.faq14_a',
     keywords: ['list equipment', 'post equipment', 'add equipment', 'rent out'],
-    action: { labelKey: 'chatbot.actionListEquip', view: 'list-equipment' }
+    action: { labelKey: 'chatbot.actionListEquip', view: 'list-equipment' },
+    followups: [
+      { q: 'chatbot.faq14_f1_q', a: 'chatbot.faq14_f1_a' }
+    ]
   }
 ];
 

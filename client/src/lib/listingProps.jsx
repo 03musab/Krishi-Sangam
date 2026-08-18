@@ -39,7 +39,8 @@ export function listingToModalProps(listing, type) {
   const { t } = useLanguage();
 
   const rawTitle = listing.title || listing.name || listing.crop_name || t('card.untitled');
-  const title = t(`seed.${rawTitle}`, rawTitle);
+  // Only use seed.* translations for produce/equipment — labour titles are direct
+  const title = type === 'labour' ? rawTitle : t(`seed.${rawTitle}`, rawTitle);
   const location = listing.location || '';
   const district = listing.district || '';
 

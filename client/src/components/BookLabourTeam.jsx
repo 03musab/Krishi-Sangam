@@ -5,7 +5,7 @@ import AreaField from './AreaField';
 import { useToast } from '../context/ToastContext';
 import { useLanguage } from '../i18n/LanguageContext';
 import { bookService } from '../lib/api';
-import { TEAM_TYPES, SKILL_LEVELS, DEFAULT_WORKER_RATE } from '../data/services';
+import { DEFAULT_WORKER_RATE } from '../data/services';
 
 export default function BookLabourTeam({ onBack, onSubmitted }) {
   const { showToast } = useToast();
@@ -13,8 +13,6 @@ export default function BookLabourTeam({ onBack, onSubmitted }) {
   const [form, setForm] = useState({
     workers: '',
     days: '',
-    team_type: 'Mixed',
-    skill_level: 'Skilled',
     start_date: '',
     location: '',
     description: '',
@@ -34,8 +32,7 @@ export default function BookLabourTeam({ onBack, onSubmitted }) {
         service_name: 'Farm Workers',
         num_workers: Number(form.workers),
         days: Number(form.days),
-        team_type: form.team_type,
-        skill_level: form.skill_level,
+
         start_date: form.start_date,
         location: form.location,
         lat: coords?.lat,
@@ -80,25 +77,12 @@ export default function BookLabourTeam({ onBack, onSubmitted }) {
         </div>
       </div>
 
-      <div className="form-grid-row">
+      <div className="form-group">
         <AreaField
           label={t('labour.fieldSize')}
           value={form.area_acres}
           onChange={(v) => setForm({ ...form, area_acres: v })}
         />
-        <div className="form-group">
-          <label className="form-label">{t('labour.teamType')}</label>
-          <select className="form-select" value={form.team_type} onChange={set('team_type')}>
-            {TEAM_TYPES.map((type) => <option key={type} value={type}>{t('labour.' + type.toLowerCase() + 'Team')}</option>)}
-          </select>
-        </div>
-      </div>
-
-      <div className="form-group">
-        <label className="form-label">{t('labour.skillLevel')}</label>
-        <select className="form-select" value={form.skill_level} onChange={set('skill_level')}>
-          {SKILL_LEVELS.map((s) => <option key={s} value={s}>{s}</option>)}
-        </select>
       </div>
 
       <div className="form-group">

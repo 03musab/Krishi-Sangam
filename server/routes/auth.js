@@ -163,7 +163,9 @@ router.post('/register', async (req, res) => {
       full_name, username, phone, email, password, role,
       gender, dob, govt_id_url, id_type, id_number, village, taluka, district, state,
       labour_category, skill_level, bank_account, ifsc, upi_id,
-      farm_size, farm_lat, farm_lng, location
+      farm_size, farm_size_unit, land_ownership, irrigation_type, main_crops,
+      soil_type, farming_experience, farm_access, farm_notes,
+      farm_lat, farm_lng, location
     } = req.body;
 
     if (!full_name || !phone || !password) {
@@ -210,8 +212,10 @@ router.post('/register', async (req, res) => {
         username, email, password_hash, role, phone, gender, dob,
         govt_id_url, id_type, id_number, village, taluka, district, state, location,
         labour_category, skill_level, bank_account, ifsc, upi_id,
-        farm_size, farm_lat, farm_lng, phone_verified
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+        farm_size, farm_size_unit, land_ownership, irrigation_type, main_crops,
+        soil_type, farming_experience, farm_access, farm_notes,
+        farm_lat, farm_lng, phone_verified
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
     `).run(
       finalUsername, userEmail, passwordHash, userRole, String(phone),
       gender || null, dob || null, govt_id_url || null,
@@ -220,7 +224,10 @@ router.post('/register', async (req, res) => {
       location || [village, taluka, district, state].filter(Boolean).join(', ') || null,
       labour_category || null, skill_level || null,
       bank_account || null, ifsc || null, upi_id || null,
-      farm_size || null,
+      farm_size || null, farm_size_unit || 'Acre',
+      land_ownership || null, irrigation_type || null, main_crops || null,
+      soil_type || null, farming_experience || null, farm_access || null,
+      farm_notes || null,
       farm_lat != null ? Number(farm_lat) : null,
       farm_lng != null ? Number(farm_lng) : null
     );

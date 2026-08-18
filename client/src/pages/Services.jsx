@@ -9,14 +9,9 @@ const SERVICES = [
     img: 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=800&q=80'
   },
   {
-    id: 'equipment',
-    view: 'equipment-rental',
+    id: 'farmServices',
+    view: 'farm-services',
     img: 'https://images.unsplash.com/photo-1530267981375-f0de937f5f13?auto=format&fit=crop&w=800&q=80'
-  },
-  {
-    id: 'labour',
-    view: 'labour',
-    img: 'https://images.unsplash.com/photo-1464226184884-fa280b87c399?auto=format&fit=crop&w=800&q=80'
   },
   {
     id: 'produce',

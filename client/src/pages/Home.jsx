@@ -5,6 +5,7 @@ import ContactSection from '../components/ContactSection';
 import Chatbot from '../components/Chatbot';
 import Icon from '../components/Icon';
 import dpiitLogo from '../assets/dpiit.jpeg';
+import krishiSangamLogo from '../assets/krishisangam_logo.png';
 
 const WHY_CARDS = [
   { key: 'why1', color: 'var(--green-mid)', bg: 'var(--green-light)', icon: <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg> },
@@ -144,27 +145,15 @@ export default function Home() {
               <span className="service-card-link">{t('services.cta')} <span aria-hidden="true">→</span></span>
             </div>
 
-            <div className="service-card hover-lift" onClick={() => navigate('equipment-rental')}>
+            <div className="service-card hover-lift" onClick={() => navigate('farm-services')}>
               <img
                 src="https://images.unsplash.com/photo-1530267981375-f0de937f5f13?auto=format&fit=crop&w=800&q=80"
-                alt={t('home.equipmentRental')}
+                alt={t('home.farmServices')}
                 loading="lazy"
                 style={{ width: 'calc(100% + 48px)', height: '150px', objectFit: 'cover', display: 'block', margin: '-28px -24px 18px', borderTopLeftRadius: '20px', borderTopRightRadius: '20px' }}
               />
-              <h3>{t('home.equipmentRental')}</h3>
-              <p>{t('home.equipmentRentalBody')}</p>
-              <span className="service-card-link">{t('services.cta')} <span aria-hidden="true">→</span></span>
-            </div>
-
-            <div className="service-card hover-lift" onClick={() => navigate('labour')}>
-              <img
-                src="https://images.unsplash.com/photo-1464226184884-fa280b87c399?auto=format&fit=crop&w=800&q=80"
-                alt={t('home.labourServices')}
-                loading="lazy"
-                style={{ width: 'calc(100% + 48px)', height: '150px', objectFit: 'cover', display: 'block', margin: '-28px -24px 18px', borderTopLeftRadius: '20px', borderTopRightRadius: '20px' }}
-              />
-              <h3>{t('home.labourServices')}</h3>
-              <p>{t('home.labourServicesBody')}</p>
+              <h3>{t('home.farmServices')}</h3>
+              <p>{t('home.farmServicesBody')}</p>
               <span className="service-card-link">{t('services.cta')} <span aria-hidden="true">→</span></span>
             </div>
           </div>
@@ -249,8 +238,9 @@ export default function Home() {
         <div style={{ maxWidth: 'var(--container-max)', margin: '0 auto', display: 'flex', flexWrap: 'wrap', gap: '40px', justifyContent: 'space-between', borderBottom: '1px solid #334155', paddingBottom: '40px' }}>
           {/* Brand + tagline */}
           <div style={{ flex: '1 1 300px', maxWidth: '360px' }}>
-            <div style={{ marginBottom: '16px' }}>
-              <h3 style={{ color: 'white', fontSize: 'var(--fs-2xl)', margin: 0 }}>Krishi Sangam</h3>
+            <h3 style={{ color: 'white', fontSize: 'var(--fs-2xl)', margin: '0 0 12px', textAlign: 'left' }}>Krishi Sangam</h3>
+            <div style={{ textAlign: 'center', marginBottom: '12px' }}>
+              <img src={krishiSangamLogo} alt="Krishi Sangam" style={{ height: '56px', width: 'auto', borderRadius: '8px' }} />
             </div>
             <p style={{ lineHeight: '1.6', marginBottom: '12px', fontWeight: '600', color: '#cbd5e1' }}>{t('home.footer.tagline')}</p>
             <p style={{ lineHeight: '1.7', marginBottom: '20px', fontSize: '14px' }}>{t('home.footer.description')}</p>
@@ -263,8 +253,7 @@ export default function Home() {
               <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('home'); }}>{t('nav.home')}</a>
               <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('about'); }}>{t('nav.about')}</a>
               <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('land-leasing'); }}>{t('nav.land')}</a>
-              <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('equipment-rental'); }}>{t('nav.equipment')}</a>
-              <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('agri-services'); }}>{t('nav.labour')}</a>
+              <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('farm-services'); }}>{t('nav.farmServices')}</a>
               <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('farmers'); }}>{t('home.footer.forFarmers')}</a>
               <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('landowners'); }}>{t('home.footer.forLandowners')}</a>
               <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('equipment-owners'); }}>{t('home.footer.forEquipmentOwners')}</a>

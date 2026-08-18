@@ -35,15 +35,17 @@ const ForEquipmentOwners = lazy(() => import('../pages/ForEquipmentOwners'));
 const ForServiceProviders = lazy(() => import('../pages/ForServiceProviders'));
 const AgriculturalServices = lazy(() => import('../pages/AgriculturalServices'));
 const HowItWorks = lazy(() => import('../pages/HowItWorks'));
+const FarmServices = lazy(() => import('../pages/FarmServices'));
 
 const VIEWS = {
   home: Home,
   services: Services,
   'land-leasing': LandLeasing,
   'list-land': ListLand,
-  'equipment-rental': EquipmentRental,
+  'equipment-rental': FarmServices,
   'list-equipment': ListEquipment,
-  labour: Labour,
+  labour: FarmServices,
+  'farm-services': FarmServices,
   'list-labour': ListLabour,
   produce: Produce,
   'list-produce': ListProduce,
