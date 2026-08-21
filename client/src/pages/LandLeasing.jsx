@@ -63,6 +63,70 @@ export default function LandLeasing() {
         if (!user) { setGateOpen(true); return; }
         navigate('list-land');
       }} />
+
+      <div style={{
+        width: 'fit-content',
+        maxWidth: '92%',
+        margin: '12px auto 18px auto',
+        background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
+        border: '1px solid #86efac',
+        borderRadius: '20px',
+        padding: '6px 14px',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexWrap: 'nowrap',
+        gap: '10px',
+        boxShadow: '0 2px 6px rgba(22, 163, 74, 0.06)'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, flex: 1 }}>
+          <span style={{
+            background: '#16a34a',
+            color: '#ffffff',
+            fontSize: '0.68rem',
+            fontWeight: '800',
+            padding: '2px 8px',
+            borderRadius: '12px',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px',
+            flexShrink: 0,
+            whiteSpace: 'nowrap'
+          }}>{t('guide.badge', 'GUIDE')}</span>
+          <span style={{
+            fontSize: '0.82rem',
+            color: '#14532d',
+            fontWeight: '600',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis'
+          }}>
+            {t('land.guideText', 'Want to know how farmland leasing works on Krishi Sangam?')}
+          </span>
+        </div>
+        <button
+          type="button"
+          onClick={() => navigate('about-land-leasing')}
+          style={{
+            background: '#15803d',
+            color: '#ffffff',
+            border: 'none',
+            padding: '4px 12px',
+            borderRadius: '14px',
+            cursor: 'pointer',
+            fontSize: '0.78rem',
+            fontWeight: '700',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px',
+            flexShrink: 0,
+            whiteSpace: 'nowrap',
+            transition: 'all 0.15s ease'
+          }}
+        >
+          {t('land.aboutBtn', 'About Land Leasing →')}
+        </button>
+      </div>
+
       <LocationPrompt />
       <div className="search-filter-bar">
         <div className="search-input-wrapper">

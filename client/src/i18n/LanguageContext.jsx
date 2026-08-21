@@ -6,8 +6,8 @@ const LanguageContext = createContext(null);
 const STORAGE_KEY = 'krishi_lang';
 
 function interpolate(template, params) {
-  if (!params) return template;
-  return template.replace(/\{(\w+)\}/g, (match, key) =>
+  if (!params || typeof params !== 'object') return template;
+  return String(template).replace(/\{(\w+)\}/g, (match, key) =>
     key in params ? String(params[key]) : match
   );
 }
@@ -24,12 +24,24 @@ export function LanguageProvider({ children }) {
   useEffect(() => {
     try { localStorage.setItem(STORAGE_KEY, lang); } catch (e) { /* noop */ }
     document.documentElement.lang = lang;
+    document.documentElement.dir = lang === 'ur' ? 'rtl' : 'ltr';
   }, [lang]);
 
-  const t = useCallback((key, params) => {
+  const t = useCallback((key, fallbackOrParams, options) => {
     const dict = translations[lang] || {};
-    const fallback = translations.en || {};
-    const template = dict[key] ?? fallback[key] ?? key;
+    const fallbackDict = translations.en || {};
+
+    let template = dict[key] ?? fallbackDict[key];
+    let params = options;
+
+    if (typeof fallbackOrParams === 'string') {
+      if (!template) template = fallbackOrParams;
+    } else if (typeof fallbackOrParams === 'object' && fallbackOrParams !== null) {
+      params = fallbackOrParams;
+    }
+
+    if (!template) template = key;
+
     return interpolate(template, params);
   }, [lang]);
 

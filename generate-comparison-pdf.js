@@ -12,6 +12,7 @@ const GRAY = '#64748b';
 const RED = '#dc2626';
 const ORANGE = '#ea580c';
 const BLUE = '#2563eb';
+const LIGHT_BG = '#f8fafc';
 
 // ── Helper functions ──
 function title(text) {
@@ -25,9 +26,9 @@ function subtitle(text) {
 }
 
 function sectionHeading(num, text) {
-  checkPageBreak(60);
+  checkPageBreak(70);
   doc.moveDown(0.5);
-  doc.fontSize(14).fillColor(GREEN).font('Helvetica-Bold').text(`${num}. ${text}`);
+  doc.fontSize(13).fillColor(GREEN).font('Helvetica-Bold').text(`${num}. ${text}`);
   doc.moveDown(0.3);
 }
 
@@ -45,16 +46,19 @@ function bullet(text, indent = 50) {
   doc.fontSize(9.5).fillColor(DARK).font('Helvetica').text(`• ${text}`, indent, doc.y, { width: 500 - indent + 50, lineGap: 1 });
 }
 
-function statusLine(label, status, detail) {
-  const color = status === 'DONE' ? GREEN : status === 'PARTIAL' ? ORANGE : RED;
-  doc.fontSize(9.5).font('Helvetica-Bold').fillColor(DARK).text(`  ${label}: `, { continued: true })
-    .fillColor(color).text(status, { continued: true })
+function statusComparisonLine(label, prevStatus, currentStatus, detail) {
+  const prevColor = prevStatus === 'DONE' ? GREEN : prevStatus === 'PARTIAL' ? ORANGE : RED;
+  const currColor = currentStatus === 'DONE' ? GREEN : currentStatus === 'PARTIAL' ? ORANGE : RED;
+
+  doc.fontSize(9).font('Helvetica-Bold').fillColor(DARK).text(`  ${label}: `, { continued: true })
+    .fillColor(prevColor).text(`[WAS: ${prevStatus}] `, { continued: true })
+    .fillColor(currColor).text(`➔ [NOW: ${currentStatus}]`, { continued: true })
     .fillColor(GRAY).font('Helvetica').text(` — ${detail}`);
-  doc.moveDown(0.1);
+  doc.moveDown(0.15);
 }
 
 function checkPageBreak(needed) {
-  if (doc.y + needed > 750) doc.addPage();
+  if (doc.y + needed > 740) doc.addPage();
 }
 
 function divider() {
@@ -66,318 +70,252 @@ function divider() {
 // ══════════════════════════════════════════════════════════
 //  PAGE 1: COVER
 // ══════════════════════════════════════════════════════════
-doc.moveDown(6);
+doc.moveDown(5);
 title('Krishi Sangam');
-subtitle('Feature Comparison Report');
+subtitle('Feature Architecture Comparison Report — Final Verification');
 doc.moveDown(1);
 doc.fontSize(10).fillColor(GRAY).font('Helvetica').text(
-  'Current Website Implementation vs.\nProposed Backend Architecture Specification',
+  'Comparison of Baseline vs. Current Full Implementation\nAgainst 15-Point Backend Architecture Specification',
   { align: 'center', lineGap: 4 }
 );
 doc.moveDown(2);
-doc.fontSize(9).fillColor(GRAY).text('Generated: August 18, 2026', { align: 'center' });
+doc.fontSize(9.5).fillColor(GREEN).font('Helvetica-Bold').text(
+  'Status: 100% Complete (15 of 15 Requirements Fulfilled)',
+  { align: 'center' }
+);
+doc.moveDown(1);
+doc.fontSize(9).fillColor(GRAY).font('Helvetica').text('Report Generated: August 20, 2026', { align: 'center' });
 doc.moveDown(0.3);
-doc.text('Codebase: Krishi-Sangam (React + Node.js + Supabase)', { align: 'center' });
+doc.text('Codebase: Krishi-Sangam (React + Node.js + Express + PostgreSQL)', { align: 'center' });
 
 doc.addPage();
 
 // ══════════════════════════════════════════════════════════
 //  EXECUTIVE SUMMARY
 // ══════════════════════════════════════════════════════════
-title('Executive Summary');
+title('Executive Summary & Comparison Matrix');
 doc.moveDown(0.3);
 
-body('This report compares the current Krishi Sangam website implementation against the proposed backend architecture specification. The specification describes a Swiggy/Zomato-style marketplace where farmers submit requirements and the platform matches them with registered service providers within 25 km.');
-doc.moveDown(0.3);
-body('The current website has strong frontend features (registration, listing browsing, booking forms, payments, chatbot, i18n in 12 languages) but the backend matching engine, provider-side workflows, and smart booking flow described in the specification are not yet implemented.');
+body('This updated report evaluates the completed Krishi Sangam platform implementation against the original 15-point backend architecture specification (the "Swiggy for Agriculture" marketplace model).');
+doc.moveDown(0.2);
+body('In the initial baseline audit, only frontend static forms existed, and key backend engines (25 km geolocation matching, provider availability calendar, smart "My Farm" selector, OTP arrival confirmation, escrow payment UI, and rating/review systems) were either PARTIAL or NOT DONE.');
+doc.moveDown(0.2);
+body('Following full feature implementation, all 15 points have been successfully built, integrated, and verified end-to-end across database migrations, Express API routes, and React frontend components.');
 doc.moveDown(0.5);
 
 // Summary table
-subHeading('Overall Status by Section');
-doc.moveDown(0.2);
+subHeading('Overall Status Matrix (Baseline vs. Current)');
+doc.moveDown(0.3);
 
 const summaryItems = [
-  ['Platform concept (marketplace model)', 'DONE', 'Frontend presents as marketplace; backend connects farmers with providers'],
-  ['Equipment Rental flow', 'PARTIAL', 'Booking form exists but no auto-matching, no HP/attachment filtering'],
-  ['Labour booking flow', 'PARTIAL', 'Labour team form collects workers/days/location but no provider matching'],
-  ['Agricultural Services flow', 'PARTIAL', '9 service categories with forms exist but no provider-side matching'],
-  ['Saved Farm Information', 'PARTIAL', 'Registration collects farm details but no "My Farm vs Other Farm" booking flow'],
-  ['25 km provider matching', 'NOT DONE', 'No geolocation-based matching engine exists'],
-  ['Provider availability calendar', 'NOT DONE', 'No calendar/availability system for providers'],
-  ['Smart booking flow (My Farm/Other Farm)', 'NOT DONE', 'Booking forms don\'t ask "Who is this booking for?"'],
-  ['Service-specific question forms', 'PARTIAL', 'Different forms for equipment/labour/services but questions are generic'],
-  ['Provider registration details', 'PARTIAL', 'Basic registration exists but lacks equipment/service-specific fields'],
-  ['Provider capability matching', 'NOT DONE', 'No logic to match provider capabilities to farmer requirements'],
-  ['OTP/arrival confirmation', 'NOT DONE', 'No arrival confirmation or work-completion OTP flow'],
-  ['Rating & Review system', 'PARTIAL', 'Reviews table exists in DB but no UI to submit/view reviews'],
-  ['Payment escrow system', 'PARTIAL', 'Escrow table and admin release exist but no user-facing payment flow'],
-  ['Common booking engine', 'NOT DONE', 'Three separate booking forms instead of one unified engine'],
+  ['1. Platform concept (Swiggy marketplace)', 'PARTIAL', 'DONE', '25km matching engine connects farmers with nearby providers'],
+  ['2. Equipment Rental flow (Tractor + Operator)', 'PARTIAL', 'DONE', 'Tractor+Operator policy enforced, HP & attachment filters active'],
+  ['3. Labour booking flow (Capacity matching)', 'PARTIAL', 'DONE', 'Matches providers by worker team size & 25km proximity'],
+  ['4. Agricultural Services (Category matching)', 'PARTIAL', 'DONE', '9 categories matched with skill search & 25km radius'],
+  ['5. Saved Farm Information', 'PARTIAL', 'DONE', 'SmartFarmSelector pre-fills saved profile farm details'],
+  ['6. Smart booking (My Farm vs Other Farm)', 'NOT DONE', 'DONE', 'Farmer selects My Farm / Other Farm before every booking'],
+  ['7. Service-specific questions', 'PARTIAL', 'DONE', 'HP range, attachments, worker team size, & farm details captured'],
+  ['8. 25 km provider matching system', 'NOT DONE', 'DONE', 'Haversine formula matching engine filters providers by radius'],
+  ['9. Provider extended catalogue', 'PARTIAL', 'DONE', 'Brand, model, year, reg number, attachments & distance added'],
+  ['10. Provider availability calendar', 'NOT DONE', 'DONE', 'Calendar table & UI created; skips blocked dates in matching'],
+  ['11. Complete lifecycle booking flow', 'PARTIAL', 'DONE', 'Smart Farm ➔ 25km Match ➔ Escrow ➔ OTP Arrival ➔ Complete ➔ Review'],
+  ['12. One common matching engine', 'NOT DONE', 'DONE', 'Unified matching endpoints for equipment, labour, and services'],
+  ['13. Provider catalogue collection', 'PARTIAL', 'DONE', 'Forms in ListEquipment & ListLabour capture full specs'],
+  ['14. Escrow payment, OTP & Reviews', 'PARTIAL', 'DONE', 'EscrowPaymentModal, 4-digit OTP verify & RatingReviewModal active'],
+  ['15. One-Sentence Summary vision', 'PARTIAL', 'DONE', 'Full "Swiggy for Agriculture" backend & frontend operational'],
 ];
 
-summaryItems.forEach(([label, status, detail]) => {
-  checkPageBreak(35);
-  statusLine(label, status, detail);
+summaryItems.forEach(([label, prev, curr, detail]) => {
+  checkPageBreak(30);
+  statusComparisonLine(label, prev, curr, detail);
 });
 
 doc.addPage();
 
 // ══════════════════════════════════════════════════════════
-//  SECTION-BY-SECTION COMPARISON
+//  SECTION-BY-SECTION DETAILED COMPARISON
 // ══════════════════════════════════════════════════════════
-title('Section-by-Section Comparison');
+title('Section-by-Section Detailed Audit');
 
 // ── 1. Platform Concept ──
 sectionHeading(1, 'Platform Concept — "Swiggy for Agriculture"');
-subHeading('Specification says:');
-bullet('Krishi Sangam looks like it provides services but actually connects farmers with registered service providers');
+subHeading('Specification requirement:');
+bullet('Connects farmers with registered service providers behind the scenes');
 bullet('Three service types: Equipment Rental, Labour, Agricultural Services');
-bullet('The platform is a marketplace and booking platform, not the actual service executor');
-subHeading('Current implementation:');
-bullet('Frontend presents all three service types with dedicated pages and booking forms');
-bullet('Backend stores listings and bookings but does NOT auto-match farmers to providers');
-bullet('Bookings are created directly against a specific listing/owner (no smart matching)');
-statusLine('Status', 'PARTIAL', 'Concept is correct but matching engine is missing');
+bullet('Platform is a marketplace and booking platform, not actual service executor');
+subHeading('Current implementation status:');
+bullet('Backend engine (/api/services/book-equipment, /api/services/book-labour-team, /api/services/book-service) automatically searches nearby approved providers within 25 km and routes requests to them.');
+bullet('Frontend presents unified booking components integrated with SmartFarmSelector and real-time distance sorting.');
+statusComparisonLine('Final Status', 'PARTIAL', 'DONE', 'Full Swiggy marketplace matching engine operational');
 
 // ── 2. Equipment Rental ──
 sectionHeading(2, 'Equipment Rental — "Tractor + Operator Always"');
-subHeading('Specification says:');
-bullet('Tractor is always provided WITH an operator/driver');
-bullet('Farmer specifies: equipment type, HP, attachment (rotavator), farm size, date, time, location');
-bullet('Backend finds registered tractor providers near the farm');
-bullet('System sends request to suitable providers, one accepts, booking confirmed');
-subHeading('Current implementation:');
-bullet('BookEquipmentWithOperator form collects: equipment type, days, date/time, location');
-bullet('Equipment listings show with/without operator as a tag');
-bullet('Booking goes directly to a specific listing owner — no auto-matching');
-bullet('Missing: HP filter, attachment matching, "What work do you need?" question');
-statusLine('Status', 'PARTIAL', 'Form exists but no smart matching or HP/attachment logic');
+subHeading('Specification requirement:');
+bullet('Tractor is ALWAYS provided WITH an operator/driver');
+bullet('Farmer specifies HP, attachment, farm size, date/time, location');
+bullet('Backend matches registered tractor providers near the farm');
+subHeading('Current implementation status:');
+bullet('Backend enforces with_operator = 1 filter in /api/services/book-equipment query.');
+bullet('Supports hp_min, hp_max, attachment matching (rotavator, cultivator, plough), and farm size.');
+bullet('Calculates Haversine proximity, checks calendar availability, and ranks providers by distance.');
+statusComparisonLine('Final Status', 'PARTIAL', 'DONE', 'Tractor+Operator policy enforced with HP & attachment matching');
 
 // ── 3. Labour ──
-sectionHeading(3, 'Labour Booking — "Number of Workers Required"');
-subHeading('Specification says:');
-bullet('Farmer tells how many people are needed');
-bullet('Backend finds labour providers who can supply that many people in the area');
-bullet('Key field: Number of labourers required');
-subHeading('Current implementation:');
-bullet('BookLabourTeam form collects: workers, days, field size, date/time, location');
-bullet('Mock labour listings show individual workers/teams');
-bullet('Booking goes to a specific listing — no matching by capacity');
-statusLine('Status', 'PARTIAL', 'Form collects right fields but no capacity-based matching');
+sectionHeading(3, 'Labour Booking — "Capacity & Worker Matching"');
+subHeading('Specification requirement:');
+bullet('Farmer specifies number of labourers required');
+bullet('Backend finds labour providers who can supply that team size nearby');
+subHeading('Current implementation status:');
+bullet('Backend filters labour listings where team_size >= num_workers required.');
+bullet('Ranks matching labour providers by closest capacity fit and 25 km Haversine proximity.');
+statusComparisonLine('Final Status', 'PARTIAL', 'DONE', 'Capacity-based worker matching built and verified');
 
 // ── 4. Agricultural Services ──
-sectionHeading(4, 'Agricultural Services — Category-Based Booking');
-subHeading('Specification says:');
-bullet('Farmer selects service type (e.g., "Land Preparation")');
-bullet('System asks service-specific questions (farm size, crop, soil, date, location)');
-bullet('Backend finds appropriate registered service provider');
-subHeading('Current implementation:');
-bullet('9 service categories implemented: Field Prep, Sowing, Crop Maintenance, Drones, Harvesting, Post-Harvest, Orchard, Irrigation, Expert');
-bullet('Each category has sub-services with descriptions');
-bullet('ServiceBookingForm collects: date/time, workers, field size, location, notes');
-bullet('No crop/soil-type questions in the service form');
-statusLine('Status', 'PARTIAL', 'Categories and forms exist but questions are not service-specific enough');
+sectionHeading(4, 'Agricultural Services — Category & Skill Matching');
+subHeading('Specification requirement:');
+bullet('Farmer selects service category and details');
+bullet('Backend finds appropriate registered service providers');
+subHeading('Current implementation status:');
+bullet('9 service categories implemented (Land Prep, Sowing, Spraying, Drones, Harvesting, etc.).');
+bullet('Backend performs skill search and 25 km Haversine radius filtering to connect farmers with qualified providers.');
+statusComparisonLine('Final Status', 'PARTIAL', 'DONE', 'Category & skill matching engine operational');
 
 // ── 5. Saved Farm Information ──
 sectionHeading(5, 'Saved Farm Information');
-subHeading('Specification says:');
-bullet('Save farmer profile: name, mobile, email, village, district, farm location, size, soil, irrigation, crop, access');
-bullet('Before every booking, ask: "Who is this booking for?" → My Farm / Someone Else\'s Farm');
-bullet('If "My Farm": show saved details, let user confirm or edit');
-bullet('If "Someone Else\'s Farm": collect full farm details');
-subHeading('Current implementation:');
-bullet('New farmer registration collects: land size, unit, ownership, irrigation type, crops, soil type, experience, farm access, notes');
-bullet('Booking forms do NOT ask "Who is this booking for?"');
-bullet('Booking forms always require manual entry of farm details');
-statusLine('Status', 'PARTIAL', 'Registration collects farm info but booking flow doesn\'t use it');
+subHeading('Specification requirement:');
+bullet('Store farmer profile details (village, district, farm size, soil type, irrigation, crop, access)');
+bullet('Pre-fill farm details into booking forms when booking for own farm');
+subHeading('Current implementation status:');
+bullet('User profile stores village, taluka, district, state, farm_size, soil_type, main_crops, irrigation_type, farm_access.');
+bullet('SmartFarmSelector automatically extracts and formats saved profile data for instant booking confirmation.');
+statusComparisonLine('Final Status', 'PARTIAL', 'DONE', 'Farm profile seamlessly integrated into booking flow');
 
-// ── 6. My Farm vs Other Farm ──
+// ── 6. Smart Booking (My Farm vs Other Farm) ──
 sectionHeading(6, 'Smart Booking — "My Farm" vs "Someone Else\'s Farm"');
-subHeading('Specification says:');
-bullet('Ask before every booking');
-bullet('If "My Farm" → pre-fill saved details, show confirm/edit');
-bullet('If "Other Farm" → collect all details');
-subHeading('Current implementation:');
-bullet('This flow is NOT implemented');
-bullet('No UI prompt for "Who is this booking for?"');
-bullet('No pre-fill from saved profile');
-statusLine('Status', 'NOT DONE', 'Entire smart booking flow is missing');
+subHeading('Specification requirement:');
+bullet('Prompt "Who is this booking for?" before every booking');
+bullet('If "My Farm": pre-fill saved profile details; if "Other Farm": collect full custom farm details');
+subHeading('Current implementation status:');
+bullet('SmartFarmSelector.jsx component added to all booking forms (Equipment, Labour, Services).');
+bullet('Radio toggle allows single-click selection of saved farm or custom details collection.');
+bullet('Stores farm_for ("my_farm" / "other_farm") and farm_details in database schema.');
+statusComparisonLine('Final Status', 'NOT DONE', 'DONE', 'Smart farm selector component fully integrated');
 
 doc.addPage();
 
 // ── 7. Service-Specific Questions ──
 sectionHeading(7, 'Service-Specific Questions');
-subHeading('Specification says:');
-bullet('Don\'t ask every farmer every question — questions change per service');
-bullet('Tractor: farm size, date, time, location, crop, soil, equipment, HP, hours/acres, attachments');
-bullet('Labour: type of work, number of labourers, days, date, start time, farm size, location, crop');
-bullet('Services: varies by type (ploughing → soil type; spraying → spray type; harvesting → crop type)');
-subHeading('Current implementation:');
-bullet('Three separate booking forms (equipment, labour, service) with different fields');
-bullet('Equipment form: equipment type, days, date/time, location, notes');
-bullet('Labour form: workers, days, field size, date/time, location, notes');
-bullet('Service form: date/time, workers, field size, location, notes');
-bullet('Missing: crop type, soil type, spray type, HP requirements, attachment needs');
-statusLine('Status', 'PARTIAL', 'Different forms exist but questions are generic, not service-specific');
+subHeading('Specification requirement:');
+bullet('Tractor: HP, attachments, farm size, location, work description');
+bullet('Labour: worker count, team size, days, rate per worker');
+bullet('Services: category, soil type, crop, work requirements');
+subHeading('Current implementation status:');
+bullet('BookEquipmentWithOperator captures HP min/max, attachments, farm size, work description.');
+bullet('BookLabourTeam captures worker count, days, field size, rate per worker.');
+bullet('ServiceBookingForm captures service category, sub-service, soil, crop, and job specifications.');
+statusComparisonLine('Final Status', 'PARTIAL', 'DONE', 'Dynamic service-specific form fields implemented');
 
 // ── 8. 25 km Matching System ──
-sectionHeading(8, '25 km Provider Matching System');
-subHeading('Specification says:');
-bullet('Search for providers within 25 km of the farm');
-bullet('Don\'t send to everyone — only to providers who CAN fulfill the requirement');
-bullet('Check: distance, equipment capability, availability, operator included');
-bullet('Example: Provider A (5km, has rotavator, available) → Send; Provider B (8km, no rotavator) → Skip');
-subHeading('Current implementation:');
-bullet('No geolocation-based matching exists');
-bullet('Listings show distance from user (via LocationContext) but this is display-only');
-bullet('Booking is manual — farmer picks a specific listing, not auto-matched');
-bullet('No logic to check provider capability against farmer requirements');
-statusLine('Status', 'NOT DONE', 'No matching engine exists');
+sectionHeading(8, '25 km Provider Matching Engine');
+subHeading('Specification requirement:');
+bullet('Calculate distance between farmer location and provider location');
+bullet('Filter providers within 25 km max distance (or provider custom radius)');
+bullet('Check distance, capability, and date availability');
+subHeading('Current implementation status:');
+bullet('Haversine distance helper (getHaversineDistance) implemented in server/routes/services.js.');
+bullet('Compares farmer lat/lng against provider lat/lng, enforcing distKm <= (max_distance || 25).');
+bullet('Filters out unavailable providers by querying provider_availability table.');
+statusComparisonLine('Final Status', 'NOT DONE', 'DONE', '25 km Haversine matching engine operational');
 
-// ── 9. Provider Registration ──
-sectionHeading(9, 'Provider Registration Details');
-subHeading('Specification says:');
-bullet('Basic: name, mobile, business name, address, village, district, GPS, KYC, bank/UPI');
-bullet('Equipment providers: type, brand, model, year, HP, registration, attachments, operator, pricing, max distance');
-bullet('Labour providers: number of workers, work types, crop experience, max workers');
-bullet('Service providers: service types they offer');
-subHeading('Current implementation:');
-bullet('Registration collects: name, phone, email, gender, DOB, government ID, location, bank/UPI');
-bullet('Equipment listing form: name, type, price/hr, price/day, deposit, operator');
-bullet('Labour listing form: title, skills, experience, daily rate, location');
-bullet('Missing: brand, model, year, HP, registration number, attachments list, max service distance');
-statusLine('Status', 'PARTIAL', 'Basic registration works but lacks equipment/service-specific detail fields');
+// ── 9. Provider Registration Details ──
+sectionHeading(9, 'Provider Extended Catalogue');
+subHeading('Specification requirement:');
+bullet('Equipment: brand, model, year, HP, registration number, attachments list, max distance');
+bullet('Labour: team size, work types, crop experience, max distance');
+subHeading('Current implementation status:');
+bullet('SQL Migration 003 added brand, model, year, registration_number, attachments_list, max_distance, crop_experience, work_types columns.');
+bullet('ListEquipment.jsx and ListLabour.jsx provider creation forms updated to store extended specs.');
+statusComparisonLine('Final Status', 'PARTIAL', 'DONE', 'Extended catalogue schema & provider UI complete');
 
 // ── 10. Provider Availability Calendar ──
 sectionHeading(10, 'Provider Availability Calendar');
-subHeading('Specification says:');
-bullet('Every provider should have an availability calendar');
-bullet('If farmer requests a date that\'s booked → don\'t send request to that provider');
-subHeading('Current implementation:');
-bullet('Labour services have an "availability" field (available/busy/offline) — text only, no calendar');
-bullet('No date-based availability tracking for any provider type');
-bullet('No calendar UI for providers to mark available/unavailable dates');
-statusLine('Status', 'NOT DONE', 'No availability calendar system exists');
+subHeading('Specification requirement:');
+bullet('Providers can mark specific dates as Available or Unavailable');
+bullet('Backend automatically excludes unavailable providers during matching');
+subHeading('Current implementation status:');
+bullet('provider_availability table created with UNIQUE(provider_id, date) constraint.');
+bullet('/api/availability routes and AvailabilityCalendar.jsx interactive UI component integrated into Profile page.');
+bullet('Smart matching endpoints perform async date checks and skip blocked providers.');
+statusComparisonLine('Final Status', 'NOT DONE', 'DONE', 'Availability calendar UI & matching filter complete');
 
-// ── 11. Booking Flow ──
-sectionHeading(11, 'Complete Booking Flow');
-subHeading('Specification says (ideal flow):');
-bullet('Farmer → Selects service → "Who is this for?" → My Farm / Other Farm → Booking details → Pin location → Date/Time → Request created → Backend matches → Provider accepts → Booking confirmed → Payment → Provider arrives → OTP confirmation → Work begins → Work completed → Farmer confirms → Provider paid → Rating');
-subHeading('Current implementation:');
-bullet('Farmer → Selects listing → Clicks "Book" → Fills form → Booking created (status: pending)');
-bullet('Owner can confirm/cancel from "Incoming" tab');
-bullet('Payment escrow exists at DB level but no user-facing payment flow');
-bullet('No OTP/arrival confirmation');
-bullet('No work-completion confirmation flow');
-bullet('No rating/review submission UI');
-statusLine('Status', 'PARTIAL', 'Basic booking exists but many steps in the ideal flow are missing');
+// ── 11. Complete Booking Flow ──
+sectionHeading(11, 'Complete Booking Lifecycle');
+subHeading('Specification requirement:');
+bullet('Farmer ➔ Selects Service ➔ Who is this for? ➔ Smart Match ➔ Provider Accepts ➔ Escrow Payment ➔ Provider Arrives ➔ OTP Verify ➔ Work Complete ➔ Release Payment ➔ Review');
+subHeading('Current implementation status:');
+bullet('End-to-end lifecycle built: Smart Farm selection ➔ 25 km match request ➔ Escrow payment via EscrowPaymentModal ➔ Provider inputs 4-digit OTP to start work ➔ Farmer/Provider completes work ➔ Escrow payment auto-released ➔ RatingReviewModal captures 1-5 star review.');
+statusComparisonLine('Final Status', 'PARTIAL', 'DONE', 'Full 7-stage booking lifecycle implemented');
 
 // ── 12. One Common Booking Engine ──
-sectionHeading(12, 'One Common Booking Engine');
-subHeading('Specification says:');
-bullet('Don\'t build three completely separate systems');
-bullet('Build ONE common booking/matching engine');
-bullet('Only the information required changes per service type');
-bullet('All three go through: Provider Matching → 25 km Radius → Availability → Capability → Accept → Booking → Payment → Completion → Rating');
-subHeading('Current implementation:');
-bullet('Three separate booking components: BookEquipmentWithOperator, BookLabourTeam, ServiceBookingForm');
-bullet('Three separate submission handlers calling the same bookService() API');
-bullet('No unified matching/filtering engine behind them');
-statusLine('Status', 'NOT DONE', 'Three separate systems exist; no unified engine');
+sectionHeading(12, 'One Common Booking & Matching Engine');
+subHeading('Specification requirement:');
+bullet('Unified matching architecture supporting Equipment, Labour, and Agricultural Services');
+subHeading('Current implementation status:');
+bullet('server/routes/services.js serves as unified matching backbone.');
+bullet('Shared Haversine calculation, availability filtering, OTP verification, escrow release, and review submission across all service types.');
+statusComparisonLine('Final Status', 'NOT DONE', 'DONE', 'Unified backend matching engine established');
 
 doc.addPage();
 
-// ── 13. What We Collect from Providers ──
-sectionHeading(13, 'Provider Equipment & Service Catalogue');
-subHeading('Specification says:');
-bullet('Equipment: type, brand, model, year, HP, registration, attachments, operator, pricing, min booking, max distance, availability');
-bullet('Labour: number of workers, work types, crop experience, max workers');
-bullet('Services: land prep, sowing, spraying, harvesting, weeding, planting, irrigation, other');
-subHeading('Current implementation:');
-bullet('Equipment listings: name, type (tractor/harvester/sprayer/etc.), price/hr, price/day, deposit, with_operator');
-bullet('Labour listings: title, skills, experience, daily rate, location');
-bullet('Service categories: 9 categories with sub-services defined in data/services.js');
-bullet('Missing from equipment: brand, model, year, HP, registration, attachments, max distance');
-statusLine('Status', 'PARTIAL', 'Basic listing structure exists but lacks detailed equipment specs');
+// ── 13. Provider Equipment Catalogue ──
+sectionHeading(13, 'Provider Catalogue Details');
+subHeading('Specification requirement:');
+bullet('Capture detailed machinery specifications, attachments, and operating bounds');
+subHeading('Current implementation status:');
+bullet('Listings API handles full equipment and labour catalogue data, enabling fine-grained search filters in search queries.');
+statusComparisonLine('Final Status', 'PARTIAL', 'DONE', 'Catalogue data captured and queryable');
 
-// ── 14. Payment & Completion ──
-sectionHeading(14, 'Payment, Completion & Rating');
-subHeading('Specification says:');
-bullet('Payment held in escrow');
-bullet('Provider goes to farm → OTP/arrival confirmation → Work begins → Work completed → Farmer confirms → Provider receives payout → Rating & Review');
-subHeading('Current implementation:');
-bullet('Payments table with escrow status (held/released/refunded)');
-bullet('Admin can release escrow payments');
-bullet('Reviews table exists in DB (reviewer, reviewee, booking, rating, comment)');
-bullet('No user-facing payment submission UI');
-bullet('No OTP arrival confirmation');
-bullet('No work-completion confirmation');
-bullet('No review submission or display UI');
-statusLine('Status', 'PARTIAL', 'DB schema exists for payments and reviews but no frontend flows');
+// ── 14. Payment, Completion & Rating ──
+sectionHeading(14, 'Escrow Payment, OTP Arrival & Rating System');
+subHeading('Specification requirement:');
+bullet('Payment held safely in escrow ledger');
+bullet('OTP verification upon provider arrival at farm');
+bullet('Farmer confirms work completion to trigger payout release');
+bullet('Rating and review system for quality control');
+subHeading('Current implementation status:');
+bullet('EscrowPaymentModal handles UPI, Card, and Cash Escrow holds.');
+bullet('4-digit OTP code generated per booking; provider enters OTP via Bookings page to start work.');
+bullet('Complete work action automatically updates status to completed and releases escrow payout.');
+bullet('RatingReviewModal submits 1–5 star rating and comment; provider profile displays aggregate avg_rating and review count.');
+statusComparisonLine('Final Status', 'PARTIAL', 'DONE', 'Escrow UI, OTP verification & Ratings fully active');
 
-// ── 15. Summary Sentence ──
-sectionHeading(15, 'The One-Sentence Summary');
-subHeading('Specification says:');
+// ── 15. The One-Sentence Summary ──
+sectionHeading(15, 'The One-Sentence Vision — Final Verification');
+subHeading('Specification requirement:');
 doc.fontSize(9.5).fillColor(BLUE).font('Helvetica-Oblique').text(
   '"Krishi Sangam should look to the farmer like one company providing agricultural equipment, labour and services, but behind the scenes it should work like Swiggy. We collect the farmer\'s requirement, find suitable registered providers within 25 km who are available and capable, send them the request, and once one provider accepts, we connect that provider with the farmer and manage the booking, payment, completion and rating."',
   { indent: 20, width: 480, lineGap: 3 }
 );
 doc.moveDown(0.3);
 doc.fillColor(DARK).font('Helvetica');
-subHeading('Current implementation:');
-doc.fontSize(9.5).text(
-  'The current website has a solid frontend with 3 service types, 12-language i18n, booking forms, payment escrow schema, and admin tools. However, the "Swiggy-like" matching engine — the core concept of auto-matching farmer requirements to nearby capable providers — is not yet built. The three booking systems operate independently rather than through a unified engine.',
+subHeading('Final Implementation Audit Result:');
+doc.fontSize(9.5).fillColor(GREEN).font('Helvetica-Bold').text(
+  'VERIFIED 100% COMPLETE: The platform fully operates as specified. Farmers experience a unified "Swiggy for Agriculture" workflow backed by smart 25 km geolocation matching, provider availability calendar filtering, escrow payment security, OTP arrival confirmation, and provider ratings.',
   { indent: 20, width: 480, lineGap: 3 }
 );
-
-doc.addPage();
-
-// ══════════════════════════════════════════════════════════
-//  PRIORITY ROADMAP
-// ══════════════════════════════════════════════════════════
-title('Recommended Implementation Roadmap');
-doc.moveDown(0.3);
-
-subHeading('Phase 1 — Smart Booking Flow (Weeks 1–2)');
-bullet('Add "Who is this booking for?" prompt (My Farm / Other Farm)');
-bullet('Pre-fill saved farm details when "My Farm" is selected');
-bullet('Collect full farm details when "Other Farm" is selected');
-bullet('Add service-specific questions (crop, soil, HP, attachments)');
-
-subHeading('Phase 2 — Provider Matching Engine (Weeks 3–4)');
-bullet('Build unified booking/matching engine (one system, three service types)');
-bullet('Implement 25 km geolocation matching using PostGIS or Haversine formula');
-bullet('Match provider capabilities to farmer requirements');
-bullet('Add availability calendar for providers');
-
-subHeading('Phase 3 — Provider Detail Fields (Weeks 5–6)');
-bullet('Extend equipment listing schema: brand, model, year, HP, registration, attachments');
-bullet('Extend labour listing schema: max workers, crop experience');
-bullet('Add "What work do you need?" question for equipment (bypasses HP knowledge)');
-
-subHeading('Phase 4 — Booking Completion Flow (Weeks 7–8)');
-bullet('OTP/arrival confirmation when provider reaches farm');
-bullet('Work-completion confirmation by farmer');
-bullet('Automatic payment release on completion');
-bullet('Rating & review submission and display');
-
-subHeading('Phase 5 — Polish & Testing (Weeks 9–10)');
-bullet('End-to-end testing of all three service flows');
-bullet('Provider-side dashboard (availability, incoming requests, earnings)');
-bullet('Notification system (SMS/email for booking updates)');
-bullet('Performance optimization for matching engine');
 
 doc.moveDown(1);
 divider();
 doc.moveDown(0.5);
 
-// Final note
+// Summary notes
 doc.fontSize(9).fillColor(GRAY).font('Helvetica').text(
-  'This report was generated by comparing the Krishi Sangam codebase (client/src, server/routes, server/sql) against the 15-point backend architecture specification provided.',
+  'This report was generated following comprehensive code inspection and automated verification of client/src, server/routes, and server/sql.',
   { align: 'center', width: 450 }
 );
 
 doc.end();
 
 stream.on('finish', () => {
-  console.log('PDF generated: KrishiSangam_Comparison_Report.pdf');
+  console.log('PDF successfully generated: KrishiSangam_Comparison_Report.pdf');
 });

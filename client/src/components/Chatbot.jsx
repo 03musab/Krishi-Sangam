@@ -6,22 +6,21 @@ import { getLand, getEquipment, getLabour, getProduce } from '../lib/api';
 import Icon from './Icon';
 
 // ── FAQ data ──────────────────────────────────────────────
-// Each entry can have:
-//   q, a            — translation keys for question & answer
-//   keywords        — array of search keywords (lowercase)
-//   action?         — { labelKey, view } for a CTA button
-//   followups?      — array of { q, a, action? } for follow-up questions
-//   liveData?       — function that returns dynamic data appended to the answer
-//   context?        — array of view names where this FAQ should be prioritized
-
 const FAQS = [
   {
     q: 'chatbot.faq1_q', a: 'chatbot.faq1_a',
-    keywords: ['krishi sangam', 'what is', 'platform', 'about']
+    keywords: ['krishi sangam', 'what is', 'platform', 'about'],
+    followups: [
+      { q: 'chatbot.faq2_q', a: 'chatbot.faq2_a' },
+      { q: 'chatbot.faq9_q', a: 'chatbot.faq9_a' }
+    ]
   },
   {
     q: 'chatbot.faq2_q', a: 'chatbot.faq2_a',
-    keywords: ['free', 'cost', 'price', 'pricing', 'pay', 'payment']
+    keywords: ['free', 'cost', 'price', 'pricing', 'pay', 'payment'],
+    followups: [
+      { q: 'chatbot.faq6_q', a: 'chatbot.faq6_a' }
+    ]
   },
   {
     q: 'chatbot.faq3_q', a: 'chatbot.faq3_a',
@@ -30,7 +29,8 @@ const FAQS = [
     context: ['land-leasing', 'list-land'],
     followups: [
       { q: 'chatbot.faq3_f1_q', a: 'chatbot.faq3_f1_a' },
-      { q: 'chatbot.faq3_f2_q', a: 'chatbot.faq3_f2_a' }
+      { q: 'chatbot.faq3_f2_q', a: 'chatbot.faq3_f2_a' },
+      { q: 'chatbot.faq13_q', a: 'chatbot.faq13_a' }
     ]
   },
   {
@@ -40,7 +40,8 @@ const FAQS = [
     context: ['equipment-rental', 'list-equipment', 'farm-services'],
     followups: [
       { q: 'chatbot.faq4_f1_q', a: 'chatbot.faq4_f1_a' },
-      { q: 'chatbot.faq4_f2_q', a: 'chatbot.faq4_f2_a' }
+      { q: 'chatbot.faq4_f2_q', a: 'chatbot.faq4_f2_a' },
+      { q: 'chatbot.faq14_q', a: 'chatbot.faq14_a' }
     ]
   },
   {
@@ -68,7 +69,8 @@ const FAQS = [
     context: ['produce', 'list-produce'],
     followups: [
       { q: 'chatbot.faq7_f1_q', a: 'chatbot.faq7_f1_a' },
-      { q: 'chatbot.faq7_f2_q', a: 'chatbot.faq7_f2_a' }
+      { q: 'chatbot.faq7_f2_q', a: 'chatbot.faq7_f2_a' },
+      { q: 'chatbot.faq8_q', a: 'chatbot.faq8_a' }
     ]
   },
   {
@@ -76,7 +78,8 @@ const FAQS = [
     keywords: ['buy', 'produce', 'fresh', 'crop purchase', 'shop'],
     action: { labelKey: 'chatbot.actionProduce', view: 'produce' },
     followups: [
-      { q: 'chatbot.faq8_f1_q', a: 'chatbot.faq8_f1_a' }
+      { q: 'chatbot.faq8_f1_q', a: 'chatbot.faq8_f1_a' },
+      { q: 'chatbot.faq7_q', a: 'chatbot.faq7_a' }
     ]
   },
   {
@@ -84,7 +87,8 @@ const FAQS = [
     keywords: ['sign up', 'account', 'register', 'create account', 'join'],
     action: { labelKey: 'chatbot.actionSignup', view: 'signup' },
     followups: [
-      { q: 'chatbot.faq9_f1_q', a: 'chatbot.faq9_f1_a' }
+      { q: 'chatbot.faq9_f1_q', a: 'chatbot.faq9_f1_a' },
+      { q: 'chatbot.faq10_q', a: 'chatbot.faq10_a' }
     ]
   },
   {
@@ -115,7 +119,8 @@ const FAQS = [
     keywords: ['list land', 'post land', 'add land'],
     action: { labelKey: 'chatbot.actionListLand', view: 'list-land' },
     followups: [
-      { q: 'chatbot.faq13_f1_q', a: 'chatbot.faq13_f1_a' }
+      { q: 'chatbot.faq13_f1_q', a: 'chatbot.faq13_f1_a' },
+      { q: 'chatbot.faq3_q', a: 'chatbot.faq3_a' }
     ]
   },
   {
@@ -123,19 +128,19 @@ const FAQS = [
     keywords: ['list equipment', 'post equipment', 'add equipment', 'rent out'],
     action: { labelKey: 'chatbot.actionListEquip', view: 'list-equipment' },
     followups: [
-      { q: 'chatbot.faq14_f1_q', a: 'chatbot.faq14_f1_a' }
+      { q: 'chatbot.faq14_f1_q', a: 'chatbot.faq14_f1_a' },
+      { q: 'chatbot.faq4_q', a: 'chatbot.faq4_a' }
     ]
   }
 ];
 
 const GREETING = 'chatbot.greeting';
 const SUGGESTION = 'chatbot.suggestion';
-const TYPING_DELAY = 600; // ms
-const NOTIF_FIRST_DELAY = 2500;   // ms before the first bubble
-const NOTIF_REPEAT = 3 * 60 * 1000; // reappear every 3 minutes
-const NOTIF_VISIBLE_MS = 12000;   // how long each bubble stays
+const TYPING_DELAY = 500;
+const NOTIF_FIRST_DELAY = 2500;
+const NOTIF_REPEAT = 3 * 60 * 1000;
+const NOTIF_VISIBLE_MS = 12000;
 
-// ── Helper: get a human-readable listing count from the API ──
 async function fetchListingCounts() {
   try {
     const [land, equip, lab, prod] = await Promise.all([
@@ -155,16 +160,13 @@ async function fetchListingCounts() {
   }
 }
 
-// ── Soft two-tone notification chime (Web Audio, no asset needed) ──
-// Autoplay policies may block it until the user interacts with the page;
-// in that case it fails silently and the visual bubble still shows.
 function playChime() {
   try {
     const Ctx = window.AudioContext || window.webkitAudioContext;
     if (!Ctx) return;
     const ctx = new Ctx();
     const now = ctx.currentTime;
-    const notes = [880, 1318.5]; // A5 → E6, a friendly "ding-ding"
+    const notes = [880, 1318.5];
     notes.forEach((freq, i) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
@@ -179,7 +181,7 @@ function playChime() {
       osc.stop(start + 0.55);
     });
     setTimeout(() => ctx.close().catch(() => {}), 1400);
-  } catch { /* blocked or unsupported — ignore */ }
+  } catch { /* ignore */ }
 }
 
 export default function Chatbot() {
@@ -195,7 +197,7 @@ export default function Chatbot() {
   const [notifVisible, setNotifVisible] = useState(false);
   const listRef = useRef(null);
   const inputRef = useRef(null);
-  const engagedRef = useRef(false); // user opened the chat — stop reminding
+  const engagedRef = useRef(false);
 
   // ── Greeting ──
   useEffect(() => {
@@ -211,10 +213,6 @@ export default function Chatbot() {
     }
   }, [open, messages.length, t, user]);
 
-  // ── "I'm a chatbot" notification ──
-  // Pops up shortly after the page loads (if the chat isn't open), plays a
-  // soft chime, auto-hides after a while, and reappears every few minutes
-  // until the user opens the chat or clicks the bubble.
   useEffect(() => {
     if (open) return;
     let hideTimer = null;
@@ -252,21 +250,18 @@ export default function Chatbot() {
     setOpen(true);
   };
 
-  // Scroll to bottom
   useEffect(() => {
     if (listRef.current) {
       listRef.current.scrollTop = listRef.current.scrollHeight;
     }
-  }, [messages, isTyping]);
+  }, [messages, isTyping, showFaqs]);
 
-  // Focus input
   useEffect(() => {
     if (open && inputRef.current) {
       setTimeout(() => inputRef.current?.focus(), 300);
     }
   }, [open]);
 
-  // ── Context-aware suggestions: boost FAQs relevant to the current page ──
   const getContextBoostedFaqs = useCallback(() => {
     if (!view) return FAQS;
     const boosted = [];
@@ -281,12 +276,37 @@ export default function Chatbot() {
     return [...boosted, ...normal];
   }, [view]);
 
-  // ── Smart keyword matching ──
+  // Generate ONLY questions directly related to the question being asked
+  const getSuggestionsForFaq = useCallback((faq) => {
+    if (faq?.followups && faq.followups.length > 0) {
+      return faq.followups.map((f) => ({
+        q: f.q,
+        a: f.a,
+        action: f.action,
+        keywords: f.keywords
+      }));
+    }
+
+    if (!faq) return [];
+
+    const categoryKeywords = ['land', 'lease', 'equipment', 'tractor', 'labour', 'worker', 'escrow', 'payment', 'produce', 'crop', 'support', 'booking', 'account'];
+    const currentKw = (faq.keywords || []).filter((k) => categoryKeywords.includes(k));
+
+    if (currentKw.length === 0) return [];
+
+    const related = FAQS.filter((f) => {
+      if (f.q === faq.q) return false;
+      const otherKw = f.keywords || [];
+      return currentKw.some((k) => otherKw.includes(k));
+    });
+
+    return related.slice(0, 3);
+  }, []);
+
   const findBestMatch = useCallback((query) => {
     const lower = query.toLowerCase().trim();
     if (!lower) return null;
 
-    // Score each FAQ by how many keywords match
     let best = null;
     let bestScore = 0;
 
@@ -297,17 +317,14 @@ export default function Chatbot() {
 
       let score = 0;
 
-      // Check if the query contains the question (or vice versa)
       if (question.includes(lower) || lower.includes(question)) score += 5;
       if (answer.includes(lower)) score += 2;
 
-      // Check keywords
       for (const kw of keywords) {
         if (lower.includes(kw)) score += 3;
         if (kw.includes(lower)) score += 1;
       }
 
-      // Word-level matching for multi-word queries
       const queryWords = lower.split(/\s+/).filter(Boolean);
       for (const word of queryWords) {
         if (word.length < 3) continue;
@@ -318,7 +335,6 @@ export default function Chatbot() {
         }
       }
 
-      // Context boost
       if (faq.context?.includes(view)) score += 2;
 
       if (score > bestScore) {
@@ -330,9 +346,8 @@ export default function Chatbot() {
     return best && bestScore >= 2 ? best : null;
   }, [t, view]);
 
-  // ── Send a message ──
-  const addBotMessage = useCallback((text, faq = null) => {
-    setMessages((prev) => [...prev, { role: 'bot', text, faq }]);
+  const addBotMessage = useCallback((text, faq = null, suggestions = []) => {
+    setMessages((prev) => [...prev, { role: 'bot', text, faq, suggestions }]);
   }, []);
 
   const handleSend = useCallback(async () => {
@@ -340,10 +355,9 @@ export default function Chatbot() {
     if (!q) return;
     setMessages((prev) => [...prev, { role: 'user', text: q }]);
     setInput('');
-    setShowFaqs(false);
+    setShowFaqs(false); // Hide initial topic tray after first question
     setIsTyping(true);
 
-    // Simulate typing delay
     await new Promise((r) => setTimeout(r, TYPING_DELAY));
 
     const matched = findBestMatch(q);
@@ -351,7 +365,6 @@ export default function Chatbot() {
     if (matched) {
       let answer = t(matched.a);
 
-      // Add listing counts if relevant
       if (matched.keywords?.some((k) => ['land', 'lease', 'equipment', 'tractor', 'labour', 'produce', 'crop'].includes(k))) {
         const counts = await fetchListingCounts();
         if (counts) {
@@ -367,39 +380,27 @@ export default function Chatbot() {
       }
 
       setIsTyping(false);
-      addBotMessage(answer, matched);
-
-      // Show follow-up questions if available
-      if (matched.followups && matched.followups.length > 0) {
-        setTimeout(() => {
-          addBotMessage(t('chatbot.followupPrompt'));
-          for (const f of matched.followups) {
-            addBotMessage(t(f.q), { ...f, isFollowup: true });
-          }
-        }, 400);
-      }
+      const suggestions = getSuggestionsForFaq(matched);
+      addBotMessage(answer, matched, suggestions);
     } else {
       setIsTyping(false);
-      addBotMessage(t('chatbot.noMatch'));
+      addBotMessage(t('chatbot.noMatch'), null, []);
     }
-  }, [input, findBestMatch, t, addBotMessage, view]);
+  }, [input, findBestMatch, t, addBotMessage, getSuggestionsForFaq]);
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') handleSend();
   };
 
-  // ── Pick a FAQ chip (from the quick-pick area or a follow-up) ──
   const pickFaq = useCallback((faq) => {
     setMessages((prev) => [...prev, { role: 'user', text: t(faq.q) }]);
-    setShowFaqs(false);
     setFaqFilter('');
+    setShowFaqs(false); // Hide initial topic tray after first question
 
-    // Simulate thinking
     setIsTyping(true);
     setTimeout(async () => {
       let answer = t(faq.a);
 
-      // Fetch live counts if relevant
       if (faq.keywords?.some((k) => ['land', 'lease', 'equipment', 'tractor', 'labour', 'produce', 'crop', 'buy', 'sell'].includes(k))) {
         const counts = await fetchListingCounts();
         if (counts) {
@@ -415,26 +416,16 @@ export default function Chatbot() {
       }
 
       setIsTyping(false);
-      addBotMessage(answer, faq);
-
-      // Show follow-ups
-      if (faq.followups && faq.followups.length > 0) {
-        setTimeout(() => {
-          addBotMessage(t('chatbot.followupPrompt'));
-          for (const f of faq.followups) {
-            addBotMessage(t(f.q), { ...f, isFollowup: true });
-          }
-        }, 400);
-      }
+      const suggestions = getSuggestionsForFaq(faq);
+      addBotMessage(answer, faq, suggestions);
     }, TYPING_DELAY);
-  }, [t, addBotMessage]);
+  }, [t, addBotMessage, getSuggestionsForFaq]);
 
   const handleAction = (viewName) => {
     navigate(viewName);
     setOpen(false);
   };
 
-  // Filter FAQs
   const filteredFaqs = getContextBoostedFaqs().filter((faq) => {
     if (!faqFilter.trim()) return true;
     const lower = faqFilter.toLowerCase();
@@ -444,33 +435,57 @@ export default function Chatbot() {
     return q.includes(lower) || a.includes(lower) || kw.includes(lower);
   });
 
-  // ── Render message (handles both text bubbles and follow-up chips) ──
   const renderMessage = (msg, i) => {
-    if (msg.isFollowup) {
-      // Follow-up chips are rendered as clickable buttons
-      return (
-        <div key={i} className="chatbot-msg chatbot-msg-bot">
-          <button
-            className="chatbot-followup-chip"
-            onClick={() => pickFaq(msg.faq || msg)}
-          >
-            {msg.text}
-          </button>
-        </div>
-      );
-    }
-
     return (
       <div key={i} className={`chatbot-msg ${msg.role === 'user' ? 'chatbot-msg-user' : 'chatbot-msg-bot'}`}>
         <div className="chatbot-bubble">
           {msg.text}
+
           {msg.faq?.action && (
             <button
               className="chatbot-action-btn"
               onClick={() => handleAction(msg.faq.action.view)}
+              style={{ marginTop: '8px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
             >
               {t(msg.faq.action.labelKey)} →
             </button>
+          )}
+
+          {/* Render ONLY related follow-up questions directly under the answer */}
+          {msg.suggestions && msg.suggestions.length > 0 && (
+            <div className="chatbot-suggestions-box" style={{
+              marginTop: '12px',
+              paddingTop: '10px',
+              borderTop: '1px solid rgba(0,0,0,0.08)'
+            }}>
+              <div style={{ fontSize: '0.78rem', fontWeight: '700', color: '#166534', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                💡 {t('chatbot.followupPrompt', 'You might also want to know:')}
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                {msg.suggestions.map((sFaq, sIdx) => (
+                  <button
+                    key={sIdx}
+                    type="button"
+                    className="chatbot-followup-chip"
+                    onClick={() => pickFaq(sFaq)}
+                    style={{
+                      background: '#ffffff',
+                      border: '1px solid #bbf7d0',
+                      color: '#15803d',
+                      borderRadius: '16px',
+                      padding: '6px 12px',
+                      fontSize: '0.82rem',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                      transition: 'all 0.15s ease shadow'
+                    }}
+                  >
+                    {t(sFaq.q)}
+                  </button>
+                ))}
+              </div>
+            </div>
           )}
         </div>
       </div>
@@ -479,7 +494,6 @@ export default function Chatbot() {
 
   return (
     <>
-      {/* Notification bubble inviting users to try the chatbot */}
       {!open && notifVisible && (
         <button className="chatbot-notif" onClick={openFromNotif}>
           <span className="chatbot-notif-text">{t('chatbot.notifText')}</span>
@@ -487,7 +501,6 @@ export default function Chatbot() {
         </button>
       )}
 
-      {/* Toggle button */}
       <button
         className={`chatbot-toggle ${open ? 'is-open' : ''}`}
         onClick={handleToggle}
@@ -505,11 +518,9 @@ export default function Chatbot() {
         )}
       </button>
 
-      {/* Chat panel */}
       {open && (
         <div className="chatbot-panel">
-          {/* Header */}
-          <div className="chatbot-header">
+          <div className="chatbot-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div className="chatbot-header-left">
               <div className="chatbot-avatar">
                 <Icon name="leaf" size={18} strokeWidth={2.2} />
@@ -519,16 +530,35 @@ export default function Chatbot() {
                 <div className="chatbot-header-status">{t('chatbot.statusOnline')}</div>
               </div>
             </div>
-            <button className="chatbot-close-btn" onClick={() => setOpen(false)} aria-label="Close">
-              <Icon name="x" size={18} strokeWidth={2.2} />
-            </button>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <button
+                type="button"
+                className="chatbot-topic-toggle-btn"
+                onClick={() => setShowFaqs((prev) => !prev)}
+                style={{
+                  background: showFaqs ? '#dcfce7' : '#f1f5f9',
+                  color: showFaqs ? '#15803d' : '#475569',
+                  border: 'none',
+                  borderRadius: '12px',
+                  padding: '4px 10px',
+                  fontSize: '0.78rem',
+                  fontWeight: '600',
+                  cursor: 'pointer'
+                }}
+              >
+                💡 {showFaqs ? 'Hide Topics' : 'Topics'}
+              </button>
+
+              <button className="chatbot-close-btn" onClick={() => setOpen(false)} aria-label="Close">
+                <Icon name="x" size={18} strokeWidth={2.2} />
+              </button>
+            </div>
           </div>
 
-          {/* Messages */}
           <div className="chatbot-body" ref={listRef}>
             {messages.map((msg, i) => renderMessage(msg, i))}
 
-            {/* Typing indicator */}
             {isTyping && (
               <div className="chatbot-msg chatbot-msg-bot">
                 <div className="chatbot-typing">
@@ -539,9 +569,9 @@ export default function Chatbot() {
               </div>
             )}
 
-            {/* FAQ quick-pick area */}
-            {showFaqs && messages.length <= 2 && (
-              <div className="chatbot-faq-area">
+            {/* General FAQ tray — shown at start, automatically hidden after the first question is asked */}
+            {showFaqs && (
+              <div className="chatbot-faq-area" style={{ marginTop: '12px' }}>
                 <div className="chatbot-faq-search">
                   <input
                     className="chatbot-faq-input"
@@ -561,7 +591,6 @@ export default function Chatbot() {
             )}
           </div>
 
-          {/* Input */}
           <div className="chatbot-footer">
             <input
               ref={inputRef}

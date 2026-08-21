@@ -92,7 +92,7 @@ export default function Labour() {
           <span className="labour-team-emoji"><Icon name="worker" size={44} /></span>
           <div className="labour-team-text">
             <h3>{t('labour.bookLabourTeam')}</h3>
-            <p>{t('labour.hireFarmWorkers')}</p>
+            <p>{t('labour.teamSubtitleMatch')}</p>
             <span className="labour-team-link">{t('labour.bookNow')}</span>
           </div>
         </button>

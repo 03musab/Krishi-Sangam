@@ -105,7 +105,7 @@ export default function Navbar() {
         {NAV_ITEMS.filter((i) => !i.adminOnly || (user && user.role === 'admin')).map((item) => (
           <li key={item.id}>
             <a
-              href="#"
+              href={`#${item.view}`}
               className={`nav-item ${view === item.view ? 'active' : ''}`}
               onClick={(e) => { e.preventDefault(); handleNav(item); }}
             >

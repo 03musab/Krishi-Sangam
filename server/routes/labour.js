@@ -22,12 +22,12 @@ router.get('/', async (req, res) => {
     const params = [];
 
     if (search) {
-      query += ` AND (l.title LIKE ? OR l.location LIKE ? OR l.description LIKE ?)`;
-      params.push(`%${search}%`, `%${search}%`, `%${search}%`);
+      query += ` AND (l.title ILIKE ? OR l.location ILIKE ? OR l.description ILIKE ? OR l.skills ILIKE ? OR l.work_types ILIKE ?)`;
+      params.push(`%${search}%`, `%${search}%`, `%${search}%`, `%${search}%`, `%${search}%`);
     }
     if (district) { query += ` AND l.district = ?`; params.push(district); }
     if (state) { query += ` AND l.state = ?`; params.push(state); }
-    if (skill) { query += ` AND l.skills LIKE ?`; params.push(`%${skill}%`); }
+    if (skill) { query += ` AND l.skills ILIKE ?`; params.push(`%${skill}%`); }
     if (min_rate) { query += ` AND (l.daily_rate >= ? OR l.hourly_rate >= ?)`; params.push(Number(min_rate), Number(min_rate)); }
     if (max_rate) { query += ` AND (l.daily_rate <= ? OR l.hourly_rate <= ?)`; params.push(Number(max_rate), Number(max_rate)); }
 
@@ -88,7 +88,8 @@ router.post('/', authenticateToken, async (req, res) => {
   try {
     const db = getDb();
     const { title, description, skills, experience_years, daily_rate,
-            hourly_rate, location, district, state, photo_url } = req.body;
+            hourly_rate, location, district, state, photo_url,
+            team_size, lat, lng, max_distance, crop_experience, work_types } = req.body;
 
     if (!title || !location) {
       return res.status(400).json({ error: 'Title and location are required.' });
@@ -96,11 +97,19 @@ router.post('/', authenticateToken, async (req, res) => {
 
     const result = await db.prepare(`
       INSERT INTO labour_services (worker_id, title, description, skills,
-        experience_years, daily_rate, hourly_rate, location, district, state, photo_url, status)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'approved')
+        experience_years, daily_rate, hourly_rate, location, district, state,
+        team_size, lat, lng, photo_url, max_distance, crop_experience, work_types, status)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'approved')
     `).run(req.user.id, title, description || null, skills || null,
            experience_years || 0, daily_rate || null, hourly_rate || null,
-           location, district || null, state || null, photo_url || null);
+           location, district || null, state || null,
+           team_size != null ? Number(team_size) : null,
+           lat != null ? Number(lat) : null,
+           lng != null ? Number(lng) : null,
+           photo_url || null,
+           max_distance != null ? Number(max_distance) : 25,
+           crop_experience || null,
+           work_types || null);
 
     const listing = await db.prepare('SELECT * FROM labour_services WHERE id = ?')
       .get(result.lastInsertRowid);
@@ -122,18 +131,29 @@ router.put('/:id', authenticateToken, async (req, res) => {
     }
 
     const { title, description, skills, experience_years, daily_rate,
-            hourly_rate, location, district, state, availability, photo_url } = req.body;
+            hourly_rate, location, district, state, availability, photo_url,
+            team_size, lat, lng, max_distance, crop_experience, work_types } = req.body;
 
     await db.prepare(`
       UPDATE labour_services SET title=?, description=?, skills=?, experience_years=?,
-        daily_rate=?, hourly_rate=?, location=?, district=?, state=?, availability=?,
-        photo_url=?, updated_at=NOW() WHERE id=?
+        daily_rate=?, hourly_rate=?, location=?, district=?, state=?,
+        team_size=?, lat=?, lng=?, availability=?, photo_url=?,
+        max_distance=?, crop_experience=?, work_types=?,
+        updated_at=NOW() WHERE id=?
     `).run(title || listing.title, description ?? listing.description,
            skills ?? listing.skills, experience_years ?? listing.experience_years,
            daily_rate ?? listing.daily_rate, hourly_rate ?? listing.hourly_rate,
            location || listing.location, district ?? listing.district,
-           state ?? listing.state, availability || listing.availability,
-           photo_url ?? listing.photo_url, req.params.id);
+           state ?? listing.state,
+           team_size != null ? Number(team_size) : (listing.team_size ?? null),
+           lat != null ? Number(lat) : (listing.lat ?? null),
+           lng != null ? Number(lng) : (listing.lng ?? null),
+           availability || listing.availability,
+           photo_url ?? listing.photo_url,
+           max_distance != null ? Number(max_distance) : (listing.max_distance ?? 25),
+           crop_experience ?? listing.crop_experience,
+           work_types ?? listing.work_types,
+           req.params.id);
 
     const updated = await db.prepare('SELECT * FROM labour_services WHERE id = ?').get(req.params.id);
     res.json({ message: 'Updated.', listing: updated });

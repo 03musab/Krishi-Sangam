@@ -80,8 +80,23 @@ export const checkUsername = (username) => apiCall(`/auth/check-username?usernam
 
 /* Services (agricultural services & labour teams) */
 export const bookService = (data) => apiCall('/services/book', 'POST', data);
+export const bookEquipmentSmart = (data) => apiCall('/services/book-equipment', 'POST', data);
+export const bookLabourTeamSmart = (data) => apiCall('/services/book-labour-team', 'POST', data);
+export const bookServiceSmart = (data) => apiCall('/services/book-service', 'POST', data);
 export const getMyServices = () => apiCall('/services/my');
+export const getEquipmentIncoming = () => apiCall('/services/equipment-incoming');
 export const updateService = (id, data) => apiCall(`/services/${id}`, 'PUT', data);
+export const verifyServiceOtp = (id, otp) => apiCall(`/services/${id}/verify-otp`, 'POST', { otp });
+export const completeServiceWork = (id) => apiCall(`/services/${id}/complete`, 'POST');
+
+/* Availability Calendar */
+export const getMyAvailability = () => apiCall('/availability/my');
+export const toggleAvailability = (data) => apiCall('/availability/toggle', 'POST', data);
+export const getProviderAvailability = (id) => apiCall(`/availability/provider/${id}`);
+
+/* Reviews & Ratings */
+export const submitReview = (data) => apiCall('/reviews', 'POST', data);
+export const getProviderReviews = (id) => apiCall(`/reviews/provider/${id}`);
 
 /* Land */
 export const getLand = (params = '') => apiCall(`/land${params ? '?' + params : ''}`);
@@ -158,3 +173,12 @@ export const getAdminUsers = (params = '') => apiCall(`/admin/users${params ? '?
 export const getAdminHelpConversations = () => apiCall('/admin/help-conversations');
 export const updateUserRole = (id, role) => apiCall(`/admin/users/${id}/role`, 'PUT', { role });
 export const deleteUser = (id) => apiCall(`/admin/users/${id}`, 'DELETE');
+
+/* Agricultural Service Listings */
+export const getAgriServices = (params = '') => apiCall(`/agri-services${params ? '?' + params : ''}`);
+export const getAgriServiceById = (id) => apiCall(`/agri-services/${id}`);
+export const getMyAgriServices = () => apiCall('/agri-services/my');
+export const createAgriService = (data) => apiCall('/agri-services', 'POST', data);
+export const updateAgriService = (id, data) => apiCall(`/agri-services/${id}`, 'PUT', data);
+export const deleteAgriService = (id) => apiCall(`/agri-services/${id}`, 'DELETE');
+

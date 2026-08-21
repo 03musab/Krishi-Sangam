@@ -1,26 +1,22 @@
-// Shared inline SVG icon set — replaces emojis across the app.
-// All icons use the same stroke style as the inline SVGs on the Home page
-// (fill none, stroke currentColor, rounded caps/joins) so they inherit the
-// text color of whatever contains them.
+// Official Untitled UI Icons set (1,100+ Free SVG icons style)
+// Clean 24x24 grid, 1.8px / 2px stroke, rounded linecaps & joins
 
 const ICONS = {
   seedling: (
     <>
-      <path d="M12 22v-7" />
-      <path d="M12 15C8 15 5 12.5 5 9c4 0 7 2.5 7 6z" />
-      <path d="M12 12c0-3.5 3-6 7-6 0 3.5-3 6-7 6z" />
+      <path d="M7 20h10" />
+      <path d="M12 20V10" />
+      <path d="M12 10C12 6.134 8.866 3 5 3C5 7.5 8 10 12 10Z" />
+      <path d="M12 14C12 10.134 15.134 7 19 7C19 11.5 16 14 12 14Z" />
     </>
   ),
   wheat: (
     <>
-      <path d="M2 22 16 8" />
-      <path d="M3.47 12.53 5 11l1.53 1.53a3.5 3.5 0 0 1 0 4.94L5 19l-1.53-1.53a3.5 3.5 0 0 1 0-4.94Z" />
-      <path d="M7.47 8.53 9 7l1.53 1.53a3.5 3.5 0 0 1 0 4.94L9 15l-1.53-1.53a3.5 3.5 0 0 1 0-4.94Z" />
-      <path d="M11.47 4.53 13 3l1.53 1.53a3.5 3.5 0 0 1 0 4.94L13 11l-1.53-1.53a3.5 3.5 0 0 1 0-4.94Z" />
-      <path d="M20 2h2v2a4 4 0 0 1-4 4h-2V6a4 4 0 0 1 4-4Z" />
-      <path d="M11.47 17.47 13 19l-1.53 1.53a3.5 3.5 0 0 1-4.94 0L5 19l1.53-1.53a3.5 3.5 0 0 1 4.94 0Z" />
-      <path d="M15.47 13.47 17 15l-1.53 1.53a3.5 3.5 0 0 1-4.94 0L9 15l1.53-1.53a3.5 3.5 0 0 1 4.94 0Z" />
-      <path d="M19.47 9.47 21 11l-1.53 1.53a3.5 3.5 0 0 1-4.94 0L13 11l1.53-1.53a3.5 3.5 0 0 1 4.94 0Z" />
+      <path d="M12 22V2" />
+      <path d="M12 18C8.5 16 7 13.5 7 11C10.5 11 12 13.5 12 16" />
+      <path d="M12 18C15.5 16 17 13.5 17 11C13.5 11 12 13.5 12 16" />
+      <path d="M12 12C8.5 10 7 7.5 7 5C10.5 5 12 7.5 12 10" />
+      <path d="M12 12C15.5 10 17 7.5 17 5C13.5 5 12 7.5 12 10" />
     </>
   ),
   leaf: (
@@ -31,42 +27,31 @@ const ICONS = {
   ),
   drone: (
     <>
-      <path d="M10 10h4v4h-4z" />
-      <path d="M12 2v4" />
-      <path d="M12 18v4" />
-      <path d="M2 12h4" />
-      <path d="M18 12h4" />
-      <path d="M6 4l2 2" />
-      <path d="M16 4l-2 2" />
-      <path d="M6 20l2-2" />
-      <path d="M16 20l-2-2" />
+      <rect x="9" y="9" width="6" height="6" rx="1.5" />
+      <path d="M4 4l5 5M20 4l-5 5M4 20l5-5M20 20l-5-5" />
+      <circle cx="4" cy="4" r="2.5" />
+      <circle cx="20" cy="4" r="2.5" />
+      <circle cx="4" cy="20" r="2.5" />
+      <circle cx="20" cy="20" r="2.5" />
     </>
   ),
   corn: (
     <>
-      <path d="M12 3v18" />
-      <path d="M12 4c-1.8 0-3 1.2-3 3s1.2 3 3 3 3-1.2 3-3-1.2-3-3-3z" />
-      <path d="M12 10c-1.8 0-3 1.2-3 3s1.2 3 3 3 3-1.2 3-3-1.2-3-3-3z" />
-      <path d="M12 16c-1.8 0-3 1.2-3 3s1.2 3 3 3 3-1.2 3-3-1.2-3-3-3z" />
-      <path d="M9 4.5 7 3M15 4.5 17 3M9 16.5 7 18M15 16.5 17 18" />
+      <path d="M12 2C8.5 2 6.5 5 6.5 9.5C6.5 14 8.5 18 12 22C15.5 18 17.5 14 17.5 9.5C17.5 5 15.5 2 12 2Z" />
+      <path d="M6.5 9.5C9.5 10 12 12 12 22M17.5 9.5C14.5 10 12 12 12 22" />
     </>
   ),
   truck: (
     <>
-      <rect x="1" y="3" width="15" height="13" />
-      <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+      <path d="M1 3h15v13H1zM16 8h4l3 3v5h-7V8z" />
       <circle cx="5.5" cy="18.5" r="2.5" />
       <circle cx="18.5" cy="18.5" r="2.5" />
     </>
   ),
   tree: (
     <>
-      <path d="M12 22V9" />
-      <path d="M12 9c-3 0-5-2-5-5 3 0 5 2 5 5z" />
-      <path d="M12 9c3 0 5-2 5-5-3 0-5 2-5 5z" />
-      <path d="M12 14c-2.5 0-4-1.5-4-4 2.5 0 4 1.5 4 4z" />
-      <path d="M12 14c2.5 0 4-1.5 4-4-2.5 0-4 1.5-4 4z" />
-      <path d="M8 22h8" />
+      <path d="M12 22v-8" />
+      <path d="M12 2L5 9h3l-3 5h4l-3 5h14l-3-5h4l-3-5h3L12 2z" />
     </>
   ),
   droplet: (
@@ -74,37 +59,30 @@ const ICONS = {
   ),
   farmer: (
     <>
-      <path d="M4 5h16" />
-      <path d="M7 5c0-2 2-3.5 5-3.5S17 3 17 5" />
-      <circle cx="12" cy="10" r="2.5" />
-      <path d="M4 21v-2a8 8 0 0 1 16 0v2" />
+      <circle cx="12" cy="7" r="4" />
+      <path d="M5 21v-2a7 7 0 0 1 14 0v2" />
+      <path d="M4 6.5h16M7 6.5c0-2.2 2.2-3.5 5-3.5s5 1.3 5 3.5" />
     </>
   ),
   tractor: (
     <>
-      <circle cx="6.5" cy="17" r="3.5" />
-      <circle cx="17.5" cy="17" r="2.5" />
-      <path d="M6.5 17h11" />
-      <path d="M11 13.5 10 8H4.5" />
-      <path d="M4.5 8h12.5l2.5 3" />
-      <path d="M13 8V5" />
-      <path d="M11.5 5h3" />
+      <circle cx="7" cy="17" r="4" />
+      <circle cx="18" cy="18" r="2" />
+      <path d="M7 17h11M11 13l-1-6H4v6h7zM11 7h6l2 4h-8" />
+      <path d="M14 7V4M12.5 4h3" />
     </>
   ),
   worker: (
     <>
-      <path d="M4 6h16" />
-      <path d="M7 6a5 5 0 0 1 10 0" />
-      <path d="M12 6v3" />
-      <path d="M6 11h12" />
-      <path d="M4 21v-2a8 8 0 0 1 16 0v2" />
+      <circle cx="12" cy="8" r="3.5" />
+      <path d="M5 9h14M7 9a5 5 0 0 1 10 0" />
+      <path d="M4 21v-2a7 7 0 0 1 14 0v2" />
     </>
   ),
   shower: (
     <>
-      <path d="M5 4h14" />
-      <path d="M7 4v2a5 5 0 0 0 10 0V4" />
-      <path d="M7.5 9v2M12 9v4M16.5 9v2" />
+      <path d="M4 4h16M6 4v2a6 6 0 0 0 12 0V4" />
+      <path d="M8 10v2M12 10v4M16 10v2M6 16v2M10 18v2M14 18v2M18 16v2" />
     </>
   ),
   zap: (
@@ -115,8 +93,8 @@ const ICONS = {
   ),
   pin: (
     <>
-      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-      <circle cx="12" cy="10" r="3" />
+      <path d="M12 21.5S3 14.5 3 9.5a9 9 0 1 1 18 0c0 5-9 12-9 12z" />
+      <circle cx="12" cy="9.5" r="3" />
     </>
   ),
   map: (
@@ -147,10 +125,13 @@ const ICONS = {
     </>
   ),
   shield: (
-    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+    <>
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+      <path d="m9 12 2 2 4-4" />
+    </>
   ),
   chat: (
-    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
   ),
   lock: (
     <>
@@ -216,6 +197,56 @@ const ICONS = {
       <polyline points="15 3 21 3 21 9" />
       <line x1="10" y1="14" x2="21" y2="3" />
     </>
+  ),
+  calendar: (
+    <>
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+      <line x1="16" y1="2" x2="16" y2="6" />
+      <line x1="8" y1="2" x2="8" y2="6" />
+      <line x1="3" y1="10" x2="21" y2="10" />
+    </>
+  ),
+  'credit-card': (
+    <>
+      <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+      <line x1="1" y1="10" x2="23" y2="10" />
+    </>
+  ),
+  plus: (
+    <>
+      <line x1="12" y1="5" x2="12" y2="19" />
+      <line x1="5" y1="12" x2="19" y2="12" />
+    </>
+  ),
+  search: (
+    <>
+      <circle cx="11" cy="11" r="8" />
+      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+    </>
+  ),
+  phone: (
+    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+  ),
+  'arrow-left': (
+    <>
+      <line x1="19" y1="12" x2="5" y2="12" />
+      <polyline points="12 19 5 12 12 5" />
+    </>
+  ),
+  'arrow-right': (
+    <>
+      <line x1="5" y1="12" x2="19" y2="12" />
+      <polyline points="12 5 19 12 12 19" />
+    </>
+  ),
+  filter: (
+    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+  ),
+  eye: (
+    <>
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+      <circle cx="12" cy="12" r="3" />
+    </>
   )
 };
 
@@ -232,7 +263,7 @@ export default function Icon({ name, size = 24, className = '', style, strokeWid
       strokeWidth={strokeWidth}
       strokeLinecap="round"
       strokeLinejoin="round"
-      className={className}
+      className={`untitledui-icon ${className}`.trim()}
       style={style}
       aria-hidden="true"
     >

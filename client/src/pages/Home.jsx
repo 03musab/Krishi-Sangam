@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useNav } from '../context/NavContext';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../i18n/LanguageContext';
@@ -17,9 +18,21 @@ const WHY_CARDS = [
 ];
 
 export default function Home() {
-  const { navigate } = useNav();
+  const { navigate, view } = useNav();
   const { user } = useAuth();
   const { t } = useLanguage();
+
+  useEffect(() => {
+    if (view === 'contact' || (typeof window !== 'undefined' && window.location.hash === '#contact')) {
+      const timer = setTimeout(() => {
+        const el = document.getElementById('contact');
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [view]);
 
   const handleGetStarted = () => {
     if (user) {
@@ -250,15 +263,15 @@ export default function Home() {
           <div style={{ flex: '1 1 180px', maxWidth: '240px' }}>
             <h4 style={{ color: 'white', fontSize: 'var(--fs-md)', marginBottom: '15px' }}>{t('home.footer.quickLinks')}</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '14px' }}>
-              <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('home'); }}>{t('nav.home')}</a>
-              <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('about'); }}>{t('nav.about')}</a>
-              <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('land-leasing'); }}>{t('nav.land')}</a>
-              <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('farm-services'); }}>{t('nav.farmServices')}</a>
-              <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('farmers'); }}>{t('home.footer.forFarmers')}</a>
-              <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('landowners'); }}>{t('home.footer.forLandowners')}</a>
-              <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('equipment-owners'); }}>{t('home.footer.forEquipmentOwners')}</a>
-              <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('service-providers'); }}>{t('home.footer.forServiceProviders')}</a>
-              <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); document.getElementById('contact').scrollIntoView({ behavior: 'smooth' }); }}>{t('nav.contact')}</a>
+              <a href="#home" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('home'); }}>{t('nav.home')}</a>
+              <a href="#about" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('about'); }}>{t('nav.about')}</a>
+              <a href="#about-land-leasing" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('about-land-leasing'); }}>About Land Leasing</a>
+              <a href="#about-farm-services" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('about-farm-services'); }}>About Farm Services</a>
+              <a href="#farmers" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('farmers'); }}>{t('home.footer.forFarmers')}</a>
+              <a href="#landowners" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('landowners'); }}>{t('home.footer.forLandowners')}</a>
+              <a href="#equipment-owners" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('equipment-owners'); }}>{t('home.footer.forEquipmentOwners')}</a>
+              <a href="#service-providers" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('service-providers'); }}>{t('home.footer.forServiceProviders')}</a>
+              <a href="#contact" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('contact'); }}>{t('nav.contact')}</a>
             </div>
           </div>
 
@@ -266,10 +279,10 @@ export default function Home() {
           <div style={{ flex: '1 1 180px', maxWidth: '240px' }}>
             <h4 style={{ color: 'white', fontSize: 'var(--fs-md)', marginBottom: '15px' }}>{t('home.footer.policies')}</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '14px' }}>
-              <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('privacy'); }}>{t('home.footer.privacy')}</a>
-              <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('terms'); }}>{t('home.footer.terms')}</a>
-              <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('refund-policy'); }}>{t('home.footer.refund')}</a>
-              <a href="#" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('cancellation-policy'); }}>{t('home.footer.cancellation')}</a>
+              <a href="#privacy" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('privacy'); }}>{t('home.footer.privacy')}</a>
+              <a href="#terms" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('terms'); }}>{t('home.footer.terms')}</a>
+              <a href="#refund-policy" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('refund-policy'); }}>{t('home.footer.refund')}</a>
+              <a href="#cancellation-policy" style={{ color: '#94a3b8', textDecoration: 'none' }} onClick={(e) => { e.preventDefault(); navigate('cancellation-policy'); }}>{t('home.footer.cancellation')}</a>
             </div>
           </div>
 
@@ -283,7 +296,7 @@ export default function Home() {
               Pokharan Road No. 2, Wagle Industrial Estate,<br />
               Thane – 400604, Maharashtra.
             </p>
-            <p style={{ marginBottom: '10px' }}><strong>{t('home.footer.phone')}</strong> +91-8828473778</p>
+            <p style={{ marginBottom: '10px' }}><strong>{t('home.footer.phone')}</strong> +91 88284 73778</p>
             <p><strong>{t('home.footer.email')}</strong> jaijaikuber@gmail.com</p>
           </div>
         </div>

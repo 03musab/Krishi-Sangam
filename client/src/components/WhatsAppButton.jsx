@@ -1,4 +1,4 @@
-const WHATSAPP_NUMBER = '918822847377';
+const WHATSAPP_NUMBER = '918828473778';
 const WHATSAPP_MESSAGE = 'Hello Krishi Sangam, I would like to know more about your services.';
 
 /**

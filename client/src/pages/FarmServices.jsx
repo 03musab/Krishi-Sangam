@@ -173,8 +173,8 @@ export default function FarmServices() {
           <button className="btn-back-icon" onClick={() => setLabFlow({ view: 'home' })}>←</button>
           <span className="service-emoji"><Icon name={category.icon} size={40} /></span>
           <div>
-            <h1 className="service-booking-title">{category.name}</h1>
-            <p className="service-booking-subtitle">{category.tagline}</p>
+            <h1 className="service-booking-title">{t(`cat.${category.id}.name`, category.name)}</h1>
+            <p className="service-booking-subtitle">{t(`cat.${category.id}.tagline`, category.tagline)}</p>
           </div>
         </div>
 
@@ -185,9 +185,9 @@ export default function FarmServices() {
               className="sub-service-item"
               onClick={() => requireMember(() => setLabFlow({ view: 'service', category, service: svc }))}
             >
-              <div className="sub-service-main tip" data-tip={svc.desc}>
-                <span className="sub-service-name">{svc.name}</span>
-                <span className="sub-service-desc">{svc.desc}</span>
+              <div className="sub-service-main tip" data-tip={t(`svc.${svc.name}.desc`, svc.desc)}>
+                <span className="sub-service-name">{t(`svc.${svc.name}.name`, svc.name)}</span>
+                <span className="sub-service-desc">{t(`svc.${svc.name}.desc`, svc.desc)}</span>
               </div>
               <span className="sub-service-arrow">›</span>
             </button>
@@ -208,6 +208,69 @@ export default function FarmServices() {
   return (
     <>
       <PageBanner title={t('farmServices.title')} color="green" />
+
+      <div style={{
+        width: 'fit-content',
+        maxWidth: '92%',
+        margin: '12px auto 18px auto',
+        background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
+        border: '1px solid #93c5fd',
+        borderRadius: '20px',
+        padding: '6px 14px',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexWrap: 'nowrap',
+        gap: '10px',
+        boxShadow: '0 2px 6px rgba(37, 99, 235, 0.06)'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, flex: 1 }}>
+          <span style={{
+            background: '#2563eb',
+            color: '#ffffff',
+            fontSize: '0.68rem',
+            fontWeight: '800',
+            padding: '2px 8px',
+            borderRadius: '12px',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px',
+            flexShrink: 0,
+            whiteSpace: 'nowrap'
+          }}>{t('guide.badge', 'GUIDE')}</span>
+          <span style={{
+            fontSize: '0.82rem',
+            color: '#1e3a8a',
+            fontWeight: '600',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis'
+          }}>
+            {t('farmServices.guideText', 'Want to know how farm services work on Krishi Sangam?')}
+          </span>
+        </div>
+        <button
+          type="button"
+          onClick={() => navigate('about-farm-services')}
+          style={{
+            background: '#1d4ed8',
+            color: '#ffffff',
+            border: 'none',
+            padding: '4px 12px',
+            borderRadius: '14px',
+            cursor: 'pointer',
+            fontSize: '0.78rem',
+            fontWeight: '700',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px',
+            flexShrink: 0,
+            whiteSpace: 'nowrap',
+            transition: 'all 0.15s ease'
+          }}
+        >
+          {t('farmServices.aboutBtn', 'About Farm Services →')}
+        </button>
+      </div>
 
       <LocationPrompt />
 

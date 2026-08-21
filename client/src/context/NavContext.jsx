@@ -66,7 +66,9 @@ export function NavProvider({ children }) {
     // Non-blocking view switch keeps the UI responsive while the new page loads
     startTransition(() => setView(viewName));
     if (params.onLoaded) setTimeout(params.onLoaded, 0);
-    scrollTop();
+    if (viewName !== 'contact') {
+      scrollTop();
+    }
   }, [scrollTop]);
 
   const back = useCallback(() => {

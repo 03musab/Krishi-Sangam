@@ -66,8 +66,13 @@ export function listingToModalProps(listing, type) {
       const typeText = EQUIP_TYPE_MAP[listing.type] ? t(EQUIP_TYPE_MAP[listing.type]) : listing.type;
       tags.push({ cls: 'tag-orange', text: typeText });
     }
+    if (listing.hp) tags.push({ cls: 'tag-blue', text: `${listing.hp} HP` });
+    if (listing.attachment || listing.attachments_list) tags.push({ cls: 'tag-green', text: listing.attachment || listing.attachments_list });
+    if (listing.brand) tags.push({ cls: 'tag-slate', text: listing.brand });
   } else if (type === 'labour') {
-    if (listing.skills) tags.push({ cls: 'tag-purple', text: listing.skills });
+    if (listing.team_size) tags.push({ cls: 'tag-green', text: `Team of ${listing.team_size}` });
+    if (listing.skills || listing.work_types) tags.push({ cls: 'tag-purple', text: listing.skills || listing.work_types });
+    if (listing.max_distance) tags.push({ cls: 'tag-slate', text: `${listing.max_distance} km radius` });
   } else if (type === 'produce') {
     if (listing.quantity != null && listing.unit) tags.push({ cls: 'tag-amber', text: `${listing.quantity} ${listing.unit}` });
     if (listing.quality_grade) tags.push({ cls: 'tag-slate', text: t('produce.gradeTag', { g: listing.quality_grade }) });

@@ -36,16 +36,21 @@ const ForServiceProviders = lazy(() => import('../pages/ForServiceProviders'));
 const AgriculturalServices = lazy(() => import('../pages/AgriculturalServices'));
 const HowItWorks = lazy(() => import('../pages/HowItWorks'));
 const FarmServices = lazy(() => import('../pages/FarmServices'));
+const AboutLandLeasing = lazy(() => import('../pages/AboutLandLeasing'));
+const AboutFarmServices = lazy(() => import('../pages/AboutFarmServices'));
+const ListAgriService = lazy(() => import('../pages/ListAgriService'));
 
 const VIEWS = {
   home: Home,
   services: Services,
   'land-leasing': LandLeasing,
+  'about-land-leasing': AboutLandLeasing,
   'list-land': ListLand,
   'equipment-rental': FarmServices,
   'list-equipment': ListEquipment,
   labour: FarmServices,
   'farm-services': FarmServices,
+  'about-farm-services': AboutFarmServices,
   'list-labour': ListLabour,
   produce: Produce,
   'list-produce': ListProduce,
@@ -68,7 +73,9 @@ const VIEWS = {
   'equipment-owners': ForEquipmentOwners,
   'service-providers': ForServiceProviders,
   'agri-services': AgriculturalServices,
-  'how-it-works': HowItWorks
+  'list-agri-service': ListAgriService,
+  'how-it-works': HowItWorks,
+  contact: Home
 };
 
 // Service pages (land, equipment, labour) are browsable by everyone — logged-out

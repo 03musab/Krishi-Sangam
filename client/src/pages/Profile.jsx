@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import PageBanner from '../components/PageBanner';
+import AvailabilityCalendar from '../components/AvailabilityCalendar';
 import { useNav } from '../context/NavContext';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
@@ -52,9 +53,11 @@ export default function Profile() {
     }
   };
 
+  const isProvider = user && (user.role === 'owner' || user.role === 'labourer' || user.role === 'admin' || user.skills);
+
   return (
     <>
-      <PageBanner title={t('profile.title')} color="slate" />
+      <PageBanner title={t('profile.title', 'User Profile & Settings')} color="slate" />
       <div className="form-card-container profile-container">
         <div className="form-card">
           <form className="form-body" onSubmit={handleProfile}>
@@ -76,11 +79,14 @@ export default function Profile() {
             </div>
             <div className="form-group">
               <label className="form-label">{t('profile.skills')}</label>
-              <input type="text" className="form-input" placeholder="e.g. farming, irrigation" value={form.skills} onChange={set('skills')} />
+              <input type="text" className="form-input" placeholder="e.g. farming, tractor operator, irrigation" value={form.skills} onChange={set('skills')} />
             </div>
             <button type="submit" className="btn-form-submit btn-slate">{t('profile.save')}</button>
           </form>
         </div>
+
+        {/* ── Provider Availability Calendar Section ── */}
+        <AvailabilityCalendar />
 
         <hr className="form-divider" />
 

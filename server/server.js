@@ -20,6 +20,9 @@ const profileRoutes = require('./routes/profile');
 const uploadRoutes = require('./routes/upload');
 const adminRoutes = require('./routes/admin');
 const servicesRoutes = require('./routes/services');
+const availabilityRoutes = require('./routes/availability');
+const reviewsRoutes = require('./routes/reviews');
+const agriServicesRoutes = require('./routes/agriServices');
 const { getPool } = require('./db');
 
 const app = express();
@@ -64,6 +67,9 @@ app.use('/api/profile', profileRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/services', servicesRoutes);
+app.use('/api/availability', availabilityRoutes);
+app.use('/api/reviews', reviewsRoutes);
+app.use('/api/agri-services', agriServicesRoutes);
 
 /* ── Health Check ─────────────────────────── */
 app.get('/api/health', (req, res) => {
@@ -110,6 +116,20 @@ async function init() {
     await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS id_type TEXT');
     await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS id_number TEXT');
     await pool.query('ALTER TABLE equipment_listings ADD COLUMN IF NOT EXISTS deposit INTEGER');
+    await pool.query('ALTER TABLE equipment_listings ADD COLUMN IF NOT EXISTS hp INTEGER');
+    await pool.query('ALTER TABLE equipment_listings ADD COLUMN IF NOT EXISTS attachment TEXT');
+    await pool.query('ALTER TABLE equipment_listings ADD COLUMN IF NOT EXISTS lat DOUBLE PRECISION');
+    await pool.query('ALTER TABLE equipment_listings ADD COLUMN IF NOT EXISTS lng DOUBLE PRECISION');
+    // Smart-matching columns for equipment-with-operator bookings
+    await pool.query('ALTER TABLE service_bookings ADD COLUMN IF NOT EXISTS owner_id BIGINT REFERENCES users(id)');
+    await pool.query('ALTER TABLE service_bookings ADD COLUMN IF NOT EXISTS listing_id BIGINT');
+    await pool.query('ALTER TABLE service_bookings ADD COLUMN IF NOT EXISTS hp INTEGER');
+    await pool.query('ALTER TABLE service_bookings ADD COLUMN IF NOT EXISTS attachment TEXT');
+    await pool.query('ALTER TABLE service_bookings ADD COLUMN IF NOT EXISTS farm_size TEXT');
+    // Labour team capacity matching
+    await pool.query('ALTER TABLE labour_services ADD COLUMN IF NOT EXISTS team_size INTEGER');
+    await pool.query('ALTER TABLE labour_services ADD COLUMN IF NOT EXISTS lat DOUBLE PRECISION');
+    await pool.query('ALTER TABLE labour_services ADD COLUMN IF NOT EXISTS lng DOUBLE PRECISION');
     // OTP delivery tracking (provider, request_id, delivery status)
     await pool.query('ALTER TABLE otp_verifications ADD COLUMN IF NOT EXISTS provider TEXT');
     await pool.query('ALTER TABLE otp_verifications ADD COLUMN IF NOT EXISTS request_id TEXT');
