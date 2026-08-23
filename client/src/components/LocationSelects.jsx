@@ -13,16 +13,23 @@ export default function LocationSelects({ value, onChange }) {
   const state = value?.state || '';
   const district = value?.district || '';
 
+  const taluka = value?.taluka || '';
+
   const districts = state ? DISTRICTS_BY_STATE[state] || [] : [];
 
   const handleState = (e) => {
     const s = e.target.value;
-    onChange({ ...value, state: s, district: '' });
+    onChange({ ...value, state: s, district: '', taluka: '' });
   };
 
   const handleDistrict = (e) => {
     const d = e.target.value;
     onChange({ ...value, district: d });
+  };
+
+  const handleTaluka = (e) => {
+    const tk = e.target.value;
+    onChange({ ...value, taluka: tk });
   };
 
   return (
@@ -53,6 +60,17 @@ export default function LocationSelects({ value, onChange }) {
             ))}
           </select>
         </div>
+      </div>
+
+      <div className="form-group">
+        <label className="form-label">{t('auth.taluka', 'Taluka / Sub-District')}</label>
+        <input
+          type="text"
+          className="form-input"
+          value={taluka}
+          onChange={handleTaluka}
+          placeholder={t('auth.selectTaluka', 'Enter Taluka or Tehsil')}
+        />
       </div>
     </>
   );

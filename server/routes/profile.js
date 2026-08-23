@@ -17,6 +17,7 @@ router.get('/', authenticateToken, async (req, res) => {
     const db = getDb();
     const user = await db.prepare(
       `SELECT id, username, email, role, phone, location, bio, skills,
+              bank_account, ifsc, upi_id,
               avatar_url, created_at, updated_at FROM users WHERE id = ?`
     ).get(req.user.id);
     res.json({ user });
@@ -29,7 +30,11 @@ router.get('/', authenticateToken, async (req, res) => {
 router.put('/', authenticateToken, async (req, res) => {
   try {
     const db = getDb();
-    const { username, phone, location, bio, skills, avatar_url } = req.body;
+    const { username, phone, location, bio, skills, avatar_url, bank_account, ifsc, upi_id } = req.body;
+
+    if (phone && !/^[6-9]\d{9}$/.test(String(phone))) {
+      return res.status(400).json({ error: 'A valid 10-digit mobile number starting with 9, 8, 7, or 6 is required.' });
+    }
 
     // Check username uniqueness if changed
     if (username && username !== req.user.username) {
@@ -48,13 +53,19 @@ router.put('/', authenticateToken, async (req, res) => {
         bio = COALESCE(?, bio),
         skills = COALESCE(?, skills),
         avatar_url = COALESCE(?, avatar_url),
+        bank_account = COALESCE(?, bank_account),
+        ifsc = COALESCE(?, ifsc),
+        upi_id = COALESCE(?, upi_id),
         updated_at = NOW()
       WHERE id = ?
     `).run(username || null, phone ?? null, location ?? null,
-           bio ?? null, skills ?? null, avatar_url ?? null, req.user.id);
+           bio ?? null, skills ?? null, avatar_url ?? null,
+           bank_account ?? null, ifsc ?? null, upi_id ?? null,
+           req.user.id);
 
     const user = await db.prepare(
       `SELECT id, username, email, role, phone, location, bio, skills,
+              bank_account, ifsc, upi_id,
               avatar_url, created_at, updated_at FROM users WHERE id = ?`
     ).get(req.user.id);
 

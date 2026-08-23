@@ -13,18 +13,7 @@ export default function LocationPrompt() {
   const { t } = useLanguage();
 
   if (status === 'granted') {
-    const label =
-      place?.city ||
-      (place && [place.district, place.state].filter(Boolean).join(', ')) ||
-      '';
-    return (
-      <div className="location-prompt granted">
-        <span className="location-prompt-icon"><Icon name="pin" size={14} /></span>
-        <span className="location-prompt-text">
-          {label ? t('loc.showingNear', { place: label }) : t('loc.showingNearAll')}
-        </span>
-      </div>
-    );
+    return null;
   }
 
   if (status === 'prompting') {

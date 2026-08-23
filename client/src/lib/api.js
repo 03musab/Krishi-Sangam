@@ -47,7 +47,12 @@ async function apiCall(endpoint, method = 'GET', body = null) {
   }
 
   const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'API error');
+  if (!res.ok) {
+    if (res.status === 401) {
+      clearToken();
+    }
+    throw new Error(data.error || 'API error');
+  }
   return data;
 }
 
@@ -97,6 +102,8 @@ export const getProviderAvailability = (id) => apiCall(`/availability/provider/$
 /* Reviews & Ratings */
 export const submitReview = (data) => apiCall('/reviews', 'POST', data);
 export const getProviderReviews = (id) => apiCall(`/reviews/provider/${id}`);
+export const getMyReviews = () => apiCall('/reviews/my');
+export const deleteReview = (id) => apiCall(`/reviews/${id}`, 'DELETE');
 
 /* Land */
 export const getLand = (params = '') => apiCall(`/land${params ? '?' + params : ''}`);
@@ -171,6 +178,8 @@ export const getAdminListings = (type = '', status = '') => {
 export const deleteAdminListing = (type, id) => apiCall(`/admin/listings/${type}/${id}`, 'DELETE');
 export const getAdminUsers = (params = '') => apiCall(`/admin/users${params ? '?' + params : ''}`);
 export const getAdminHelpConversations = () => apiCall('/admin/help-conversations');
+export const getAdminReviews = () => apiCall('/admin/reviews');
+export const deleteAdminReview = (id) => apiCall(`/admin/reviews/${id}`, 'DELETE');
 export const updateUserRole = (id, role) => apiCall(`/admin/users/${id}/role`, 'PUT', { role });
 export const deleteUser = (id) => apiCall(`/admin/users/${id}`, 'DELETE');
 

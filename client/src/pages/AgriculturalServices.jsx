@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import PageBanner from '../components/PageBanner';
 import SmartFarmSelector from '../components/SmartFarmSelector';
 import EscrowPaymentModal from '../components/EscrowPaymentModal';
+import SkeletonLoader from '../components/SkeletonLoader';
 import { useNav } from '../context/NavContext';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
@@ -194,9 +195,7 @@ export default function AgriculturalServices() {
 
         {/* Services Listings Grid */}
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '40px', color: '#64748b' }}>
-            {t('common.loading', 'Loading agricultural services...')}
-          </div>
+          <SkeletonLoader type="card" count={6} />
         ) : services.length === 0 ? (
           <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '40px', textAlign: 'center' }}>
             <h3 style={{ margin: '0 0 8px 0', color: '#334155' }}>No services found</h3>

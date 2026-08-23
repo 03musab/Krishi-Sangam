@@ -8,6 +8,51 @@ import WelcomeOverlay from '../components/WelcomeOverlay';
 import OtpInput from '../components/OtpInput';
 import OtpResend from '../components/OtpResend';
 
+const DEMO_ACCOUNTS = [
+  {
+    role: 'Farmer 1 (Saved Profile)',
+    phone: '9876543210',
+    username: 'farmer_ramesh',
+    pass: 'password123',
+    icon: '🌾'
+  },
+  {
+    role: 'Farmer 2 (Completed Booking & Reviews)',
+    phone: '9876543211',
+    username: 'farmer_anita',
+    pass: 'password123',
+    icon: '👩‍🌾'
+  },
+  {
+    role: 'Equipment Provider',
+    phone: '9833334444',
+    username: 'provider_suresh',
+    pass: 'password123',
+    icon: '🚜'
+  },
+  {
+    role: 'Labour Leader',
+    phone: '9855556666',
+    username: 'labour_leader_mahesh',
+    pass: 'password123',
+    icon: '👷'
+  },
+  {
+    role: 'Service Specialist',
+    phone: '9899990000',
+    username: 'service_expert_dharani',
+    pass: 'password123',
+    icon: '🛠️'
+  },
+  {
+    role: 'Admin User',
+    phone: '9999999999',
+    username: 'admin',
+    pass: 'password123',
+    icon: '👑'
+  }
+];
+
 export default function SignIn() {
   const { navigate, back } = useNav();
   const { login } = useAuth();
@@ -65,9 +110,9 @@ export default function SignIn() {
     e.preventDefault();
     setStatus('loading');
     try {
-      const isPhone = /^\d{10}$/.test(loginId.trim());
+      const isPhone = /^[6-9]\d{9}$/.test(loginId.trim());
       const data = await signin(
-        isPhone ? { phone: loginId.trim(), password } : { email: loginId.trim(), password }
+        isPhone ? { phone: loginId.trim(), password } : { identifier: loginId.trim(), password }
       );
       finishLogin(data);
     } catch (err) {
@@ -77,7 +122,7 @@ export default function SignIn() {
   };
 
   const doSendOtp = async () => {
-    if (!/^\d{10}$/.test(otpPhone.trim())) {
+    if (!/^[6-9]\d{9}$/.test(otpPhone.trim())) {
       showToast(t('auth.phoneInvalid'));
       return;
     }
@@ -229,7 +274,47 @@ export default function SignIn() {
           </form>
         )}
 
-        <p className="auth-switch">
+        <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px dashed #cbd5e1' }}>
+          <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#475569', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            ⚡ 1-Tap Quick Fill Demo Profiles
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(170px, 1fr))', gap: '8px' }}>
+            {DEMO_ACCOUNTS.map((acc) => (
+              <button
+                key={acc.phone}
+                type="button"
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                  gap: '2px',
+                  padding: '8px 12px',
+                  background: '#f8fafc',
+                  border: '1px solid #cbd5e1',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  transition: 'all 0.16s ease'
+                }}
+                onClick={() => {
+                  setLoginId(acc.phone);
+                  setPassword(acc.pass);
+                  setOtpPhone(acc.phone);
+                  showToast(`Pre-filled: ${acc.role}`);
+                }}
+              >
+                <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#0f172a' }}>
+                  {acc.icon} {acc.role}
+                </span>
+                <span style={{ fontSize: '0.75rem', color: '#64748b', fontFamily: 'monospace' }}>
+                  {acc.username} / {acc.phone}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <p className="auth-switch" style={{ marginTop: '16px' }}>
           {t('auth.dontHave')} <a href="#" onClick={(e) => { e.preventDefault(); navigate('signup'); }}>{t('auth.signupTitle')}</a>
         </p>
       </div>

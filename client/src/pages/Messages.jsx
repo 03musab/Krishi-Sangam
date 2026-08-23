@@ -92,7 +92,16 @@ export default function Messages() {
 
   useEffect(() => {
     loadConversations();
-  }, []);
+    const interval = setInterval(() => {
+      loadConversations();
+      if (activeChat) {
+        getThread(activeChat.id)
+          .then((d) => setThread(d.messages || []))
+          .catch(() => {});
+      }
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [activeChat]);
 
   useEffect(() => {
     if (threadRef.current) threadRef.current.scrollTop = threadRef.current.scrollHeight;
@@ -117,7 +126,7 @@ export default function Messages() {
       const fetcher = fetchers[type];
       if (!fetcher) throw new Error('Unknown listing type');
       const d = await fetcher(id);
-      setListingModal(listingToModalProps(d.listing, type));
+      setListingModal(listingToModalProps(d.listing, type, t));
     } catch (err) {
       setViewingListing(null);
       showToast(t('common.error', { msg: err.message }));

@@ -40,7 +40,27 @@ router.get('/', async (req, res) => {
 
     query += ` ORDER BY e.created_at DESC`;
     const listings = await db.prepare(query).all(...params);
-    res.json({ listings, count: listings.length });
+
+    const { isWithinRadius } = require('../lib/geo');
+    const userLat = req.query.user_lat || req.query.lat;
+    const userLng = req.query.user_lng || req.query.lng;
+    const userLocStr = req.query.user_location || req.query.district || req.query.location;
+
+    let filteredListings = listings;
+    if (userLat || userLng || userLocStr) {
+      filteredListings = listings.filter((l) => {
+        const maxDist = l.max_distance || 25;
+        const { isWithin, distKm } = isWithinRadius(
+          { lat: userLat, lng: userLng, location: userLocStr, district: req.query.district },
+          l,
+          maxDist
+        );
+        l._distKm = distKm;
+        return isWithin;
+      });
+    }
+
+    res.json({ listings: filteredListings, count: filteredListings.length });
   } catch (err) {
     console.error('Get equipment error:', err);
     res.status(500).json({ error: 'Server error.' });

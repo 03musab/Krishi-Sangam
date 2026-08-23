@@ -23,7 +23,7 @@ export default function ForgotPassword() {
   useEffect(() => () => clearTimeout(navTimer.current), []);
 
   const doSendOtp = async () => {
-    if (!/^\d{10}$/.test(phone.trim())) {
+    if (!/^[6-9]\d{9}$/.test(phone.trim())) {
       showToast(t('auth.phoneInvalid'));
       return;
     }

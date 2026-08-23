@@ -1,8 +1,10 @@
 import { useDeferredValue, useEffect, useState } from 'react';
 import PageBanner from '../components/PageBanner';
 import ListingCard from '../components/ListingCard';
+import Icon from '../components/Icon';
 import AuthGateModal from '../components/AuthGateModal';
 import LocationPrompt from '../components/LocationPrompt';
+import SkeletonLoader from '../components/SkeletonLoader';
 import BookEquipmentWithOperator from '../components/BookEquipmentWithOperator';
 import { useNav } from '../context/NavContext';
 import { useAuth } from '../context/AuthContext';
@@ -12,7 +14,6 @@ import { getEquipment, getMyBookings } from '../lib/api';
 import { sortListingsByProximity } from '../lib/geo';
 import { EQUIPMENT_CATEGORIES } from '../data/services';
 import { getTrustTier } from '../lib/trust';
-import Icon from '../components/Icon';
 import { FEATURES } from '../config';
 
 export default function EquipmentRental() {
@@ -161,7 +162,7 @@ export default function EquipmentRental() {
       )}
 
       <div className="listings-count-label">{t('common.count', { n: count, s: count !== 1 ? 's' : '' })}</div>
-      {loading && <div className="listings-empty">{t('common.loading')}</div>}
+      {loading && <SkeletonLoader count={6} type="card" />}
       {!loading && error && <div className="listings-error">{t('common.error', { msg: error })}</div>}
       {!loading && !error && listings.length === 0 && (
         <div className="listings-empty">{search ? t('equip.noListingsFilter', { q: search }) : t('equip.noListings')}</div>

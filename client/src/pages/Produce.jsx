@@ -3,6 +3,7 @@ import PageBanner from '../components/PageBanner';
 import ListingCard from '../components/ListingCard';
 import AuthGateModal from '../components/AuthGateModal';
 import LocationPrompt from '../components/LocationPrompt';
+import SkeletonLoader from '../components/SkeletonLoader';
 import { useNav } from '../context/NavContext';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../i18n/LanguageContext';
@@ -73,7 +74,7 @@ export default function Produce() {
         </div>
       </div>
       <div className="listings-count-label">{t('common.count', { n: count, s: count !== 1 ? 's' : '' })}</div>
-      {loading && <div className="listings-empty">{t('common.loading')}</div>}
+      {loading && <SkeletonLoader count={6} type="card" />}
       {!loading && error && <div className="listings-error">{t('common.error', { msg: error })}</div>}
       {!loading && !error && listings.length === 0 && (
         <div className="listings-empty">{t('produce.noListings')}</div>

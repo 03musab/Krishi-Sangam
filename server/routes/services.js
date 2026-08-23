@@ -12,18 +12,7 @@ function generateOtp() {
   return Math.floor(1000 + Math.random() * 9000).toString();
 }
 
-/* Helper: Haversine distance in km */
-function getHaversineDistance(lat1, lng1, lat2, lng2) {
-  if (lat1 == null || lng1 == null || lat2 == null || lng2 == null) return null;
-  const R = 6371; // Earth radius in km
-  const toRad = (d) => (d * Math.PI) / 180;
-  const dLat = toRad(lat2 - lat1);
-  const dLng = toRad(lng2 - lng1);
-  const a = Math.sin(dLat / 2) ** 2 +
-    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-    Math.sin(dLng / 2) ** 2;
-  return 2 * R * Math.asin(Math.sqrt(a));
-}
+const { getHaversineDistance, isWithinRadius } = require('../lib/geo');
 
 /* Helper: Check if provider is unavailable on date */
 async function isProviderUnavailable(db, providerId, startDateStr) {
@@ -192,11 +181,10 @@ router.post('/book-equipment', authenticateToken, async (req, res) => {
         continue;
       }
 
-      const distKm = getHaversineDistance(farmerLat, farmerLng, l.lat, l.lng);
       const maxDist = l.max_distance || 25;
+      const { isWithin, distKm } = isWithinRadius({ lat: farmerLat, lng: farmerLng, location, district: req.user?.district }, l, maxDist);
 
-      // Keep if within provider max_distance (default 25 km) or if lat/lng not provided
-      if (distKm == null || distKm <= maxDist) {
+      if (isWithin) {
         matched.push({ ...l, _distKm: distKm });
       }
     }
@@ -329,9 +317,9 @@ router.post('/book-labour-team', authenticateToken, async (req, res) => {
       if (await isProviderUnavailable(db, l.worker_id, start_date)) {
         continue;
       }
-      const distKm = getHaversineDistance(farmerLat, farmerLng, l.lat, l.lng);
       const maxDist = l.max_distance || 25;
-      if (distKm == null || distKm <= maxDist) {
+      const { isWithin, distKm } = isWithinRadius({ lat: farmerLat, lng: farmerLng, location, district: req.user?.district }, l, maxDist);
+      if (isWithin) {
         matched.push({ ...l, _distKm: distKm });
       }
     }
@@ -424,23 +412,44 @@ router.post('/book-service', authenticateToken, async (req, res) => {
     const skillParams = [];
     if (searchTerms.length > 0) {
       const conditions = searchTerms.map((term) => {
-        skillParams.push(`%${term}%`);
-        skillParams.push(`%${term}%`);
-        skillParams.push(`%${term}%`);
+        skillParams.push(`%${term}%`, `%${term}%`, `%${term}%`);
         return `(l.skills ILIKE ? OR l.title ILIKE ? OR l.description ILIKE ?)`;
       });
       skillClause = `AND (${conditions.join(' OR ')})`;
     }
 
     let query = `
-      SELECT l.*, u.username as worker_name, u.phone as worker_phone
+      SELECT l.id, l.worker_id, l.skills, l.daily_rate, l.lat, l.lng, l.max_distance, u.username as worker_name, u.phone as worker_phone
       FROM labour_services l
       JOIN users u ON l.worker_id = u.id
       WHERE l.status = 'approved'
         AND l.availability = 'available'
         ${skillClause}
     `;
-    const listings = await db.prepare(query).all(...skillParams);
+    const labListings = await db.prepare(query).all(...skillParams);
+
+    // Also match dedicated agricultural service listings from agri_service_listings
+    let agriClause = '';
+    const agriParams = [];
+    if (searchTerms.length > 0) {
+      const conditions = searchTerms.map((term) => {
+        agriParams.push(`%${term}%`, `%${term}%`, `%${term}%`);
+        return `(a.category ILIKE ? OR a.title ILIKE ? OR a.description ILIKE ?)`;
+      });
+      agriClause = `AND (${conditions.join(' OR ')})`;
+    }
+
+    let agriQuery = `
+      SELECT a.id, a.provider_id as worker_id, a.title as skills, a.price as daily_rate, a.lat, a.lng, a.service_area_km as max_distance, u.username as worker_name, u.phone as worker_phone
+      FROM agri_service_listings a
+      JOIN users u ON a.provider_id = u.id
+      WHERE a.status = 'approved'
+        AND a.availability = 'available'
+        ${agriClause}
+    `;
+    const agriListings = await db.prepare(agriQuery).all(...agriParams);
+
+    const listings = [...labListings, ...agriListings];
 
     const farmerLat = lat != null ? Number(lat) : null;
     const farmerLng = lng != null ? Number(lng) : null;
@@ -450,9 +459,9 @@ router.post('/book-service', authenticateToken, async (req, res) => {
       if (await isProviderUnavailable(db, l.worker_id, start_date)) {
         continue;
       }
-      const distKm = getHaversineDistance(farmerLat, farmerLng, l.lat, l.lng);
       const maxDist = l.max_distance || 25;
-      if (distKm == null || distKm <= maxDist) {
+      const { isWithin, distKm } = isWithinRadius({ lat: farmerLat, lng: farmerLng, location, district: req.user?.district }, l, maxDist);
+      if (isWithin) {
         matched.push({ ...l, _distKm: distKm });
       }
     }
@@ -579,6 +588,47 @@ router.post('/:id/complete', authenticateToken, async (req, res) => {
   } catch (err) {
     console.error('Complete booking error:', err);
     res.status(500).json({ error: 'Server error completing booking.' });
+  }
+});
+
+/* ── PUT /api/services/bookings/:id/status — Update status (confirm, cancel, etc.) ── */
+router.put(['/bookings/:id/status', '/:id/status', '/bookings/:id'], authenticateToken, async (req, res) => {
+  try {
+    const db = getDb();
+    const booking = await db.prepare('SELECT * FROM service_bookings WHERE id = ?').get(req.params.id);
+    if (!booking) return res.status(404).json({ error: 'Service booking not found.' });
+
+    const isOwner = booking.owner_id === req.user.id;
+    const isUser = booking.user_id === req.user.id;
+    const isAdmin = req.user.role === 'admin';
+
+    if (!isOwner && !isUser && !isAdmin) {
+      return res.status(403).json({ error: 'Not authorized to update this service booking.' });
+    }
+
+    const { status, payment_status } = req.body;
+
+    if (status) {
+      if (!['pending', 'confirmed', 'active', 'completed', 'cancelled'].includes(status)) {
+        return res.status(400).json({ error: 'Invalid status.' });
+      }
+      if (status === 'confirmed' && !isOwner && !isAdmin) {
+        return res.status(403).json({ error: 'Only the provider can accept/confirm this booking.' });
+      }
+      await db.prepare(`UPDATE service_bookings SET status = ?, updated_at = NOW() WHERE id = ?`)
+        .run(status, req.params.id);
+    }
+
+    if (payment_status) {
+      await db.prepare(`UPDATE service_bookings SET payment_status = ?, updated_at = NOW() WHERE id = ?`)
+        .run(payment_status, req.params.id);
+    }
+
+    const updated = await db.prepare('SELECT * FROM service_bookings WHERE id = ?').get(req.params.id);
+    res.json({ message: 'Service booking status updated.', booking: updated });
+  } catch (err) {
+    console.error('Update service booking status error:', err);
+    res.status(500).json({ error: 'Server error updating service booking status.' });
   }
 });
 

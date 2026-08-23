@@ -3,11 +3,12 @@
    (Express server entry point)
    ═══════════════════════════════════════════ */
 
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
+require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
 
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
 const authRoutes = require('./routes/auth');
 const landRoutes = require('./routes/land');
 const equipmentRoutes = require('./routes/equipment');
@@ -115,6 +116,9 @@ async function init() {
     // (fresh installs get them from sql/schema.sql)
     await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS id_type TEXT');
     await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS id_number TEXT');
+    await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS owns_land TEXT');
+    await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS owner_type TEXT');
+    await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS equipments_owned TEXT');
     await pool.query('ALTER TABLE equipment_listings ADD COLUMN IF NOT EXISTS deposit INTEGER');
     await pool.query('ALTER TABLE equipment_listings ADD COLUMN IF NOT EXISTS hp INTEGER');
     await pool.query('ALTER TABLE equipment_listings ADD COLUMN IF NOT EXISTS attachment TEXT');
@@ -138,6 +142,10 @@ async function init() {
     // Messages can reference the listing they were sent about (for "view listing" links in chat)
     await pool.query('ALTER TABLE messages ADD COLUMN IF NOT EXISTS listing_type TEXT');
     await pool.query('ALTER TABLE messages ADD COLUMN IF NOT EXISTS listing_id BIGINT');
+    // Allow reviews for both standard bookings and service_bookings without FK conflict
+    await pool.query('ALTER TABLE reviews DROP CONSTRAINT IF EXISTS reviews_booking_id_fkey');
+    await pool.query('ALTER TABLE bookings ADD COLUMN IF NOT EXISTS rating INTEGER');
+    await pool.query('ALTER TABLE bookings ADD COLUMN IF NOT EXISTS review_comment TEXT');
     // Messages can carry an attached image (help chats, screenshots, etc.)
     await pool.query('ALTER TABLE messages ADD COLUMN IF NOT EXISTS image_url TEXT');
     // Groups the fan-out copies of a user's help message (one per admin)

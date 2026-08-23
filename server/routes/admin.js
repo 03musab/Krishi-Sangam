@@ -383,4 +383,86 @@ router.get('/help-conversations', async (req, res) => {
   }
 });
 
+/* ── GET /api/admin/reviews — All Ratings & Reviews ── */
+router.get('/reviews', async (req, res) => {
+  try {
+    const db = getDb();
+    const reviews = await db.prepare(`
+      SELECT
+        r.id,
+        r.reviewer_id,
+        r.reviewee_id,
+        r.booking_id,
+        r.rating,
+        r.comment,
+        r.created_at,
+        u1.username AS reviewer_name,
+        u1.phone AS reviewer_phone,
+        u2.username AS reviewee_name,
+        u2.role AS reviewee_role
+      FROM reviews r
+      LEFT JOIN users u1 ON r.reviewer_id = u1.id
+      LEFT JOIN users u2 ON r.reviewee_id = u2.id
+
+      UNION ALL
+
+      SELECT
+        (sb.id + 100000) AS id,
+        sb.user_id AS reviewer_id,
+        sb.owner_id AS reviewee_id,
+        sb.id AS booking_id,
+        sb.rating,
+        sb.review_comment AS comment,
+        sb.created_at,
+        u1.username AS reviewer_name,
+        u1.phone AS reviewer_phone,
+        u2.username AS reviewee_name,
+        u2.role AS reviewee_role
+      FROM service_bookings sb
+      LEFT JOIN users u1 ON sb.user_id = u1.id
+      LEFT JOIN users u2 ON sb.owner_id = u2.id
+      WHERE sb.rating IS NOT NULL
+        AND sb.id NOT IN (SELECT booking_id FROM reviews WHERE booking_id IS NOT NULL)
+
+      UNION ALL
+
+      SELECT
+        (b.id + 200000) AS id,
+        b.booker_id AS reviewer_id,
+        b.owner_id AS reviewee_id,
+        b.id AS booking_id,
+        b.rating,
+        b.review_comment AS comment,
+        b.created_at,
+        u1.username AS reviewer_name,
+        u1.phone AS reviewer_phone,
+        u2.username AS reviewee_name,
+        u2.role AS reviewee_role
+      FROM bookings b
+      LEFT JOIN users u1 ON b.booker_id = u1.id
+      LEFT JOIN users u2 ON b.owner_id = u2.id
+      WHERE b.rating IS NOT NULL
+        AND b.id NOT IN (SELECT booking_id FROM reviews WHERE booking_id IS NOT NULL)
+
+      ORDER BY created_at DESC
+    `).all();
+    res.json({ reviews });
+  } catch (err) {
+    console.error('Admin get reviews error:', err);
+    res.status(500).json({ error: 'Server error fetching reviews.' });
+  }
+});
+
+/* ── DELETE /api/admin/reviews/:id — Delete review ── */
+router.delete('/reviews/:id', async (req, res) => {
+  try {
+    const db = getDb();
+    await db.prepare('DELETE FROM reviews WHERE id = ?').run(req.params.id);
+    res.json({ message: 'Review deleted.' });
+  } catch (err) {
+    console.error('Admin delete review error:', err);
+    res.status(500).json({ error: 'Server error deleting review.' });
+  }
+});
+
 module.exports = router;

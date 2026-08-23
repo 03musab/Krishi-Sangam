@@ -74,9 +74,9 @@ export default function AboutFarmServices() {
             <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#ffedd5', color: '#c2410c', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '14px' }}>
               <Icon name="tractor" size={22} />
             </div>
-            <h3 style={{ margin: '0 0 10px 0', fontSize: '1.2rem', color: '#1e293b' }}>{t('aboutFarm.p1Title', '1. Equipment Rental ("Tractor + Operator Always")')}</h3>
+            <h3 style={{ margin: '0 0 10px 0', fontSize: '1.2rem', color: '#1e293b' }}>{t('aboutFarm.p1Title', '1. Equipment Rental ("Equipment + Operator Included")')}</h3>
             <ul style={{ paddingLeft: '18px', margin: 0, color: '#475569', lineHeight: '1.7', fontSize: '0.94rem' }}>
-              <li>{t('aboutFarm.p1L1', 'Tractors are ALWAYS supplied WITH an experienced driver/operator.')}</li>
+              <li>{t('aboutFarm.p1L1', 'All machinery and equipment are ALWAYS supplied WITH an experienced operator.')}</li>
               <li>{t('aboutFarm.p1L2', 'Filter by Horsepower (HP), Attachment (rotavator, plough, seed drill, harvester), and date.')}</li>
               <li>{t('aboutFarm.p1L3', 'Smart 25 km radius matching finds nearby available machinery.')}</li>
             </ul>

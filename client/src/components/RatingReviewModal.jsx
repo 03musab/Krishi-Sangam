@@ -6,11 +6,11 @@ import { useLanguage } from '../i18n/LanguageContext';
 export default function RatingReviewModal({ booking, isService, onClose, onSuccess }) {
   const { t } = useLanguage();
   const { showToast } = useToast();
-  const [rating, setRating] = useState(5);
-  const [comment, setComment] = useState('');
+  const [rating, setRating] = useState(booking?.rating || 5);
+  const [comment, setComment] = useState(booking?.review_comment || '');
   const [submitting, setSubmitting] = useState(false);
 
-  const revieweeId = booking?.owner_id || booking?.worker_id;
+  const revieweeId = booking?.owner_id || booking?.worker_id || booking?.provider_id || booking?.seller_id || booking?.user_id;
 
   const handleSubmit = async () => {
     if (!revieweeId) {

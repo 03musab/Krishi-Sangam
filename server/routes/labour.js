@@ -25,15 +25,35 @@ router.get('/', async (req, res) => {
       query += ` AND (l.title ILIKE ? OR l.location ILIKE ? OR l.description ILIKE ? OR l.skills ILIKE ? OR l.work_types ILIKE ?)`;
       params.push(`%${search}%`, `%${search}%`, `%${search}%`, `%${search}%`, `%${search}%`);
     }
-    if (district) { query += ` AND l.district = ?`; params.push(district); }
-    if (state) { query += ` AND l.state = ?`; params.push(state); }
+    if (district) { query += ` AND l.district ILIKE ?`; params.push(`%${district}%`); }
+    if (state) { query += ` AND l.state ILIKE ?`; params.push(`%${state}%`); }
     if (skill) { query += ` AND l.skills ILIKE ?`; params.push(`%${skill}%`); }
     if (min_rate) { query += ` AND (l.daily_rate >= ? OR l.hourly_rate >= ?)`; params.push(Number(min_rate), Number(min_rate)); }
     if (max_rate) { query += ` AND (l.daily_rate <= ? OR l.hourly_rate <= ?)`; params.push(Number(max_rate), Number(max_rate)); }
 
     query += ` ORDER BY l.created_at DESC`;
     const listings = await db.prepare(query).all(...params);
-    res.json({ listings, count: listings.length });
+
+    const { isWithinRadius } = require('../lib/geo');
+    const userLat = req.query.user_lat || req.query.lat;
+    const userLng = req.query.user_lng || req.query.lng;
+    const userLocStr = req.query.user_location || req.query.district || req.query.location;
+
+    let filteredListings = listings;
+    if (userLat || userLng || userLocStr) {
+      filteredListings = listings.filter((l) => {
+        const maxDist = l.max_distance || 25;
+        const { isWithin, distKm } = isWithinRadius(
+          { lat: userLat, lng: userLng, location: userLocStr, district: req.query.district },
+          l,
+          maxDist
+        );
+        l._distKm = distKm;
+        return isWithin;
+      });
+    }
+
+    res.json({ listings: filteredListings, count: filteredListings.length });
   } catch (err) {
     console.error('Get labour error:', err);
     res.status(500).json({ error: 'Server error.' });

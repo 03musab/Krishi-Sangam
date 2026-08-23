@@ -80,7 +80,7 @@ export default function BookEquipmentWithOperator({ onBack, onSubmitted }) {
           <button className="btn-back-icon" onClick={() => { setMatchedProviders(null); if (onBack) onBack(); }} aria-label="Back">←</button>
           <span className="service-emoji">🚜</span>
           <div>
-            <h1 className="service-booking-title">{t('equipBook.title', 'Tractor & Equipment Rental (Operator Included)')}</h1>
+            <h1 className="service-booking-title">{t('equipBook.title', 'Tractor & Equipment Rental')}</h1>
             <p className="service-booking-subtitle">{matchedProviders.length > 0
               ? t('equipBook.matchFound', { n: matchedProviders.length })
               : t('equipBook.noMatch', 'No matching providers found within 25 km.')}</p>
@@ -152,8 +152,8 @@ export default function BookEquipmentWithOperator({ onBack, onSubmitted }) {
           onChange={handleEquipmentChange}
           required
         >
-          <optgroup label="Tractor & Tillage (Driver Included)">
-            <option value="Tractor & Tillage::Tractor">Tractor (Always WITH Operator/Driver)</option>
+          <optgroup label="Tractor & Tillage">
+            <option value="Tractor & Tillage::Tractor">Tractor</option>
             <option value="Tractor & Tillage::Mini Tractor">Mini Tractor (35 HP)</option>
             <option value="Tractor & Tillage::Heavy Duty Tractor">Heavy Duty Tractor (&gt;50 HP)</option>
           </optgroup>

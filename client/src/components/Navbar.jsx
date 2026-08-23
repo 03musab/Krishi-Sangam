@@ -5,7 +5,7 @@ import { useNav } from '../context/NavContext';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { useLanguage } from '../i18n/LanguageContext';
-import { signout } from '../lib/api';
+import { signout, getUnreadCount, getIncomingBookings, getEquipmentIncoming } from '../lib/api';
 
 const NAV_ITEMS = [
   { id: 'land', labelKey: 'nav.land', view: 'land-leasing' },
@@ -55,6 +55,8 @@ export default function Navbar() {
   const [ddOpen, setDdOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
+  const [unreadMessages, setUnreadMessages] = useState(0);
+  const [pendingBookings, setPendingBookings] = useState(0);
   const langRef = useRef(null);
 
   useEffect(() => {
@@ -64,6 +66,33 @@ export default function Navbar() {
     document.addEventListener('mousedown', onClickOutside);
     return () => document.removeEventListener('mousedown', onClickOutside);
   }, []);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchNotifications = async () => {
+      try {
+        const resMsg = await getUnreadCount();
+        setUnreadMessages(resMsg.count || 0);
+      } catch (e) {}
+
+      try {
+        const [inc, eqInc] = await Promise.allSettled([getIncomingBookings(), getEquipmentIncoming()]);
+        let pendingCount = 0;
+        if (inc.status === 'fulfilled' && Array.isArray(inc.value?.bookings)) {
+          pendingCount += inc.value.bookings.filter((b) => b.status === 'pending').length;
+        }
+        if (eqInc.status === 'fulfilled' && Array.isArray(eqInc.value?.bookings)) {
+          pendingCount += eqInc.value.bookings.filter((b) => b.status === 'pending').length;
+        }
+        setPendingBookings(pendingCount);
+      } catch (e) {}
+    };
+
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 3000);
+    return () => clearInterval(interval);
+  }, [user]);
 
   const handleNav = (navItem) => {
     if (navItem.adminOnly && (!user || user.role !== 'admin')) {
@@ -85,6 +114,7 @@ export default function Navbar() {
   };
 
   const currentLang = languages.find((l) => l.code === lang) || languages[0];
+  const totalNotifications = unreadMessages + pendingBookings;
 
   return (
     <nav className="navbar">
@@ -129,17 +159,29 @@ export default function Navbar() {
                 <svg {...ICON_PROPS} width="16" height="16"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
               </span>
               <span className="nav-user-name">{user.username}</span>
+              {totalNotifications > 0 && (
+                <span className="nav-unread-badge">{totalNotifications}</span>
+              )}
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 12 15 18 9" /></svg>
             </button>
             {ddOpen && (
               <>
                 <div className="dropdown-backdrop" onClick={() => setDdOpen(false)} />
                 <div className="nav-user-dropdown">
-                  {DROPDOWN_ITEMS.map((item) => (
-                    <button key={item.id} className="nav-user-dropdown-item" onClick={() => { setDdOpen(false); navigate(item.view); }}>
-                      {item.icon} {t(item.labelKey)}
-                    </button>
-                  ))}
+                  {DROPDOWN_ITEMS.map((item) => {
+                    const itemUnread = item.id === 'messages' ? unreadMessages : item.id === 'bookings' ? pendingBookings : 0;
+                    return (
+                      <button key={item.id} className="nav-user-dropdown-item" onClick={() => { setDdOpen(false); navigate(item.view); }}>
+                        {item.icon}
+                        <span>{t(item.labelKey)}</span>
+                        {itemUnread > 0 && (
+                          <span className={`nav-dropdown-badge ${item.id === 'bookings' ? 'orange' : ''}`}>
+                            {itemUnread}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
                   {user.role === 'admin' && (
                     <button className="nav-user-dropdown-item" onClick={() => { setDdOpen(false); navigate('admin'); }}>
                       <svg {...ICON_PROPS}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg> {t('nav.adminPanel')}

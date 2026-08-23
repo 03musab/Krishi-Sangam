@@ -1,4 +1,3 @@
-import { useLanguage } from '../i18n/LanguageContext';
 import Icon from '../components/Icon';
 
 const SOIL_MAP = {
@@ -33,10 +32,10 @@ const LEASE_MAP = {
 // Normalises a raw listing row from the API into the props the
 // ListingDetailsModal expects. Used by ListingCard (cards) and Messages
 // (clickable listing links in chat) so both render listings identically.
-// NOTE: uses useLanguage() — only call this from inside a component render.
-export function listingToModalProps(listing, type) {
+// Accepts a `t` translation function to avoid calling React hooks inside
+// a non-component helper (which would break when invoked from event handlers).
+export function listingToModalProps(listing, type, t) {
   if (!listing) return null;
-  const { t } = useLanguage();
 
   const rawTitle = listing.title || listing.name || listing.crop_name || t('card.untitled');
   // Only use seed.* translations for produce/equipment — labour titles are direct
@@ -59,7 +58,7 @@ export function listingToModalProps(listing, type) {
     }
     if (listing.water_source) {
       const waterText = WATER_MAP[listing.water_source] ? t(WATER_MAP[listing.water_source]) : listing.water_source;
-      tags.push({ cls: 'tag-blue', text: <><Icon name="droplet" size={13} style={{ verticalAlign: '-2px', marginRight: '5px' }} />{waterText}</> });
+      tags.push({ cls: 'tag-blue', icon: 'droplet', text: waterText });
     }
   } else if (type === 'equipment') {
     if (listing.type) {

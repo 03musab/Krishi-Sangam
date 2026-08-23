@@ -89,8 +89,25 @@ router.get('/', async (req, res) => {
     query += ` ORDER BY s.created_at DESC`;
     const listings = await db.prepare(query).all(...params);
 
-    // Fetch review ratings stats per provider
+    const { isWithinRadius } = require('../lib/geo');
+    const userLat = req.query.user_lat || req.query.lat;
+    const userLng = req.query.user_lng || req.query.lng;
+    const userLocStr = req.query.user_location || req.query.district || req.query.location;
+
+    const filteredListings = [];
     for (const item of listings) {
+      if (userLat || userLng || userLocStr) {
+        const maxDist = item.service_area_km || item.max_distance || 25;
+        const { isWithin, distKm } = isWithinRadius(
+          { lat: userLat, lng: userLng, location: userLocStr, district: req.query.district },
+          item,
+          maxDist
+        );
+        if (!isWithin) continue;
+        item._distKm = distKm;
+      }
+
+      // Fetch review ratings stats per provider
       const stats = await db.prepare(`
         SELECT COALESCE(AVG(rating), 0) as avg_rating, COUNT(*) as total_reviews
         FROM reviews
@@ -98,9 +115,10 @@ router.get('/', async (req, res) => {
       `).get(item.provider_id);
       item.avg_rating = Math.round((stats?.avg_rating || 5) * 10) / 10;
       item.total_reviews = stats?.total_reviews || 0;
+      filteredListings.push(item);
     }
 
-    res.json({ listings, count: listings.length });
+    res.json({ listings: filteredListings, count: filteredListings.length });
   } catch (err) {
     console.error('Get agri services error:', err);
     res.status(500).json({ error: 'Server error fetching agricultural services.' });

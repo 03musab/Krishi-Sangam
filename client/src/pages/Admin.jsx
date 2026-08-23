@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import PageBanner from '../components/PageBanner';
 import Icon from '../components/Icon';
+import SkeletonLoader from '../components/SkeletonLoader';
 import { useToast } from '../context/ToastContext';
 import { useLanguage } from '../i18n/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import {
   getAdminStats, getPendingListings, approveListing, getAdminListings, deleteAdminListing,
-  getAdminUsers, updateUserRole, deleteUser, getAdminHelpConversations, getThread, sendMessage
+  getAdminUsers, updateUserRole, deleteUser, getAdminHelpConversations, getThread, sendMessage,
+  getAdminReviews, deleteAdminReview
 } from '../lib/api';
 
 const TAB_KEYS = {
@@ -14,6 +16,7 @@ const TAB_KEYS = {
   'admin-pending': 'admin.tabPending',
   'admin-manage': 'admin.tabManage',
   'admin-users': 'admin.tabUsers',
+  'admin-reviews': 'admin.tabReviews',
   'admin-help': 'admin.tabHelp'
 };
 
@@ -57,6 +60,8 @@ export default function Admin() {
   const [stats, setStats] = useState(null);
   const [pending, setPending] = useState({ land: [], equipment: [], labour: [], produce: [] });
   const [users, setUsers] = useState([]);
+  const [reviews, setReviews] = useState([]);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
 
   // Manage-listings tab state
   const [manageType, setManageType] = useState('land');
@@ -76,6 +81,13 @@ export default function Admin() {
   const loadStats = () => getAdminStats().then((d) => setStats(d.stats)).catch(() => {});
   const loadPending = () => getPendingListings().then((d) => setPending(d)).catch(() => {});
   const loadUsers = () => getAdminUsers().then((d) => setUsers(d.users)).catch(() => {});
+  const loadReviews = () => {
+    setReviewsLoading(true);
+    getAdminReviews()
+      .then((d) => setReviews(d.reviews || []))
+      .catch((err) => showToast(t('common.error', { msg: err.message })))
+      .finally(() => setReviewsLoading(false));
+  };
   const loadHelp = () => {
     setHelpLoading(true);
     getAdminHelpConversations()
@@ -121,8 +133,8 @@ export default function Admin() {
     if (tab === 'admin-pending') loadPending();
     if (tab === 'admin-manage') loadManage();
     if (tab === 'admin-users') loadUsers();
+    if (tab === 'admin-reviews') loadReviews();
     if (tab === 'admin-help') loadHelp();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab]);
 
   // Keep an open help thread fresh so new user messages appear automatically
@@ -146,7 +158,6 @@ export default function Admin() {
   // Reload the manage list whenever its type/status filters change
   useEffect(() => {
     if (tab === 'admin-manage') loadManage();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [manageType, manageStatus]);
 
   const handleApprove = async (type, id, status) => {
@@ -168,6 +179,17 @@ export default function Admin() {
       showToast(t('common.toast.deleted'));
       loadManage();
       loadStats();
+    } catch (err) {
+      showToast(t('common.error', { msg: err.message }));
+    }
+  };
+
+  const handleDeleteReview = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this review?')) return;
+    try {
+      await deleteAdminReview(id);
+      showToast(t('common.toast.deleted'));
+      loadReviews();
     } catch (err) {
       showToast(t('common.error', { msg: err.message }));
     }
@@ -297,7 +319,7 @@ export default function Admin() {
               </div>
             </div>
 
-            {manageLoading && <div className="listings-empty">{t('common.loading')}</div>}
+            {manageLoading && <SkeletonLoader type="row" count={4} />}
             {!manageLoading && !manageItems.length && <div className="listings-empty">{t('admin.noListings')}</div>}
             {!manageLoading && manageItems.map((i) => {
               const rawNm = i.title || i.name || i.crop_name || i.worker_name;
@@ -332,7 +354,7 @@ export default function Admin() {
             <div className="messages-layout" style={{ margin: '0 auto' }}>
               {/* Help requests list */}
               <div className="conversations-list">
-                {helpLoading && <div className="listings-empty">{t('common.loading')}</div>}
+                {helpLoading && <SkeletonLoader type="row" count={3} />}
                 {!helpLoading && helpConvos.length === 0 && (
                   <div className="listings-empty">{t('admin.noHelp')}</div>
                 )}
@@ -423,6 +445,64 @@ export default function Admin() {
               </div>
             ))}
             {!users.length && <div className="listings-empty">{t('admin.noUsers')}</div>}
+          </div>
+        )}
+
+        {tab === 'admin-reviews' && (
+          <div className="tab-pane">
+            <div style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0, color: '#1e293b' }}>Ratings & User Reviews</h2>
+              <span className="tag-pill tag-green" style={{ fontSize: '0.85rem' }}>Total Reviews: {reviews.length}</span>
+            </div>
+            {reviewsLoading ? (
+              <SkeletonLoader type="row" count={4} />
+            ) : reviews.length === 0 ? (
+              <div className="listings-empty">No reviews submitted yet.</div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {reviews.map((rev) => (
+                  <div key={rev.id} className="booking-card" style={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '12px', padding: '16px 20px', boxShadow: '0 2px 6px rgba(0,0,0,0.03)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '10px' }}>
+                      <div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                          <span style={{ fontSize: '1.1rem', fontWeight: 700, color: '#1e293b' }}>
+                            {rev.reviewer_name || 'Anonymous User'}
+                          </span>
+                          {rev.reviewer_phone && (
+                            <span style={{ fontSize: '0.8rem', color: '#64748b' }}>({rev.reviewer_phone})</span>
+                          )}
+                          <span style={{ fontSize: '0.85rem', color: '#94a3b8' }}>➔</span>
+                          <span style={{ fontSize: '0.95rem', fontWeight: 600, color: '#166534', background: '#dcfce7', padding: '2px 8px', borderRadius: '6px' }}>
+                            For: {rev.reviewee_name || 'Provider'} ({rev.reviewee_role || 'owner'})
+                          </span>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', margin: '6px 0' }}>
+                          <span style={{ color: '#eab308', fontSize: '1.1rem', fontWeight: 700 }}>
+                            {'★'.repeat(rev.rating)}{'☆'.repeat(5 - rev.rating)}
+                          </span>
+                          <strong style={{ fontSize: '0.9rem', color: '#334155' }}>{rev.rating} / 5 Stars</strong>
+                        </div>
+                        {rev.comment && (
+                          <p style={{ margin: '6px 0 0 0', color: '#475569', fontSize: '0.92rem', fontStyle: 'italic', background: '#f8fafc', padding: '10px 14px', borderRadius: '8px', border: '1px solid #f1f5f9' }}>
+                            "{rev.comment}"
+                          </p>
+                        )}
+                        <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '8px' }}>
+                          Submitted on: {new Date(rev.created_at).toLocaleString()}
+                        </div>
+                      </div>
+                      <button
+                        className="btn-small"
+                        style={{ background: '#dc2626', color: '#ffffff', border: 'none', borderRadius: '6px', padding: '8px 14px', fontWeight: 600, cursor: 'pointer' }}
+                        onClick={() => handleDeleteReview(rev.id)}
+                      >
+                        Delete Review
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>

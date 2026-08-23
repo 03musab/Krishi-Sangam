@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import PageBanner from '../components/PageBanner';
+import BankDetailsCard from '../components/BankDetailsCard';
 import { useLanguage } from '../i18n/LanguageContext';
 import { getMyPayments } from '../lib/api';
 
@@ -20,8 +21,14 @@ export default function Payments() {
 
   return (
     <>
-      <PageBanner title={t('pay.title')} color="emerald" />
-      <div className="tab-pane">
+      <PageBanner title={t('pay.title', 'Bank & Payments')} color="emerald" />
+      <div className="tab-pane" style={{ maxWidth: '900px', margin: '0 auto', padding: '0 16px' }}>
+        <BankDetailsCard />
+
+        <h3 style={{ marginTop: '32px', marginBottom: '14px', fontSize: '1.15rem', color: '#0f172a', fontWeight: 700 }}>
+          {t('pay.historyTitle', 'Escrow Payment Transactions')}
+        </h3>
+
         {loading && <div className="listings-empty">{t('common.loading')}</div>}
         {!loading && payments.length === 0 && <div className="listings-empty">{t('pay.noPayments')}</div>}
         {payments.map((p) => (

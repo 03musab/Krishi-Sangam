@@ -88,7 +88,10 @@ export default function ListingDetailsModal({
           {tags.length > 0 && (
             <div className="listing-tags">
               {tags.map((tag, i) => (
-                <span key={i} className={`tag-pill ${tag.cls}`}>{tag.text}</span>
+                <span key={i} className={`tag-pill ${tag.cls}`}>
+                  {tag.icon && <Icon name={tag.icon} size={13} style={{ verticalAlign: '-2px', marginRight: '5px' }} />}
+                  {tag.text}
+                </span>
               ))}
             </div>
           )}

@@ -10,10 +10,10 @@ import { useNav } from '../context/NavContext';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../i18n/LanguageContext';
 import { useLocation } from '../context/LocationContext';
-import { getEquipment, getMyBookings } from '../lib/api';
+import { getEquipment, getLabour, getMyBookings } from '../lib/api';
 import { sortListingsByProximity } from '../lib/geo';
 import { EQUIPMENT_CATEGORIES, SERVICE_CATEGORIES } from '../data/services';
-import MOCK_LABOUR from '../data/mockLabour';
+
 import { getTrustTier } from '../lib/trust';
 import Icon from '../components/Icon';
 import { FEATURES } from '../config';
@@ -39,9 +39,10 @@ export default function FarmServices() {
   const [sortedListings, setSortedListings] = useState([]);
   const deferredEqSearch = useDeferredValue(eqSearch);
 
-  // ── Labour state (mock) ──
+  // ── Labour state ──
   const [labListings, setLabListings] = useState([]);
   const [labSearch, setLabSearch] = useState('');
+  const [labLoading, setLabLoading] = useState(true);
   const [labCount, setLabCount] = useState(0);
   const [sortedLabListings, setSortedLabListings] = useState([]);
   const deferredLabSearch = useDeferredValue(labSearch);
@@ -51,6 +52,8 @@ export default function FarmServices() {
   const [bookEqGateOpen, setBookEqGateOpen] = useState(false);
   const [listEqGateOpen, setListEqGateOpen] = useState(false);
   const [listLabGateOpen, setListLabGateOpen] = useState(false);
+  const [bookAgriGateOpen, setBookAgriGateOpen] = useState(false);
+  const [listAgriGateOpen, setListAgriGateOpen] = useState(false);
 
   // ── Sub-flows ──
   const [eqBookingOpen, setEqBookingOpen] = useState(false);
@@ -89,20 +92,24 @@ export default function FarmServices() {
     return () => { cancelled = true; };
   }, [eqListings, locStatus, locCoords, locPlace]);
 
-  // ── Filter + sort labour listings (mock) ──
+  // ── Fetch real labour listings from API ──
   useEffect(() => {
-    const q = deferredLabSearch.toLowerCase().trim();
-    let filtered = MOCK_LABOUR;
-    if (q) {
-      filtered = MOCK_LABOUR.filter(
-        (l) =>
-          l.worker_name.toLowerCase().includes(q) ||
-          l.skills.toLowerCase().includes(q) ||
-          l.location.toLowerCase().includes(q)
-      );
-    }
-    setLabListings(filtered);
-    setLabCount(filtered.length);
+    let cancelled = false;
+    setLabLoading(true);
+    getLabour(deferredLabSearch ? `search=${encodeURIComponent(deferredLabSearch)}` : '')
+      .then((d) => {
+        if (cancelled) return;
+        setLabListings(d.listings || []);
+        setLabCount(d.count || (d.listings || []).length);
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setLabListings([]);
+          setLabCount(0);
+        }
+      })
+      .finally(() => { if (!cancelled) setLabLoading(false); });
+    return () => { cancelled = true; };
   }, [deferredLabSearch]);
 
   useEffect(() => {
@@ -154,12 +161,12 @@ export default function FarmServices() {
     return <BookLabourTeam onBack={() => setLabFlow({ view: 'home' })} onSubmitted={() => setLabFlow({ view: 'home' })} />;
   }
 
-  if (labFlow.view === 'service' && labFlow.category && labFlow.service) {
+  if (labFlow.view === 'general-service' || (labFlow.view === 'service' && labFlow.category && labFlow.service)) {
     return (
       <ServiceBookingForm
-        category={labFlow.category}
-        service={labFlow.service}
-        onBack={() => setLabFlow({ view: 'category', category: labFlow.category })}
+        category={labFlow.category || SERVICE_CATEGORIES[0]}
+        service={labFlow.service || SERVICE_CATEGORIES[0].services[0]}
+        onBack={() => setLabFlow({ view: 'home' })}
         onSubmitted={() => setLabFlow({ view: 'home' })}
       />
     );
@@ -210,66 +217,57 @@ export default function FarmServices() {
       <PageBanner title={t('farmServices.title')} color="green" />
 
       <div style={{
-        width: 'fit-content',
-        maxWidth: '92%',
-        margin: '12px auto 18px auto',
-        background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
-        border: '1px solid #93c5fd',
-        borderRadius: '20px',
-        padding: '6px 14px',
+        maxWidth: '1200px',
+        margin: '12px auto 6px auto',
+        padding: '0 20px',
         display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        flexWrap: 'nowrap',
-        gap: '10px',
-        boxShadow: '0 2px 6px rgba(37, 99, 235, 0.06)'
+        justifyContent: 'flex-start'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, flex: 1 }}>
+        <div style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '8px',
+          background: '#f8fafc',
+          border: '1px solid #e2e8f0',
+          borderRadius: '20px',
+          padding: '3px 12px 3px 8px',
+          fontSize: '0.78rem',
+          color: '#475569'
+        }}>
           <span style={{
-            background: '#2563eb',
-            color: '#ffffff',
-            fontSize: '0.68rem',
+            background: '#e2e8f0',
+            color: '#475569',
+            fontSize: '0.64rem',
             fontWeight: '800',
-            padding: '2px 8px',
-            borderRadius: '12px',
+            padding: '1px 6px',
+            borderRadius: '10px',
             textTransform: 'uppercase',
-            letterSpacing: '0.5px',
-            flexShrink: 0,
-            whiteSpace: 'nowrap'
+            letterSpacing: '0.4px',
+            flexShrink: 0
           }}>{t('guide.badge', 'GUIDE')}</span>
-          <span style={{
-            fontSize: '0.82rem',
-            color: '#1e3a8a',
-            fontWeight: '600',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis'
-          }}>
+          <span style={{ fontWeight: '500', color: '#64748b' }}>
             {t('farmServices.guideText', 'Want to know how farm services work on Krishi Sangam?')}
           </span>
+          <button
+            type="button"
+            onClick={() => navigate('about-farm-services')}
+            style={{
+              background: 'transparent',
+              color: '#1d4ed8',
+              border: 'none',
+              padding: '0 4px',
+              cursor: 'pointer',
+              fontSize: '0.78rem',
+              fontWeight: '700',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '2px',
+              textDecoration: 'underline'
+            }}
+          >
+            {t('farmServices.aboutBtn', 'About Farm Services →')}
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={() => navigate('about-farm-services')}
-          style={{
-            background: '#1d4ed8',
-            color: '#ffffff',
-            border: 'none',
-            padding: '4px 12px',
-            borderRadius: '14px',
-            cursor: 'pointer',
-            fontSize: '0.78rem',
-            fontWeight: '700',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '4px',
-            flexShrink: 0,
-            whiteSpace: 'nowrap',
-            transition: 'all 0.15s ease'
-          }}
-        >
-          {t('farmServices.aboutBtn', 'About Farm Services →')}
-        </button>
       </div>
 
       <LocationPrompt />
@@ -451,14 +449,17 @@ export default function FarmServices() {
               </div>
 
               <div className="listings-count-label">{t('common.count', { n: labCount, s: labCount !== 1 ? 's' : '' })}</div>
-              {labListings.length === 0 && (
+              {labLoading && <div className="listings-empty">{t('common.loading')}</div>}
+              {!labLoading && labListings.length === 0 && (
                 <div className="listings-empty">{labSearch ? t('labour.noWorkersFilter', { q: labSearch }) : t('labour.noWorkers')}</div>
               )}
+              {!labLoading && sortedLabListings.length > 0 && (
               <div className="grid-cards-2col">
                 {sortedLabListings.map((l) => (
                   <ListingCard key={l.id} listing={l} type="labour" trustTier={tier} />
                 ))}
               </div>
+              )}
             </div>
           )}
         </div>
@@ -480,6 +481,27 @@ export default function FarmServices() {
           </div>
 
           <div className="farm-card-divider" />
+
+          <div className="farm-service-actions">
+            <button
+              className="farm-service-btn farm-service-btn-primary"
+              onClick={() => {
+                if (!user) { setBookAgriGateOpen(true); return; }
+                setLabFlow({ view: 'general-service' });
+              }}
+            >
+              {t('farmServices.book')}
+            </button>
+            <button
+              className="farm-service-btn farm-service-btn-secondary"
+              onClick={() => {
+                if (!user) { setListAgriGateOpen(true); return; }
+                navigate('list-agri-service');
+              }}
+            >
+              {t('farmServices.list')}
+            </button>
+          </div>
 
           <button className="farm-browse-toggle" onClick={() => setAgriBrowseOpen((o) => !o)}>
             <span className="farm-browse-toggle-left">
@@ -542,6 +564,20 @@ export default function FarmServices() {
           title={t('farmServices.list')}
           description={t('gate.labourDesc')}
           onClose={() => setListLabGateOpen(false)}
+        />
+      )}
+      {bookAgriGateOpen && (
+        <AuthGateModal
+          title={t('farmServices.book')}
+          description={t('gate.labourDesc')}
+          onClose={() => setBookAgriGateOpen(false)}
+        />
+      )}
+      {listAgriGateOpen && (
+        <AuthGateModal
+          title={t('farmServices.list')}
+          description={t('gate.listDesc')}
+          onClose={() => setListAgriGateOpen(false)}
         />
       )}
     </>

@@ -72,7 +72,7 @@ export default function ListEquipment() {
         <div className="form-group">
           <label className="form-label">{t('equip.type', 'Equipment Category')} *</label>
           <select className="form-select" value={form.type} onChange={set('type')} required>
-            <option value="Tractor">Tractor (Always WITH Operator)</option>
+            <option value="Tractor">Tractor</option>
             <option value="Harvester">Combine Harvester</option>
             <option value="Sprayer">Tractor / Drone Sprayer</option>
             <option value="Rotavator">Rotavator</option>
@@ -146,20 +146,7 @@ export default function ListEquipment() {
         </div>
       </div>
 
-      <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', marginBottom: '16px' }}>
-        <label className="form-checkbox-group">
-          <input
-            type="checkbox"
-            className="form-checkbox"
-            checked={isTractor || form.with_operator}
-            disabled={isTractor}
-            onChange={(e) => setForm({ ...form, with_operator: e.target.checked })}
-          />
-          <span className="form-checkbox-text" style={{ fontWeight: '600', color: '#1e293b' }}>
-            🚜 Driver / Operator Included {isTractor ? '(Always Required for Tractors)' : ''}
-          </span>
-        </label>
-      </div>
+
 
       <div className="form-group">
         <label className="form-label">{t('equip.description', 'Description & Operating Details')}</label>

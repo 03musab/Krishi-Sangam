@@ -48,7 +48,7 @@ export default function ListingCard({ listing, type, onBook, trustTier }) {
     });
   };
 
-  const modalProps = listingToModalProps(listing, type);
+  const modalProps = listingToModalProps(listing, type, t);
   const price = modalProps.price;
   const title = modalProps.title;
   const location = modalProps.location;
@@ -84,9 +84,7 @@ export default function ListingCard({ listing, type, onBook, trustTier }) {
         ) : (
           <div className="listing-img-placeholder" style={{ background: accent }}><Icon name={placeholderIcon} size={52} /></div>
         )}
-        {type === 'equipment' && listing.with_operator ? (
-          <span className="listing-badge"><Icon name="user" size={12} style={{ verticalAlign: '-1px', marginRight: '5px' }} />{t('card.withOperator')}</span>
-        ) : null}
+
       </div>
       <div className="listing-body">
         <h3 className="listing-title">{escapeHtml(title)}</h3>
@@ -96,7 +94,10 @@ export default function ListingCard({ listing, type, onBook, trustTier }) {
         <div className="listing-tags">
           {listing._nearby && <span className="tag-pill tag-green">{t('loc.near')}</span>}
           {tags.map((t, i) => (
-            <span key={i} className={`tag-pill ${t.cls}`}>{t.text}</span>
+            <span key={i} className={`tag-pill ${t.cls}`}>
+              {t.icon && <Icon name={t.icon} size={13} style={{ verticalAlign: '-2px', marginRight: '5px' }} />}
+              {t.text}
+            </span>
           ))}
         </div>
         {type === 'equipment' && Number(listing.deposit) > 0 && (
