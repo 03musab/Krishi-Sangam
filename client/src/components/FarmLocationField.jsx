@@ -2,30 +2,50 @@ import { useEffect, useRef, useState } from 'react';
 import { useLanguage } from '../i18n/LanguageContext';
 import Icon from './Icon';
 
+function extractDistrict(address) {
+  if (!address) return '';
+  let d =
+    address.state_district ||
+    address.district ||
+    address.county ||
+    address.city_district ||
+    address.city ||
+    '';
+  return d.replace(/\s+District$/i, '').trim();
+}
+
+function extractState(address) {
+  if (!address) return '';
+  return (address.state || '').trim();
+}
+
 // Reverse geocode with OpenStreetMap's free Nominatim API (no key required).
-// Returns a short "Village, Taluka, State" style address, or '' on failure.
+// Returns location text, district, and state.
 async function reverseGeocode(lat, lng) {
   try {
     const url =
       `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}` +
       '&zoom=16&addressdetails=1&accept-language=en';
     const res = await fetch(url, { headers: { Accept: 'application/json' } });
-    if (!res.ok) return '';
+    if (!res.ok) return { text: '', district: '', state: '' };
     const data = await res.json();
-    if (!data || !data.address) return '';
+    if (!data || !data.address) return { text: '', district: '', state: '' };
     const a = data.address;
+    const district = extractDistrict(a);
+    const state = extractState(a);
     const parts = [
       a.village || a.town || a.city || a.suburb || a.municipality || a.hamlet || a.locality,
-      a.district || a.county || a.municipality,
-      a.state
+      district,
+      state
     ].filter(Boolean);
-    return parts.join(', ') || data.display_name || '';
+    const text = parts.join(', ') || data.display_name || '';
+    return { text, district, state, lat, lng };
   } catch {
-    return '';
+    return { text: '', district: '', state: '' };
   }
 }
 
-export default function FarmLocationField({ value, onChange, onCoords }) {
+export default function FarmLocationField({ value, onChange, onCoords, onDetails }) {
   const { t } = useLanguage();
   const [coords, setCoords] = useState(null);
   const [showMap, setShowMap] = useState(false);
@@ -34,15 +54,64 @@ export default function FarmLocationField({ value, onChange, onCoords }) {
   const [mapError, setMapError] = useState('');
   const mapContainerRef = useRef(null);
 
-  // Set coordinates AND auto-fill the location text from the map — no typing needed.
+  // Set coordinates AND auto-fill the location text, district & state
   const applyLocation = async (lat, lng) => {
     const next = { lat, lng };
     setCoords(next);
     if (onCoords) onCoords(next);
     setResolving(true);
-    const place = await reverseGeocode(lat, lng);
+    const info = await reverseGeocode(lat, lng);
     setResolving(false);
-    if (place) onChange(place);
+    if (info.text) onChange(info.text, next, info);
+    if (onDetails) onDetails(info);
+  };
+
+  const handleBlur = async () => {
+    if (!value || !value.trim() || !onDetails) return;
+
+    // 1. Check if input is comma-separated e.g. "Dindori, Nashik, Maharashtra"
+    const parts = value.split(',').map((s) => s.trim()).filter(Boolean);
+    let parsedDistrict = '';
+    let parsedState = '';
+    if (parts.length >= 3) {
+      parsedState = parts[parts.length - 1];
+      parsedDistrict = parts[parts.length - 2];
+    } else if (parts.length === 2) {
+      parsedState = parts[1];
+      parsedDistrict = parts[0];
+    }
+
+    if (parsedDistrict || parsedState) {
+      onDetails({ district: parsedDistrict, state: parsedState });
+    }
+
+    // 2. Query Nominatim to resolve district and state if available
+    try {
+      const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&q=${encodeURIComponent(value.trim())}&addressdetails=1&limit=1&countrycodes=in&accept-language=en`;
+      const res = await fetch(url, { headers: { Accept: 'application/json' } });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.length > 0 && data[0].address) {
+          const a = data[0].address;
+          const geoDistrict = extractDistrict(a);
+          const geoState = extractState(a);
+          if (geoDistrict || geoState) {
+            const nextCoords = { lat: Number(data[0].lat), lng: Number(data[0].lon) };
+            onDetails({
+              district: geoDistrict || parsedDistrict,
+              state: geoState || parsedState,
+              ...nextCoords
+            });
+            if (onCoords) {
+              setCoords(nextCoords);
+              onCoords(nextCoords);
+            }
+          }
+        }
+      }
+    } catch {
+      // ignore network errors
+    }
   };
 
   const handleLocate = () => {
@@ -149,6 +218,7 @@ export default function FarmLocationField({ value, onChange, onCoords }) {
         placeholder={t('field.villageTaluka')}
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        onBlur={handleBlur}
         disabled={resolving}
         required
       />

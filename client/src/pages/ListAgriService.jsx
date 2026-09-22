@@ -176,28 +176,37 @@ export default function ListAgriService() {
           setForm((prev) => ({ ...prev, location: val }));
           if (newCoords) setCoords(newCoords);
         }}
+        onDetails={({ district, state }) => {
+          setForm((prev) => ({
+            ...prev,
+            district: district || prev.district,
+            state: state || prev.state
+          }));
+        }}
       />
 
       <div className="form-grid-row">
         <div className="form-group">
-          <label className="form-label">District</label>
+          <label className="form-label">District *</label>
           <input
             type="text"
             className="form-input"
             placeholder="e.g. Nashik, Pune"
             value={form.district}
             onChange={set('district')}
+            required
           />
         </div>
 
         <div className="form-group">
-          <label className="form-label">State</label>
+          <label className="form-label">State *</label>
           <input
             type="text"
             className="form-input"
             placeholder="e.g. Maharashtra"
             value={form.state}
             onChange={set('state')}
+            required
           />
         </div>
       </div>

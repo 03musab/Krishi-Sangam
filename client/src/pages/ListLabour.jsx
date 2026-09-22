@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import FormCard from '../components/FormCard';
+import FarmLocationField from '../components/FarmLocationField';
 import { useNav } from '../context/NavContext';
 import { useToast } from '../context/ToastContext';
 import { useLanguage } from '../i18n/LanguageContext';
@@ -9,14 +10,20 @@ export default function ListLabour() {
   const { navigate } = useNav();
   const { showToast } = useToast();
   const { t } = useLanguage();
+  const [coords, setCoords] = useState(null);
   const [form, setForm] = useState({
     title: '', skills: '', experience_years: '', daily_rate: '', location: '', description: '',
-    team_size: '', max_distance: '25', crop_experience: '', work_types: ''
+    team_size: '', max_distance: '25', crop_experience: '', work_types: '',
+    district: '', state: ''
   });
 
   const set = (key) => (e) => setForm({ ...form, [key]: e.target.value });
 
   const handleSubmit = async () => {
+    if (!form.district?.trim() || !form.state?.trim()) {
+      showToast(t('common.error', { msg: 'District and State are required.' }));
+      return;
+    }
     try {
       await createLabour({
         title: form.title,
@@ -24,6 +31,10 @@ export default function ListLabour() {
         experience_years: form.experience_years ? Number(form.experience_years) : 0,
         daily_rate: form.daily_rate ? Number(form.daily_rate) : null,
         location: form.location,
+        district: form.district.trim(),
+        state: form.state.trim(),
+        lat: coords?.lat || null,
+        lng: coords?.lng || null,
         team_size: form.team_size ? Number(form.team_size) : null,
         max_distance: form.max_distance ? Number(form.max_distance) : 25,
         crop_experience: form.crop_experience || null,
@@ -84,9 +95,42 @@ export default function ListLabour() {
         </div>
       </div>
 
-      <div className="form-group">
-        <label className="form-label">{t('labour.location', 'Location / Village')} *</label>
-        <input type="text" className="form-input" placeholder="e.g. Baramati, Pune" value={form.location} onChange={set('location')} required />
+      <FarmLocationField
+        value={form.location}
+        onChange={(v) => setForm((prev) => ({ ...prev, location: v }))}
+        onCoords={setCoords}
+        onDetails={({ district, state }) => {
+          setForm((prev) => ({
+            ...prev,
+            district: district || prev.district,
+            state: state || prev.state
+          }));
+        }}
+      />
+
+      <div className="form-grid-row">
+        <div className="form-group">
+          <label className="form-label">{t('auth.district', 'District')} *</label>
+          <input
+            type="text"
+            className="form-input"
+            placeholder="e.g. Nashik"
+            value={form.district}
+            onChange={set('district')}
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label className="form-label">{t('auth.state', 'State')} *</label>
+          <input
+            type="text"
+            className="form-input"
+            placeholder="e.g. Maharashtra"
+            value={form.state}
+            onChange={set('state')}
+            required
+          />
+        </div>
       </div>
 
       <div className="form-group">

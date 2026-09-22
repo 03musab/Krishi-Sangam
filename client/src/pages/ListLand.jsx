@@ -14,24 +14,78 @@ export default function ListLand() {
   const { t } = useLanguage();
   const [photoUrl, setPhotoUrl] = useState(null);
   const [form, setForm] = useState({
-    title: '', area_acres: '', lease_type: 'Per Season', price_per_season: '',
-    price_per_year: '', location: '', district: '', state: '',
+    title: '', area_acres: '', lease_type: 'Per Season',
+    price_per_season: '', price_per_month: '', price_per_year: '',
+    location: '', district: '', state: '',
     soil_type: 'Black Soil', water_source: 'Borewell', description: ''
   });
 
   const set = (key) => (e) => setForm({ ...form, [key]: e.target.value });
 
+  const getPriceConfig = () => {
+    switch (form.lease_type) {
+      case 'Per Month':
+        return {
+          key: 'price_per_month',
+          label: t('land.priceMonth', 'Price per Month (₹)'),
+          placeholder: 'e.g. 5000'
+        };
+      case 'Per Year':
+        return {
+          key: 'price_per_year',
+          label: t('land.priceYear', 'Price per Year (₹)'),
+          placeholder: 'e.g. 50000'
+        };
+      case 'Per Season':
+      default:
+        return {
+          key: 'price_per_season',
+          label: t('land.priceSeason', 'Price per Season (₹)'),
+          placeholder: 'e.g. 25000'
+        };
+    }
+  };
+
+  const priceConfig = getPriceConfig();
+
+  const handleLeaseTypeChange = (e) => {
+    const newType = e.target.value;
+    setForm((prev) => {
+      const currentPrice =
+        prev.lease_type === 'Per Month'
+          ? prev.price_per_month
+          : prev.lease_type === 'Per Year'
+          ? prev.price_per_year
+          : prev.price_per_season;
+
+      const updated = { ...prev, lease_type: newType };
+      if (newType === 'Per Month' && !updated.price_per_month && currentPrice) {
+        updated.price_per_month = currentPrice;
+      } else if (newType === 'Per Year' && !updated.price_per_year && currentPrice) {
+        updated.price_per_year = currentPrice;
+      } else if (newType === 'Per Season' && !updated.price_per_season && currentPrice) {
+        updated.price_per_season = currentPrice;
+      }
+      return updated;
+    });
+  };
+
   const handleSubmit = async () => {
+    if (!form.district?.trim() || !form.state?.trim()) {
+      showToast(t('common.error', { msg: 'District and State are required.' }));
+      return;
+    }
     try {
       await createLand({
         title: form.title,
         area_acres: Number(form.area_acres),
         lease_type: form.lease_type,
-        price_per_season: form.price_per_season ? Number(form.price_per_season) : null,
-        price_per_year: form.price_per_year ? Number(form.price_per_year) : null,
+        price_per_season: form.lease_type === 'Per Season' && form.price_per_season ? Number(form.price_per_season) : null,
+        price_per_month: form.lease_type === 'Per Month' && form.price_per_month ? Number(form.price_per_month) : null,
+        price_per_year: form.lease_type === 'Per Year' && form.price_per_year ? Number(form.price_per_year) : null,
         location: form.location,
-        district: form.district || null,
-        state: form.state || null,
+        district: form.district.trim(),
+        state: form.state.trim(),
         soil_type: form.soil_type,
         water_source: form.water_source,
         description: form.description || null,
@@ -66,30 +120,58 @@ export default function ListLand() {
         />
         <div className="form-group">
           <label className="form-label">{t('land.leaseType')}</label>
-          <select className="form-select" value={form.lease_type} onChange={set('lease_type')}>
-            <option>{t('land.perSeason')}</option><option>{t('land.perMonth')}</option><option>{t('land.perYear')}</option>
+          <select className="form-select" value={form.lease_type} onChange={handleLeaseTypeChange}>
+            <option value="Per Season">{t('land.perSeason')}</option>
+            <option value="Per Month">{t('land.perMonth')}</option>
+            <option value="Per Year">{t('land.perYear')}</option>
           </select>
         </div>
       </div>
       <div className="form-grid-row">
         <div className="form-group">
-          <label className="form-label">{t('land.priceSeason')}</label>
-          <input type="number" className="form-input" placeholder="e.g. 25000" value={form.price_per_season} onChange={set('price_per_season')} />
-        </div>
-        <div className="form-group">
-          <label className="form-label">{t('land.priceYear')}</label>
-          <input type="number" className="form-input" placeholder="e.g. 50000" value={form.price_per_year} onChange={set('price_per_year')} />
+          <label className="form-label">{priceConfig.label}</label>
+          <input
+            type="number"
+            className="form-input"
+            placeholder={priceConfig.placeholder}
+            value={form[priceConfig.key]}
+            onChange={(e) => setForm({ ...form, [priceConfig.key]: e.target.value })}
+          />
         </div>
       </div>
-      <FarmLocationField value={form.location} onChange={(v) => setForm({ ...form, location: v })} />
+      <FarmLocationField
+        value={form.location}
+        onChange={(v) => setForm((prev) => ({ ...prev, location: v }))}
+        onDetails={({ district, state }) => {
+          setForm((prev) => ({
+            ...prev,
+            district: district || prev.district,
+            state: state || prev.state
+          }));
+        }}
+      />
       <div className="form-grid-row">
         <div className="form-group">
-          <label className="form-label">{t('auth.district')}</label>
-          <input type="text" className="form-input" value={form.district} onChange={set('district')} />
+          <label className="form-label">{t('auth.district')} *</label>
+          <input
+            type="text"
+            className="form-input"
+            placeholder="e.g. Nashik"
+            value={form.district}
+            onChange={set('district')}
+            required
+          />
         </div>
         <div className="form-group">
-          <label className="form-label">{t('auth.state')}</label>
-          <input type="text" className="form-input" value={form.state} onChange={set('state')} />
+          <label className="form-label">{t('auth.state')} *</label>
+          <input
+            type="text"
+            className="form-input"
+            placeholder="e.g. Maharashtra"
+            value={form.state}
+            onChange={set('state')}
+            required
+          />
         </div>
       </div>
       <div className="form-grid-row">

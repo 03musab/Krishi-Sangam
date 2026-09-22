@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import FormCard from '../components/FormCard';
 import PhotoUpload from '../components/PhotoUpload';
+import FarmLocationField from '../components/FarmLocationField';
 import { useNav } from '../context/NavContext';
 import { useToast } from '../context/ToastContext';
 import { useLanguage } from '../i18n/LanguageContext';
@@ -21,6 +22,14 @@ export default function ListEquipment() {
   const set = (key) => (e) => setForm({ ...form, [key]: e.target.value });
 
   const handleSubmit = async () => {
+    if (!form.brand?.trim() || !form.model?.trim() || !form.year || !form.hp || !form.registration_number?.trim()) {
+      showToast(t('common.error', { msg: 'Brand, Model, Year, Horsepower, and Registration Number are required.' }));
+      return;
+    }
+    if (!form.district?.trim() || !form.state?.trim()) {
+      showToast(t('common.error', { msg: 'District and State are required.' }));
+      return;
+    }
     try {
       const isTractor = String(form.type).toLowerCase().includes('tractor') || String(form.name).toLowerCase().includes('tractor');
       await createEquipment({
@@ -30,15 +39,15 @@ export default function ListEquipment() {
         price_per_day: form.price_per_day ? Number(form.price_per_day) : null,
         deposit: form.deposit ? Number(form.deposit) : null,
         location: form.location,
-        district: form.district || null,
-        state: form.state || null,
+        district: form.district.trim(),
+        state: form.state.trim(),
         with_operator: isTractor ? true : form.with_operator,
         hp: form.hp ? Number(form.hp) : null,
         attachment: form.attachment || null,
-        brand: form.brand || null,
-        model: form.model || null,
+        brand: form.brand.trim(),
+        model: form.model.trim(),
         year: form.year ? Number(form.year) : null,
-        registration_number: form.registration_number || null,
+        registration_number: form.registration_number.trim(),
         attachments_list: form.attachments_list || form.attachment || null,
         max_distance: form.max_distance ? Number(form.max_distance) : 25,
         description: form.description || null,
@@ -85,14 +94,36 @@ export default function ListEquipment() {
 
       <div className="form-grid-row">
         <div className="form-group">
-          <label className="form-label">Brand / Make</label>
-          <input type="text" className="form-input" placeholder="e.g. Mahindra, Swaraj, John Deere" value={form.brand} onChange={set('brand')} />
+          <label className="form-label">{t('equip.brand', 'Brand / Make')} *</label>
+          <input
+            type="text"
+            className="form-input"
+            placeholder="e.g. Mahindra, Swaraj, John Deere"
+            value={form.brand}
+            onChange={set('brand')}
+            required
+          />
         </div>
         <div className="form-group">
-          <label className="form-label">Model Name & Year</label>
+          <label className="form-label">{t('equip.modelYear', 'Model Name & Year')} *</label>
           <div style={{ display: 'flex', gap: '8px' }}>
-            <input type="text" className="form-input" placeholder="e.g. 575 DI" value={form.model} onChange={set('model')} />
-            <input type="number" className="form-input" placeholder="e.g. 2022" style={{ width: '100px' }} value={form.year} onChange={set('year')} />
+            <input
+              type="text"
+              className="form-input"
+              placeholder="e.g. 575 DI"
+              value={form.model}
+              onChange={set('model')}
+              required
+            />
+            <input
+              type="number"
+              className="form-input"
+              placeholder="e.g. 2022"
+              style={{ width: '100px' }}
+              value={form.year}
+              onChange={set('year')}
+              required
+            />
           </div>
         </div>
       </div>
@@ -100,11 +131,25 @@ export default function ListEquipment() {
       <div className="form-grid-row">
         <div className="form-group">
           <label className="form-label">{t('equip.hp', 'Horsepower (HP)')} *</label>
-          <input type="number" className="form-input" placeholder="e.g. 45" value={form.hp} onChange={set('hp')} />
+          <input
+            type="number"
+            className="form-input"
+            placeholder="e.g. 45"
+            value={form.hp}
+            onChange={set('hp')}
+            required
+          />
         </div>
         <div className="form-group">
-          <label className="form-label">Registration / RTO Number</label>
-          <input type="text" className="form-input" placeholder="e.g. MH-12-AB-1234" value={form.registration_number} onChange={set('registration_number')} />
+          <label className="form-label">{t('equip.registrationNumber', 'Registration / RTO Number')} *</label>
+          <input
+            type="text"
+            className="form-input"
+            placeholder="e.g. MH-12-AB-1234"
+            value={form.registration_number}
+            onChange={set('registration_number')}
+            required
+          />
         </div>
       </div>
 
@@ -130,19 +175,40 @@ export default function ListEquipment() {
         </div>
       </div>
 
-      <div className="form-group">
-        <label className="form-label">{t('equip.location', 'Farm / Base Location')} *</label>
-        <input type="text" className="form-input" placeholder="Village, Taluka, City" value={form.location} onChange={set('location')} required />
-      </div>
+      <FarmLocationField
+        value={form.location}
+        onChange={(v) => setForm((prev) => ({ ...prev, location: v }))}
+        onDetails={({ district, state }) => {
+          setForm((prev) => ({
+            ...prev,
+            district: district || prev.district,
+            state: state || prev.state
+          }));
+        }}
+      />
 
       <div className="form-grid-row">
         <div className="form-group">
-          <label className="form-label">{t('auth.district', 'District')}</label>
-          <input type="text" className="form-input" value={form.district} onChange={set('district')} />
+          <label className="form-label">{t('auth.district', 'District')} *</label>
+          <input
+            type="text"
+            className="form-input"
+            placeholder="e.g. Nashik"
+            value={form.district}
+            onChange={set('district')}
+            required
+          />
         </div>
         <div className="form-group">
-          <label className="form-label">{t('auth.state', 'State')}</label>
-          <input type="text" className="form-input" value={form.state} onChange={set('state')} />
+          <label className="form-label">{t('auth.state', 'State')} *</label>
+          <input
+            type="text"
+            className="form-input"
+            placeholder="e.g. Maharashtra"
+            value={form.state}
+            onChange={set('state')}
+            required
+          />
         </div>
       </div>
 
