@@ -14,6 +14,7 @@ export default function AboutFarmServices() {
       <PageBanner
         title={t('aboutFarm.bannerTitle', 'About Farm Services')}
         color="green"
+        backTo="farm-services"
       />
 
       <div style={{ maxWidth: '1080px', margin: '0 auto', padding: '0 20px' }}>

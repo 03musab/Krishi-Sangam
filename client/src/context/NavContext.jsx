@@ -80,6 +80,7 @@ export function NavProvider({ children }) {
     historyRef.current = historyRef.current.slice(0, -1);
     viewRef.current = prev;
     setCanGoBack(historyRef.current.length > 0);
+    window.history.replaceState(null, '', '#' + prev);
     startTransition(() => setView(prev));
     scrollTop();
   }, [navigate, scrollTop]);

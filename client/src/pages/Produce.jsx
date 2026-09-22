@@ -60,7 +60,7 @@ export default function Produce() {
 
   return (
     <>
-      <PageBanner title={t('produce.title')} color="amber" actionLabel={t('produce.action')} onAction={() => {
+      <PageBanner title={t('produce.title')} color="amber" backTo="home" actionLabel={t('produce.action')} onAction={() => {
         if (!user) { setGateOpen(true); return; }
         navigate('list-produce');
       }} />

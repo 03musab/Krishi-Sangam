@@ -60,7 +60,7 @@ export default function LandLeasing() {
 
   return (
     <>
-      <PageBanner title={t('land.title')} color="green" actionLabel={t('land.action')} onAction={() => {
+      <PageBanner title={t('land.title')} color="green" backTo="home" actionLabel={t('land.action')} onAction={() => {
         if (!user) { setGateOpen(true); return; }
         navigate('list-land');
       }} />

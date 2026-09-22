@@ -14,6 +14,7 @@ export default function AboutLandLeasing() {
       <PageBanner
         title={t('aboutLand.bannerTitle', 'About Land Leasing')}
         color="green"
+        backTo="land-leasing"
       />
 
       <div style={{ maxWidth: '1080px', margin: '0 auto', padding: '0 20px' }}>

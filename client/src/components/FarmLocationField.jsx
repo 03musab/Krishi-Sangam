@@ -51,8 +51,12 @@ export default function FarmLocationField({ value, onChange, onCoords, onDetails
   const [showMap, setShowMap] = useState(false);
   const [locating, setLocating] = useState(false);
   const [resolving, setResolving] = useState(false);
+  const [searching, setSearching] = useState(false);
+  const [mapSearch, setMapSearch] = useState('');
   const [mapError, setMapError] = useState('');
   const mapContainerRef = useRef(null);
+  const mapRef = useRef(null);
+  const markerRef = useRef(null);
 
   // Set coordinates AND auto-fill the location text, district & state
   const applyLocation = async (lat, lng) => {
@@ -116,66 +120,212 @@ export default function FarmLocationField({ value, onChange, onCoords, onDetails
 
   const handleLocate = () => {
     if (!navigator.geolocation) {
-      setMapError(t('field.geoError'));
+      setMapError(t('field.geoError', 'Geolocation is not supported by your browser.'));
       return;
     }
     setLocating(true);
     setMapError('');
+
+    // Request high accuracy GPS first (triangulates WiFi/Cell towers/GPS instead of IP)
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        applyLocation(pos.coords.latitude, pos.coords.longitude);
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        applyLocation(lat, lng);
         setLocating(false);
         setShowMap(true);
+        if (mapRef.current) {
+          mapRef.current.flyTo([lat, lng], 14);
+          if (markerRef.current) {
+            markerRef.current.setLatLng([lat, lng]);
+          }
+        }
       },
-      () => {
-        setLocating(false);
-        setMapError(t('field.geoFail'));
+      (err) => {
+        // Fallback to standard accuracy if high-accuracy timed out
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
+            applyLocation(lat, lng);
+            setLocating(false);
+            setShowMap(true);
+            if (mapRef.current) {
+              mapRef.current.flyTo([lat, lng], 13);
+              if (markerRef.current) {
+                markerRef.current.setLatLng([lat, lng]);
+              }
+            }
+          },
+          () => {
+            setLocating(false);
+            setMapError('Could not detect exact GPS location. Please search your village or click on the map.');
+            setShowMap(true);
+          },
+          { enableHighAccuracy: false, timeout: 6000 }
+        );
       },
-      { timeout: 8000 }
+      { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
     );
   };
+
+  const handleMapSearch = async () => {
+    const query = (mapSearch || value || '').trim();
+    if (!query) return;
+    setSearching(true);
+    setMapError('');
+    try {
+      const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&q=${encodeURIComponent(query)}&addressdetails=1&limit=1&countrycodes=in&accept-language=en`;
+      const res = await fetch(url, { headers: { Accept: 'application/json' } });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.length > 0) {
+          const lat = parseFloat(data[0].lat);
+          const lng = parseFloat(data[0].lon);
+          applyLocation(lat, lng);
+          if (mapRef.current) {
+            mapRef.current.flyTo([lat, lng], 14);
+            if (markerRef.current) {
+              markerRef.current.setLatLng([lat, lng]);
+            }
+          }
+          setSearching(false);
+          return;
+        }
+      }
+      setMapError(`Location "${query}" not found. Please try adding your district name.`);
+    } catch {
+      setMapError('Failed to search location. Please check your internet connection.');
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  // Synchronize Leaflet map when coords change
+  useEffect(() => {
+    if (!coords || !mapRef.current) return;
+    if (markerRef.current) {
+      markerRef.current.setLatLng([coords.lat, coords.lng]);
+    } else if (window.L) {
+      const pinIcon = window.L.divIcon({
+        className: 'custom-map-pin',
+        html: '<div style="font-size:34px;line-height:1;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.4));cursor:grab;transform:translate(-50%,-100%);">📍</div>',
+        iconSize: [34, 34],
+        iconAnchor: [17, 34]
+      });
+      const marker = window.L.marker([coords.lat, coords.lng], {
+        icon: pinIcon,
+        draggable: true
+      }).addTo(mapRef.current);
+      markerRef.current = marker;
+      marker.on('dragend', () => {
+        const pos = marker.getLatLng();
+        applyLocation(pos.lat, pos.lng);
+      });
+    }
+  }, [coords]);
 
   useEffect(() => {
     if (!showMap || !mapContainerRef.current) return;
 
-    let mapInstance = null;
-    let markerInstance = null;
+    const initLeaflet = async () => {
+      if (!window.L || !mapContainerRef.current || mapRef.current) return;
 
-    const initLeaflet = () => {
-      if (!window.L || !mapContainerRef.current) return;
-      const initialLat = coords?.lat || 19.0760;
-      const initialLng = coords?.lng || 73.8777;
+      let initialLat = coords?.lat;
+      let initialLng = coords?.lng;
+      let initialZoom = 13;
+      let hasPin = !!(initialLat && initialLng);
+
+      // If no coords but text is typed into the input, center the map on that text
+      if (!hasPin && value && value.trim().length > 2) {
+        try {
+          const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&q=${encodeURIComponent(value.trim())}&limit=1&countrycodes=in&accept-language=en`;
+          const res = await fetch(url, { headers: { Accept: 'application/json' } });
+          if (res.ok) {
+            const data = await res.json();
+            if (data && data.length > 0) {
+              initialLat = parseFloat(data[0].lat);
+              initialLng = parseFloat(data[0].lon);
+              initialZoom = 13;
+              hasPin = true;
+              setCoords({ lat: initialLat, lng: initialLng });
+            }
+          }
+        } catch { /* ignore */ }
+      }
+
+      // Check localStorage for saved location
+      if (!hasPin) {
+        try {
+          const saved = JSON.parse(localStorage.getItem('krishi_location')) || JSON.parse(localStorage.getItem('krishisangam_location'));
+          if (saved && typeof saved.lat === 'number' && typeof saved.lng === 'number') {
+            initialLat = saved.lat;
+            initialLng = saved.lng;
+            initialZoom = 12;
+            hasPin = true;
+            setCoords({ lat: initialLat, lng: initialLng });
+          }
+        } catch { /* ignore */ }
+      }
+
+      // Default to general Maharashtra center zoom 7 (overview) instead of arbitrary remote Pune coordinates
+      if (!initialLat || !initialLng) {
+        initialLat = 19.7515;
+        initialLng = 75.7139;
+        initialZoom = 7;
+        hasPin = false;
+      }
 
       try {
-        mapInstance = window.L.map(mapContainerRef.current).setView([initialLat, initialLng], 12);
+        const map = window.L.map(mapContainerRef.current).setView([initialLat, initialLng], initialZoom);
+        mapRef.current = map;
 
         window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           maxZoom: 19,
-          attribution: '&copy; OpenStreetMap contributors | Mappls Engine'
-        }).addTo(mapInstance);
+          attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
 
         const pinIcon = window.L.divIcon({
           className: 'custom-map-pin',
-          html: '<div style="font-size:32px;line-height:1;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.35));cursor:grab;">📍</div>',
-          iconSize: [32, 32],
-          iconAnchor: [16, 32]
+          html: '<div style="font-size:34px;line-height:1;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.4));cursor:grab;transform:translate(-50%,-100%);">📍</div>',
+          iconSize: [34, 34],
+          iconAnchor: [17, 34]
         });
 
-        markerInstance = window.L.marker([initialLat, initialLng], {
-          icon: pinIcon,
-          draggable: true
-        }).addTo(mapInstance);
+        if (hasPin) {
+          const marker = window.L.marker([initialLat, initialLng], {
+            icon: pinIcon,
+            draggable: true
+          }).addTo(map);
+          markerRef.current = marker;
 
-        markerInstance.on('dragend', () => {
-          const pos = markerInstance.getLatLng();
-          applyLocation(pos.lat, pos.lng);
-        });
+          marker.on('dragend', () => {
+            const pos = marker.getLatLng();
+            applyLocation(pos.lat, pos.lng);
+          });
+        }
 
-        mapInstance.on('click', (e) => {
+        map.on('click', (e) => {
           const { lat, lng } = e.latlng;
-          markerInstance.setLatLng([lat, lng]);
+          if (markerRef.current) {
+            markerRef.current.setLatLng([lat, lng]);
+          } else {
+            const marker = window.L.marker([lat, lng], {
+              icon: pinIcon,
+              draggable: true
+            }).addTo(map);
+            markerRef.current = marker;
+            marker.on('dragend', () => {
+              const pos = marker.getLatLng();
+              applyLocation(pos.lat, pos.lng);
+            });
+          }
           applyLocation(lat, lng);
         });
+
+        setTimeout(() => {
+          if (mapRef.current) mapRef.current.invalidateSize();
+        }, 200);
       } catch (err) {
         console.error('Leaflet init error:', err);
       }
@@ -203,8 +353,10 @@ export default function FarmLocationField({ value, onChange, onCoords, onDetails
     }
 
     return () => {
-      if (mapInstance) {
-        try { mapInstance.remove(); } catch (e) {}
+      if (mapRef.current) {
+        try { mapRef.current.remove(); } catch (e) {}
+        mapRef.current = null;
+        markerRef.current = null;
       }
     };
   }, [showMap]);
@@ -246,15 +398,40 @@ export default function FarmLocationField({ value, onChange, onCoords, onDetails
         </div>
       )}
       {showMap && (
-        <div className="map-embed-wrap">
+        <div className="map-embed-wrap" style={{ marginTop: '10px' }}>
+          <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+            <input
+              type="text"
+              className="form-input"
+              style={{ flex: 1, padding: '8px 12px', fontSize: '0.88rem' }}
+              placeholder="🔍 Search village, taluka, or city to move pin..."
+              value={mapSearch}
+              onChange={(e) => setMapSearch(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleMapSearch();
+                }
+              }}
+            />
+            <button
+              type="button"
+              className="locate-btn"
+              style={{ whiteSpace: 'nowrap', padding: '8px 14px', fontSize: '0.85rem' }}
+              onClick={handleMapSearch}
+              disabled={searching}
+            >
+              {searching ? t('field.locating', 'Searching...') : 'Search'}
+            </button>
+          </div>
           <div
             ref={mapContainerRef}
-            style={{ width: '100%', height: '320px', borderRadius: '12px', overflow: 'hidden', border: '2px solid #3b82f6' }}
+            style={{ width: '100%', height: '340px', borderRadius: '12px', overflow: 'hidden', border: '2px solid #3b82f6' }}
           />
           <div className="map-hint" style={{ marginTop: '8px', fontSize: '0.85rem', color: '#1e40af', fontWeight: '600' }}>
             {coords
-              ? `📍 Pin Location: ${coords.lat.toFixed(5)}, ${coords.lng.toFixed(5)} (Click or drag pin to move)`
-              : '📍 Click anywhere on the map or drag the pin to set your exact farm location.'}
+              ? `📍 Pin Location: ${coords.lat.toFixed(5)}, ${coords.lng.toFixed(5)} (Click map or drag pin to adjust)`
+              : '📍 Search your village above, or click anywhere on the map to drop your farm pin.'}
           </div>
         </div>
       )}

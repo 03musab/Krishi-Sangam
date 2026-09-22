@@ -126,6 +126,7 @@ export default function AgriculturalServices() {
         title={t('agriServices.title', 'Agricultural Services Marketplace')}
         subtitle={t('agriServices.subtitle', 'Book certified drone spraying, soil testing, land prep, harvesting, and expert advisory services near you')}
         color="green"
+        backTo="farm-services"
       />
 
       <div style={{ maxWidth: 'var(--container-max)', margin: '0 auto', padding: '24px 20px' }}>

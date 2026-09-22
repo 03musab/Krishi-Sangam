@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import BookingCard from './BookingCard';
 import FarmLocationField from './FarmLocationField';
 import AreaField from './AreaField';
@@ -6,7 +6,7 @@ import SmartFarmSelector from './SmartFarmSelector';
 import { useToast } from '../context/ToastContext';
 import { useLanguage } from '../i18n/LanguageContext';
 import { bookServiceSmart } from '../lib/api';
-import { SERVICE_QUESTIONS } from '../data/services';
+import { SERVICE_CATEGORIES, SERVICE_QUESTIONS } from '../data/services';
 import Icon from './Icon';
 
 const DYNAMIC_OPTIONS = {
@@ -28,6 +28,35 @@ export default function ServiceBookingForm({ category, service, onBack, onSubmit
   const { showToast } = useToast();
   const { t } = useLanguage();
 
+  const [selectedCatId, setSelectedCatId] = useState(category?.id || SERVICE_CATEGORIES[0].id);
+  const [selectedServiceName, setSelectedServiceName] = useState(
+    service?.name || category?.services?.[0]?.name || SERVICE_CATEGORIES[0].services[0].name
+  );
+
+  useEffect(() => {
+    if (category?.id) setSelectedCatId(category.id);
+  }, [category?.id]);
+
+  useEffect(() => {
+    if (service?.name) setSelectedServiceName(service.name);
+  }, [service?.name]);
+
+  const activeCategory = SERVICE_CATEGORIES.find((c) => c.id === selectedCatId) || category || SERVICE_CATEGORIES[0];
+  const activeService = activeCategory.services?.find((s) => s.name === selectedServiceName) || activeCategory.services?.[0] || service || SERVICE_CATEGORIES[0].services[0];
+
+  const handleCategoryChange = (e) => {
+    const newCatId = e.target.value;
+    setSelectedCatId(newCatId);
+    const newCat = SERVICE_CATEGORIES.find((c) => c.id === newCatId);
+    if (newCat && newCat.services?.length) {
+      setSelectedServiceName(newCat.services[0].name);
+    }
+  };
+
+  const handleServiceChange = (e) => {
+    setSelectedServiceName(e.target.value);
+  };
+
   const [farmFor, setFarmFor] = useState('my_farm');
   const [farmDetails, setFarmDetails] = useState('');
 
@@ -42,8 +71,8 @@ export default function ServiceBookingForm({ category, service, onBack, onSubmit
 
   const set = (key) => (e) => setForm({ ...form, [key]: e.target.value });
 
-  // Resolve service-specific questions
-  const questions = SERVICE_QUESTIONS[service.name] || [];
+  // Resolve service-specific questions dynamically based on activeService
+  const questions = SERVICE_QUESTIONS[activeService.name] || [];
 
   const handleSubmit = async () => {
     try {
@@ -61,8 +90,8 @@ export default function ServiceBookingForm({ category, service, onBack, onSubmit
       }
 
       await bookServiceSmart({
-        category: category.name,
-        service_name: service.name,
+        category: activeCategory.name,
+        service_name: activeService.name,
         start_date: form.start_date || null,
         location: form.location,
         lat: coords?.lat,
@@ -85,14 +114,14 @@ export default function ServiceBookingForm({ category, service, onBack, onSubmit
 
   return (
     <BookingCard
-      title={service.name}
+      title={t(`svc.${activeService.name}.name`, activeService.name)}
       subtitle={
         <>
-          <Icon name={category.icon} size={16} style={{ verticalAlign: '-3px', marginRight: '6px' }} />
-          {category.name}
+          <Icon name={activeCategory.icon} size={16} style={{ verticalAlign: '-3px', marginRight: '6px' }} />
+          {t(`cat.${activeCategory.id}.name`, activeCategory.name)}
         </>
       }
-      icon={category.icon}
+      icon={activeCategory.icon}
       onBack={onBack}
       onSubmitted={onSubmitted}
       submitLabel={t('labour.requestService', 'Request Agricultural Service')}
@@ -106,9 +135,61 @@ export default function ServiceBookingForm({ category, service, onBack, onSubmit
         setFarmDetails={setFarmDetails}
       />
 
-      <div className="service-desc-box" style={{ background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', marginBottom: '16px' }}>
-        <strong>{t('labour.whatIsService', 'Service Description')}</strong>
-        <p style={{ margin: '4px 0 0 0', fontSize: '0.88rem', color: '#475569' }}>{service.desc}</p>
+      {/* ── Service Selection Dropdowns ── */}
+      <div style={{
+        background: '#f8fafc',
+        border: '1.5px solid #e2e8f0',
+        borderRadius: '12px',
+        padding: '16px',
+        marginBottom: '18px'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+          <span style={{ fontSize: '12px', fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            🛠️ {t('labour.selectedService', 'Selected Agricultural Service')}
+          </span>
+        </div>
+
+        <div className="form-grid-row" style={{ gap: '12px', marginBottom: '10px' }}>
+          <div className="form-group" style={{ margin: 0 }}>
+            <label className="form-label" style={{ fontSize: '12.5px', fontWeight: 600 }}>
+              {t('labour.serviceCategory', 'Service Category')}
+            </label>
+            <select
+              className="form-select"
+              value={activeCategory.id}
+              onChange={handleCategoryChange}
+              style={{ fontWeight: 600 }}
+            >
+              {SERVICE_CATEGORIES.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {t(`cat.${c.id}.name`, c.name)}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="form-group" style={{ margin: 0 }}>
+            <label className="form-label" style={{ fontSize: '12.5px', fontWeight: 600 }}>
+              {t('labour.specificService', 'Specific Service')}
+            </label>
+            <select
+              className="form-select"
+              value={activeService.name}
+              onChange={handleServiceChange}
+              style={{ fontWeight: 600 }}
+            >
+              {activeCategory.services.map((s) => (
+                <option key={s.name} value={s.name}>
+                  {t(`svc.${s.name}.name`, s.name)}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <p style={{ margin: '6px 0 0 0', fontSize: '0.85rem', color: '#64748b' }}>
+          {t(`svc.${activeService.name}.desc`, activeService.desc)}
+        </p>
       </div>
 
       {/* ── Service-Specific Questions ── */}

@@ -1,4 +1,4 @@
-import { useDeferredValue, useEffect, useState } from 'react';
+import { useDeferredValue, useEffect, useState, useMemo } from 'react';
 import PageBanner from '../components/PageBanner';
 import ListingCard from '../components/ListingCard';
 import AuthGateModal from '../components/AuthGateModal';
@@ -57,7 +57,29 @@ export default function FarmServices() {
 
   // ── Sub-flows ──
   const [eqBookingOpen, setEqBookingOpen] = useState(false);
-  const [labFlow, setLabFlow] = useState({ view: 'home', category: null, service: null });
+  const [labFlow, setLabFlow] = useState({ view: 'home', category: null, service: null, fromChoose: false });
+  const [serviceSearch, setServiceSearch] = useState('');
+
+  const allServices = useMemo(() => {
+    const list = [];
+    SERVICE_CATEGORIES.forEach((category) => {
+      category.services.forEach((service) => {
+        list.push({ category, service });
+      });
+    });
+    return list;
+  }, []);
+
+  const filteredServices = useMemo(() => {
+    const q = serviceSearch.trim().toLowerCase();
+    if (!q) return allServices;
+    return allServices.filter(({ category, service }) => {
+      const catName = (t(`cat.${category.id}.name`, category.name) || '').toLowerCase();
+      const svcName = (t(`svc.${service.name}.name`, service.name) || '').toLowerCase();
+      const svcDesc = (t(`svc.${service.name}.desc`, service.desc) || '').toLowerCase();
+      return catName.includes(q) || svcName.includes(q) || svcDesc.includes(q);
+    });
+  }, [allServices, serviceSearch, t]);
 
   // ── Fetch equipment listings ──
   useEffect(() => {
@@ -161,12 +183,127 @@ export default function FarmServices() {
     return <BookLabourTeam onBack={() => setLabFlow({ view: 'home' })} onSubmitted={() => setLabFlow({ view: 'home' })} />;
   }
 
-  if (labFlow.view === 'general-service' || (labFlow.view === 'service' && labFlow.category && labFlow.service)) {
+  if (labFlow.view === 'choose-service' || labFlow.view === 'general-service') {
+    return (
+      <div className="section" style={{ maxWidth: '1000px', margin: '20px auto 40px', padding: '0 20px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '24px' }}>
+          <button className="btn-back-icon" onClick={() => setLabFlow({ view: 'home' })} aria-label="Back">←</button>
+          <div>
+            <h1 style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--text-dark)', margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <span className="farm-service-icon-teal" style={{ display: 'inline-flex', padding: '6px', borderRadius: '10px' }}>
+                <Icon name="wheat" size={24} />
+              </span>
+              {t('farmServices.chooseServiceTitle', 'Choose Agricultural Service')}
+            </h1>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.92rem', margin: '4px 0 0 0' }}>
+              {t('farmServices.chooseServiceDesc', 'Select a service category or search for the specific service you need')}
+            </p>
+          </div>
+        </div>
+
+        {/* Search bar with quick filter */}
+        <div style={{ position: 'relative', marginBottom: '24px' }}>
+          <input
+            type="text"
+            className="form-input"
+            value={serviceSearch}
+            onChange={(e) => setServiceSearch(e.target.value)}
+            placeholder={t('farmServices.searchServices', '🔍 Search service by name (e.g., Drone Spraying, Harvesting, Ploughing, Soil Testing...)')}
+            style={{ width: '100%', padding: '13px 18px', fontSize: '15px', borderRadius: '12px', border: '1.5px solid #cbd5e1', boxShadow: '0 2px 6px rgba(0,0,0,0.04)' }}
+          />
+          {serviceSearch && (
+            <button
+              onClick={() => setServiceSearch('')}
+              style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', fontSize: '16px', cursor: 'pointer', color: '#94a3b8' }}
+              aria-label="Clear search"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+
+        {/* If searching, show filtered services list */}
+        {serviceSearch.trim() ? (
+          <div>
+            <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#64748b', marginBottom: '14px' }}>
+              {filteredServices.length} {t('farmServices.matchingServices', 'matching services found')}:
+            </div>
+            {filteredServices.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '40px 20px', background: '#f8fafc', borderRadius: '16px', border: '1px dashed #cbd5e1' }}>
+                <p style={{ color: '#64748b', margin: 0, fontSize: '15px' }}>{t('farmServices.noMatchingServices', 'No services found matching your search. Try another keyword or browse categories below.')}</p>
+                <button
+                  onClick={() => setServiceSearch('')}
+                  className="btn btn-secondary"
+                  style={{ marginTop: '12px' }}
+                >
+                  {t('farmServices.viewAllCategories', 'View All Categories')}
+                </button>
+              </div>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
+                {filteredServices.map(({ category, service }) => (
+                  <button
+                    key={`${category.id}-${service.name}`}
+                    style={{
+                      display: 'flex', flexDirection: 'column', alignItems: 'flex-start',
+                      padding: '18px 16px', background: '#ffffff', border: '1.5px solid #e2e8f0',
+                      borderRadius: '14px', cursor: 'pointer', textAlign: 'left',
+                      transition: 'all 0.2s ease', boxShadow: '0 2px 5px rgba(0,0,0,0.04)'
+                    }}
+                    onClick={() => requireMember(() => setLabFlow({ view: 'service', category, service, fromChoose: true }))}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginBottom: '10px' }}>
+                      <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--green-dark)', background: 'var(--green-light)', padding: '3px 8px', borderRadius: '6px' }}>
+                        {t(`cat.${category.id}.name`, category.name)}
+                      </span>
+                      <Icon name={category.icon} size={20} style={{ color: 'var(--green-mid)' }} />
+                    </div>
+                    <span style={{ fontSize: '15.5px', fontWeight: 700, color: 'var(--text-dark)', marginBottom: '6px' }}>
+                      {t(`svc.${service.name}.name`, service.name)}
+                    </span>
+                    <span style={{ fontSize: '13px', color: 'var(--text-muted)', lineHeight: '1.4', marginBottom: '12px' }}>
+                      {t(`svc.${service.name}.desc`, service.desc)}
+                    </span>
+                    <span style={{ marginTop: 'auto', fontSize: '13px', fontWeight: 600, color: 'var(--green-dark)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      {t('farmServices.bookThis', 'Book this service')} ›
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        ) : (
+          /* When not searching, show full grid of categories */
+          <div>
+            <div style={{ fontSize: '13.5px', fontWeight: 700, color: '#475569', marginBottom: '16px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              {t('labour.pickCategory', 'Pick a Category to Explore Services')}
+            </div>
+            <div className="service-category-grid">
+              {SERVICE_CATEGORIES.map((cat) => (
+                <button
+                  key={cat.id}
+                  className="service-category-card"
+                  onClick={() => setLabFlow({ view: 'category', category: cat, fromChoose: true })}
+                >
+                  <span className="service-category-emoji tip tip-left" data-tip={cat.desc || cat.tagline}><Icon name={cat.icon} size={34} /></span>
+                  <span className="service-category-name">{t(`cat.${cat.id}.name`, cat.name)}</span>
+                  <span className="service-category-tagline">{t(`cat.${cat.id}.tagline`, cat.tagline)}</span>
+                  <span className="service-category-count">{t('labour.xServices', { n: cat.services.length })}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  if (labFlow.view === 'service' && labFlow.category && labFlow.service) {
     return (
       <ServiceBookingForm
-        category={labFlow.category || SERVICE_CATEGORIES[0]}
-        service={labFlow.service || SERVICE_CATEGORIES[0].services[0]}
-        onBack={() => setLabFlow({ view: 'home' })}
+        category={labFlow.category}
+        service={labFlow.service}
+        onBack={() => setLabFlow({ view: 'category', category: labFlow.category, fromChoose: labFlow.fromChoose })}
         onSubmitted={() => setLabFlow({ view: 'home' })}
       />
     );
@@ -177,7 +314,13 @@ export default function FarmServices() {
     return (
       <div className="service-booking-wrap">
         <div className="service-booking-head">
-          <button className="btn-back-icon" onClick={() => setLabFlow({ view: 'home' })}>←</button>
+          <button
+            className="btn-back-icon"
+            onClick={() => setLabFlow({ view: labFlow.fromChoose ? 'choose-service' : 'home' })}
+            aria-label="Back"
+          >
+            ←
+          </button>
           <span className="service-emoji"><Icon name={category.icon} size={40} /></span>
           <div>
             <h1 className="service-booking-title">{t(`cat.${category.id}.name`, category.name)}</h1>
@@ -190,7 +333,7 @@ export default function FarmServices() {
             <button
               key={svc.name}
               className="sub-service-item"
-              onClick={() => requireMember(() => setLabFlow({ view: 'service', category, service: svc }))}
+              onClick={() => requireMember(() => setLabFlow({ view: 'service', category, service: svc, fromChoose: labFlow.fromChoose }))}
             >
               <div className="sub-service-main tip" data-tip={t(`svc.${svc.name}.desc`, svc.desc)}>
                 <span className="sub-service-name">{t(`svc.${svc.name}.name`, svc.name)}</span>
@@ -214,7 +357,7 @@ export default function FarmServices() {
 
   return (
     <>
-      <PageBanner title={t('farmServices.title')} color="green" />
+      <PageBanner title={t('farmServices.title')} color="green" backTo="home" />
 
       <div style={{
         maxWidth: '1200px',
@@ -487,7 +630,8 @@ export default function FarmServices() {
               className="farm-service-btn farm-service-btn-primary"
               onClick={() => {
                 if (!user) { setBookAgriGateOpen(true); return; }
-                setLabFlow({ view: 'general-service' });
+                setServiceSearch('');
+                setLabFlow({ view: 'choose-service' });
               }}
             >
               {t('farmServices.book')}
