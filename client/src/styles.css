@@ -161,7 +161,7 @@ img {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 28px;
+  padding: 0 24px 0 10px;
   background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border);
@@ -171,17 +171,17 @@ img {
 .nav-brand-group {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
 }
 
 .nav-brand {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   cursor: pointer;
   user-select: none;
-  padding: 6px 12px;
-  margin-left: -12px;
+  padding: 4px 6px;
+  margin-left: 0;
   border: none;
   background: none;
   transition: all var(--transition-fast);
@@ -195,12 +195,12 @@ img {
 .brand-main {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .brand-logo {
-  width: 80px;
-  height: 80px;
+  width: 76px;
+  height: 76px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -216,26 +216,59 @@ img {
   display: block;
 }
 
-/* DPIIT / Startup India recognition badge — sits in a clean white chip
-   so the navbar greens never bleed behind the JPEG logo */
+/* DPIIT, MSInS & PDKV Recognition Badges — sits in a clean white chip
+   so the navbar greens never bleed behind the logos */
 .brand-dpiit {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 44px;
-  padding: 0 12px;
+  height: 48px;
+  padding: 0 14px;
   background: var(--white);
-  border: none;
-  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  flex-shrink: 0;
+  gap: 12px;
+}
+
+.brand-recognition-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.brand-recognition-divider {
+  width: 1px;
+  height: 26px;
+  background: rgba(0, 0, 0, 0.14);
   flex-shrink: 0;
 }
 
-.brand-dpiit-img {
-  height: 40px;
+.brand-dpiit-img,
+.brand-recognition-img {
+  height: 35px;
   width: auto;
+  max-width: 102px;
   object-fit: contain;
   object-position: center;
   display: block;
+  transition: transform var(--transition-fast);
+}
+
+.brand-recognition-img:hover {
+  transform: scale(1.06);
+}
+
+.brand-recognition-img-msis {
+  height: 32px;
+  max-width: 110px;
+}
+
+.brand-recognition-img-pdkv {
+  height: 28px;
+  max-width: 112px;
 }
 
 .brand-name {
@@ -251,11 +284,7 @@ img {
   align-items: center;
   gap: 4px;
   list-style: none;
-  position: absolute;
-  /* Slightly right of true center so the links sit balanced against the
-     larger brand block (logo + DPIIT badge) on the left. */
-  left: calc(50% + 28px);
-  transform: translateX(-50%);
+  margin: 0 auto;
 }
 
 .nav-item {
@@ -3721,19 +3750,32 @@ img {
   }
 }
 
-/* Medium windows: keep the badge clear of the centred nav links */
+/* Medium windows: keep badges balanced */
 @media (max-width: 1360px) {
   .brand-dpiit {
-    height: 38px;
-    padding: 0 8px;
+    height: 42px;
+    padding: 0 10px;
+    gap: 9px;
   }
 
-  .brand-dpiit-img {
-    height: 32px;
+  .brand-recognition-divider {
+    height: 22px;
   }
 
-  .nav-links {
-    gap: 2px;
+  .brand-dpiit-img,
+  .brand-recognition-img {
+    height: 28px;
+    max-width: 85px;
+  }
+
+  .brand-recognition-img-msis {
+    height: 25px;
+    max-width: 88px;
+  }
+
+  .brand-recognition-img-pdkv {
+    height: 22px;
+    max-width: 90px;
   }
 
   .nav-item {
@@ -3742,42 +3784,18 @@ img {
   }
 }
 
-@media (max-width: 1150px) {
+@media (max-width: 1120px) {
   .brand-name {
     font-size: 16px;
   }
 
   .brand-dpiit {
-    height: 28px;
-    padding: 0 8px;
-  }
-
-  .brand-dpiit-img {
-    height: 22px;
+    display: none;
   }
 
   .nav-item {
     padding: 7px 9px;
     font-size: 12.5px;
-  }
-}
-
-@media (max-width: 960px) {
-  .brand-dpiit {
-    height: 28px;
-    padding: 0 6px;
-  }
-
-  .brand-dpiit-img {
-    height: 20px;
-  }
-}
-
-/* Below this width the recognition badge is hidden so it never crowds
-   the brand + mobile controls (hamburger / auth buttons) */
-@media (max-width: 900px) {
-  .brand-dpiit {
-    display: none;
   }
 }
 
@@ -4048,6 +4066,139 @@ img {
     flex-direction: column;
     align-items: flex-start;
     padding: 24px 20px;
+  }
+}
+
+/* ========================================================
+   Institutional Recognitions & Incubation (DPIIT, MSInS, PDKV)
+   ======================================================== */
+.recognitions-section {
+  max-width: var(--container-max);
+  margin: 55px auto 0;
+}
+
+.recognitions-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.recognitions-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 20px;
+  border-radius: 999px;
+  background: var(--green-pale);
+  border: 1px solid rgba(22, 101, 52, 0.2);
+  color: var(--green-dark);
+  font-weight: 700;
+  font-size: 13.5px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  box-shadow: 0 2px 8px rgba(22, 101, 52, 0.08);
+}
+
+.recognitions-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.recognition-card {
+  display: flex;
+  flex-direction: column;
+  padding: 26px 26px 28px;
+  border-radius: var(--radius-xl);
+  background: linear-gradient(145deg, #0f3d2e 0%, var(--green-deep) 60%, #166534 100%);
+  box-shadow: 0 16px 40px rgba(20, 83, 45, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.recognition-card::before {
+  content: '';
+  position: absolute;
+  top: -50px;
+  right: -50px;
+  width: 140px;
+  height: 140px;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.25), transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.recognition-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.recognition-badge {
+  flex-shrink: 0;
+  height: 72px;
+  width: 172px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--white);
+  border-radius: 16px;
+  padding: 10px 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+}
+
+.recognition-badge img {
+  max-width: 100%;
+  max-height: 52px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.recognition-card-body h3 {
+  color: #ffffff;
+  font-size: 19px;
+  margin-bottom: 10px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.recognition-card-body p {
+  color: rgba(255, 255, 255, 0.88);
+  line-height: 1.68;
+  font-size: 14.5px;
+  margin: 0;
+}
+
+@media (max-width: 1060px) {
+  .recognitions-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 18px;
+  }
+}
+
+@media (max-width: 768px) {
+  .recognitions-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .recognition-card {
+    padding: 22px;
+  }
+
+  .recognition-badge {
+    height: 54px;
+    width: 130px;
+  }
+
+  .recognition-badge img {
+    max-height: 38px;
   }
 }
 

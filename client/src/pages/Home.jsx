@@ -6,6 +6,8 @@ import ContactSection from '../components/ContactSection';
 import Chatbot from '../components/Chatbot';
 import Icon from '../components/Icon';
 import dpiitLogo from '../assets/dpiit.jpeg';
+import msisLogo from '../assets/msis.png';
+import pdkvLogo from '../assets/pdkv.png';
 import krishiSangamLogo from '../assets/krishisangam_logo.png';
 
 const WHY_CARDS = [
@@ -95,14 +97,55 @@ export default function Home() {
             </div>
           </div>
 
-          {/* DPIIT / Startup India recognition — sits before Mission & Vision */}
-          <div className="dpiit-block hover-lift">
-            <div className="dpiit-badge">
-              <img src={dpiitLogo} alt="DPIIT — Startup India" />
+          {/* Institutional Recognitions & Incubation Partners — DPIIT, MSInS, PDKV-RIF */}
+          <div className="recognitions-section">
+            <div className="recognitions-header">
+              <span className="recognitions-pill">
+                <Icon name="shield" size={15} /> {t('home.recognitionsHeading')}
+              </span>
             </div>
-            <div className="dpiit-text">
-              <h3>{t('home.dpiitTitle')} <span className="dpiit-tag">Govt. of India</span></h3>
-              <p>{t('home.dpiitBody')}</p>
+            <div className="recognitions-grid">
+              {/* DPIIT — Startup India */}
+              <div className="recognition-card hover-lift">
+                <div className="recognition-card-top">
+                  <div className="recognition-badge">
+                    <img src={dpiitLogo} alt="DPIIT — Startup India" />
+                  </div>
+                  <span className="dpiit-tag">{t('home.dpiitTag')}</span>
+                </div>
+                <div className="recognition-card-body">
+                  <h3>{t('home.dpiitTitle')}</h3>
+                  <p>{t('home.dpiitBody')}</p>
+                </div>
+              </div>
+
+              {/* Maharashtra State Innovation Society (MSInS) */}
+              <div className="recognition-card hover-lift">
+                <div className="recognition-card-top">
+                  <div className="recognition-badge">
+                    <img src={msisLogo} alt="Maharashtra State Innovation Society" />
+                  </div>
+                  <span className="dpiit-tag">{t('home.msisTag')}</span>
+                </div>
+                <div className="recognition-card-body">
+                  <h3>{t('home.msisTitle')}</h3>
+                  <p>{t('home.msisBody')}</p>
+                </div>
+              </div>
+
+              {/* PDKV Research & Incubation Foundation */}
+              <div className="recognition-card hover-lift">
+                <div className="recognition-card-top">
+                  <div className="recognition-badge">
+                    <img src={pdkvLogo} alt="PDKV Research & Incubation Foundation" />
+                  </div>
+                  <span className="dpiit-tag">{t('home.pdkvTag')}</span>
+                </div>
+                <div className="recognition-card-body">
+                  <h3>{t('home.pdkvTitle')}</h3>
+                  <p>{t('home.pdkvBody')}</p>
+                </div>
+              </div>
             </div>
           </div>
 

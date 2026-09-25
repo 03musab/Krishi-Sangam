@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import krishiSangamLogo from '../assets/krishisangam_logo.png';
 import dpiitBadge from '../assets/dpiit-badge.jpeg';
+import msisLogo from '../assets/msis.png';
+import pdkvLogo from '../assets/pdkv.png';
 import { useNav } from '../context/NavContext';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
@@ -126,8 +128,18 @@ export default function Navbar() {
             </div>          <span className="brand-name">Krishi Sangam</span>
         </div>
       </div>
-        <div className="brand-dpiit" title="Recognised & Supported by DPIIT — Startup India (Govt. of India)" aria-label="Recognised & Supported by DPIIT — Startup India (Govt. of India)">
-          <img src={dpiitBadge} alt="Recognised & Supported by DPIIT — Startup India" className="brand-dpiit-img" />
+        <div className="brand-dpiit brand-recognitions" aria-label="Institutional Recognitions & Incubation">
+          <div className="brand-recognition-item" title="Recognised & Supported by DPIIT — Startup India (Govt. of India)">
+            <img src={dpiitBadge} alt="DPIIT — Startup India" className="brand-dpiit-img brand-recognition-img" />
+          </div>
+          <span className="brand-recognition-divider" aria-hidden="true" />
+          <div className="brand-recognition-item" title="Recognised & Supported by Maharashtra State Innovation Society (Govt. of Maharashtra)">
+            <img src={msisLogo} alt="Maharashtra State Innovation Society" className="brand-recognition-img brand-recognition-img-msis" />
+          </div>
+          <span className="brand-recognition-divider" aria-hidden="true" />
+          <div className="brand-recognition-item" title="Incubated & Supported by PDKV Research & Incubation Foundation">
+            <img src={pdkvLogo} alt="PDKV Research & Incubation Foundation" className="brand-recognition-img brand-recognition-img-pdkv" />
+          </div>
         </div>
       </div>
 
