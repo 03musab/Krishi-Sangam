@@ -44,12 +44,12 @@
   --space-2xl: 32px;
 
   /* Radius — Clean rectangular component hierarchy */
-  --radius-xs:     4px;
-  --radius-sm:     6px;
-  --radius-md:     8px;
-  --radius-lg:     12px;
-  --radius-xl:     16px;
-  --radius-full:   50%;
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 50%;
 
   /* Shadows */
   --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06);
@@ -199,8 +199,8 @@ img {
 }
 
 .brand-logo {
-  width: 76px;
-  height: 76px;
+  width: 50px;
+  height: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -216,20 +216,20 @@ img {
   display: block;
 }
 
-/* DPIIT, MSInS & PDKV Recognition Badges — sits in a clean white chip
+/* DPIIT & MSInS Recognition Badges — sits in a clean white chip
    so the navbar greens never bleed behind the logos */
 .brand-dpiit {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 48px;
-  padding: 0 14px;
+  height: 38px;
+  padding: 0 10px;
   background: var(--white);
   border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 10px;
+  border-radius: 8px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   flex-shrink: 0;
-  gap: 12px;
+  gap: 10px;
 }
 
 .brand-recognition-item {
@@ -241,16 +241,16 @@ img {
 
 .brand-recognition-divider {
   width: 1px;
-  height: 26px;
+  height: 20px;
   background: rgba(0, 0, 0, 0.14);
   flex-shrink: 0;
 }
 
 .brand-dpiit-img,
 .brand-recognition-img {
-  height: 35px;
+  height: 25px;
   width: auto;
-  max-width: 102px;
+  max-width: 82px;
   object-fit: contain;
   object-position: center;
   display: block;
@@ -262,13 +262,8 @@ img {
 }
 
 .brand-recognition-img-msis {
-  height: 32px;
-  max-width: 110px;
-}
-
-.brand-recognition-img-pdkv {
-  height: 28px;
-  max-width: 112px;
+  height: 23px;
+  max-width: 84px;
 }
 
 .brand-name {
@@ -280,11 +275,15 @@ img {
 }
 
 .nav-links {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   list-style: none;
-  margin: 0 auto;
+  margin: 0;
+  z-index: 10;
 }
 
 .nav-item {
@@ -3624,6 +3623,10 @@ img {
     padding: 0 16px;
   }
 
+  .brand-dpiit {
+    display: none;
+  }
+
   .nav-links {
     position: fixed;
     top: var(--nav-h);
@@ -3750,52 +3753,47 @@ img {
   }
 }
 
-/* Medium windows: keep badges balanced */
-@media (max-width: 1360px) {
-  .brand-dpiit {
-    height: 42px;
-    padding: 0 10px;
-    gap: 9px;
+/* Medium / Laptop windows: keep badges balanced without overlap */
+@media (max-width: 1200px) {
+  .brand-logo {
+    width: 44px;
+    height: 44px;
   }
 
-  .brand-recognition-divider {
-    height: 22px;
-  }
-
-  .brand-dpiit-img,
-  .brand-recognition-img {
-    height: 28px;
-    max-width: 85px;
-  }
-
-  .brand-recognition-img-msis {
-    height: 25px;
-    max-width: 88px;
-  }
-
-  .brand-recognition-img-pdkv {
-    height: 22px;
-    max-width: 90px;
-  }
-
-  .nav-item {
-    padding: 8px 11px;
-    font-size: 13.5px;
-  }
-}
-
-@media (max-width: 1120px) {
   .brand-name {
     font-size: 16px;
   }
 
   .brand-dpiit {
-    display: none;
+    height: 34px;
+    padding: 0 8px;
+    gap: 8px;
+  }
+
+  .brand-recognition-divider {
+    height: 16px;
+  }
+
+  .brand-dpiit-img,
+  .brand-recognition-img {
+    height: 20px;
+    max-width: 70px;
+  }
+
+  .brand-recognition-img-msis {
+    height: 18px;
+    max-width: 72px;
   }
 
   .nav-item {
-    padding: 7px 9px;
-    font-size: 12.5px;
+    padding: 7px 10px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 900px) {
+  .brand-dpiit {
+    display: none;
   }
 }
 
@@ -4074,25 +4072,25 @@ img {
    ======================================================== */
 .recognitions-section {
   max-width: var(--container-max);
-  margin: 55px auto 0;
+  margin: 36px auto 0;
 }
 
 .recognitions-header {
   text-align: center;
-  margin-bottom: 24px;
+  margin-bottom: 18px;
 }
 
 .recognitions-pill {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 20px;
+  padding: 5px 18px;
   border-radius: 999px;
   background: var(--green-pale);
   border: 1px solid rgba(22, 101, 52, 0.2);
   color: var(--green-dark);
   font-weight: 700;
-  font-size: 13.5px;
+  font-size: 13px;
   letter-spacing: 0.03em;
   text-transform: uppercase;
   box-shadow: 0 2px 8px rgba(22, 101, 52, 0.08);
@@ -4101,17 +4099,17 @@ img {
 .recognitions-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+  gap: 18px;
 }
 
 .recognition-card {
   display: flex;
   flex-direction: column;
-  padding: 26px 26px 28px;
-  border-radius: var(--radius-xl);
+  padding: 20px 20px 22px;
+  border-radius: var(--radius-lg);
   background: linear-gradient(145deg, #0f3d2e 0%, var(--green-deep) 60%, #166534 100%);
-  box-shadow: 0 16px 40px rgba(20, 83, 45, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 12px 32px rgba(20, 83, 45, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   position: relative;
   overflow: hidden;
   transition: transform var(--transition-base), box-shadow var(--transition-base);
@@ -4120,11 +4118,11 @@ img {
 .recognition-card::before {
   content: '';
   position: absolute;
-  top: -50px;
-  right: -50px;
-  width: 140px;
-  height: 140px;
-  background: radial-gradient(circle, rgba(245, 158, 11, 0.25), transparent 70%);
+  top: -40px;
+  right: -40px;
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.2), transparent 70%);
   border-radius: 50%;
   pointer-events: none;
 }
@@ -4133,72 +4131,85 @@ img {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
 }
 
 .recognition-badge {
   flex-shrink: 0;
-  height: 72px;
-  width: 172px;
+  height: 52px;
+  width: 135px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: var(--white);
-  border-radius: 16px;
-  padding: 10px 16px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  border-radius: 10px;
+  padding: 6px 12px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
 }
 
 .recognition-badge img {
   max-width: 100%;
-  max-height: 52px;
+  max-height: 38px;
   width: auto;
   height: auto;
   object-fit: contain;
   display: block;
 }
 
+.recognition-card-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
 .recognition-card-body h3 {
   color: #ffffff;
-  font-size: 19px;
-  margin-bottom: 10px;
+  font-size: 17px;
+  margin-bottom: 8px;
   font-weight: 700;
   line-height: 1.35;
+  min-height: 46px;
+  display: flex;
+  align-items: flex-end;
 }
 
 .recognition-card-body p {
   color: rgba(255, 255, 255, 0.88);
-  line-height: 1.68;
-  font-size: 14.5px;
+  line-height: 1.55;
+  font-size: 13.5px;
   margin: 0;
+  flex: 1;
 }
 
 @media (max-width: 1060px) {
   .recognitions-grid {
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 18px;
+    gap: 16px;
   }
 }
 
 @media (max-width: 768px) {
   .recognitions-grid {
     grid-template-columns: 1fr;
-    gap: 16px;
+    gap: 14px;
   }
 
   .recognition-card {
-    padding: 22px;
+    padding: 18px;
+  }
+
+  .recognition-card-body h3 {
+    min-height: auto;
   }
 
   .recognition-badge {
-    height: 54px;
-    width: 130px;
+    height: 48px;
+    width: 125px;
   }
 
   .recognition-badge img {
-    max-height: 38px;
+    max-height: 34px;
   }
 }
 
@@ -6101,12 +6112,10 @@ img {
    =========================== */
 .skeleton-box {
   background: #f1f5f9;
-  background: linear-gradient(
-    90deg,
-    #f1f5f9 0%,
-    #e2e8f0 50%,
-    #f1f5f9 100%
-  );
+  background: linear-gradient(90deg,
+      #f1f5f9 0%,
+      #e2e8f0 50%,
+      #f1f5f9 100%);
   background-size: 200% 100%;
   animation: skeletonShimmer 1.5s infinite linear;
   border-radius: var(--radius-sm, 6px);
@@ -6116,6 +6125,7 @@ img {
   0% {
     background-position: -200% 0;
   }
+
   100% {
     background-position: 200% 0;
   }
