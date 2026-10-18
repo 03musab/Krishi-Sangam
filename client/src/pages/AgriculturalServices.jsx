@@ -7,7 +7,8 @@ import { useNav } from '../context/NavContext';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { useLanguage } from '../i18n/LanguageContext';
-import { getAgriServices, bookServiceSmart } from '../lib/api';
+import { getAgriServices, bookServiceSmart, getCatalogServices } from '../lib/api';
+import Icon from '../components/Icon';
 
 const CATEGORIES = [
   'All',
@@ -40,6 +41,20 @@ export default function AgriculturalServices() {
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
   const [districtFilter, setDistrictFilter] = useState('');
+  const [catalogCategories, setCatalogCategories] = useState([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    getCatalogServices()
+      .then((d) => {
+        if (!cancelled && d.services?.length) {
+          const uniqueCats = ['All', ...new Set(d.services.map((s) => s.category).filter(Boolean))];
+          setCatalogCategories(uniqueCats);
+        }
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
 
   // Booking modal state
   const [selectedService, setSelectedService] = useState(null);
@@ -111,7 +126,7 @@ export default function AgriculturalServices() {
         farm_details: farmDetails
       });
 
-      showToast('🎉 Service request submitted! Provider matched successfully.');
+      showToast('Service request submitted! Provider matched successfully.');
       setCreatedBooking(result.booking || result.matched?.[0] || { price: selectedService.price, service_name: selectedService.title });
     } catch (err) {
       showToast(t('common.error', { msg: err.message }));
@@ -133,7 +148,10 @@ export default function AgriculturalServices() {
         {/* Top Bar with dual CTAs */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', marginBottom: '24px' }}>
           <div>
-            <h2 style={{ margin: 0, fontSize: '1.4rem', color: '#0f172a' }}>🛠️ {t('agriServices.availableTitle', 'Available Services')}</h2>
+            <h2 style={{ margin: 0, fontSize: '1.4rem', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Icon name="wrench" size={22} style={{ color: '#16a34a' }} />
+              {t('agriServices.availableTitle', 'Available Services')}
+            </h2>
             <p style={{ margin: '4px 0 0 0', fontSize: '0.9rem', color: '#64748b' }}>
               {services.length} services found within your area
             </p>
@@ -143,10 +161,10 @@ export default function AgriculturalServices() {
             <button
               type="button"
               className="btn-hero"
-              style={{ background: 'var(--green-mid)', color: 'white', border: 'none', padding: '10px 20px', fontSize: '0.95rem', borderRadius: '8px' }}
+              style={{ background: 'var(--green-mid)', color: 'white', border: 'none', padding: '10px 20px', fontSize: '0.95rem', borderRadius: '8px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
               onClick={() => navigate(user ? 'list-agri-service' : 'signin')}
             >
-              ➕ {t('agriServices.listCta', 'List Your Service')}
+              <Icon name="plus" size={16} /> {t('agriServices.listCta', 'List Your Service')}
             </button>
           </div>
         </div>
@@ -156,14 +174,14 @@ export default function AgriculturalServices() {
           <input
             type="text"
             className="form-input"
-            placeholder="🔍 Search services, drones, land prep..."
+            placeholder="Search services (e.g. Drone, भात लावणी, Leveling, Ploughing)..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           <input
             type="text"
             className="form-input"
-            placeholder="📍 Filter by District (e.g. Nashik, Pune)"
+            placeholder="Filter by District (e.g. Nashik, Pune)"
             value={districtFilter}
             onChange={(e) => setDistrictFilter(e.target.value)}
           />
@@ -171,7 +189,7 @@ export default function AgriculturalServices() {
 
         {/* Category Pills */}
         <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '12px', marginBottom: '24px' }}>
-          {CATEGORIES.map((cat) => (
+          {(catalogCategories.length > 0 ? catalogCategories : CATEGORIES).map((cat) => (
             <button
               key={cat}
               type="button"
@@ -204,10 +222,10 @@ export default function AgriculturalServices() {
             <button
               type="button"
               className="btn-hero"
-              style={{ background: 'var(--green-mid)', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '8px' }}
+              style={{ background: 'var(--green-mid)', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '8px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
               onClick={() => navigate(user ? 'list-agri-service' : 'signin')}
             >
-              ➕ List Service Now
+              <Icon name="plus" size={16} /> List Service Now
             </button>
           </div>
         ) : (
@@ -233,8 +251,8 @@ export default function AgriculturalServices() {
                     style={{ width: '100%', height: '160px', objectFit: 'cover' }}
                   />
                 ) : (
-                  <div style={{ height: '100px', background: 'linear-gradient(135deg, #10b981, #047857)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '2.5rem' }}>
-                    🛠️
+                  <div style={{ height: '100px', background: 'linear-gradient(135deg, #10b981, #047857)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
+                    <Icon name="wrench" size={42} />
                   </div>
                 )}
 
@@ -243,8 +261,8 @@ export default function AgriculturalServices() {
                     <span style={{ background: '#f0fdf4', color: '#166534', border: '1px solid #bbf7d0', fontSize: '0.75rem', fontWeight: '700', padding: '2px 8px', borderRadius: '999px' }}>
                       {s.category}
                     </span>
-                    <span style={{ fontSize: '0.85rem', color: '#f59e0b', fontWeight: '700' }}>
-                      ★ {s.avg_rating || '5.0'} ({s.total_reviews || 0})
+                    <span style={{ fontSize: '0.85rem', color: '#f59e0b', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <Icon name="star" size={14} style={{ color: '#f59e0b', fill: '#f59e0b' }} /> {s.avg_rating || '5.0'} ({s.total_reviews || 0})
                     </span>
                   </div>
 
@@ -252,13 +270,16 @@ export default function AgriculturalServices() {
                     {s.title}
                   </h3>
 
-                  <div style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '10px' }}>
-                    👤 {s.provider_name || 'Agri Specialist'} • 📍 {s.location}
+                  <div style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Icon name="user" size={13} /> {s.provider_name || 'Agri Specialist'}</span>
+                    <span>•</span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Icon name="pin" size={13} /> {s.location}</span>
                   </div>
 
                   {s.equipment_included && (
-                    <div style={{ background: '#f8fafc', padding: '8px 10px', borderRadius: '6px', fontSize: '0.8rem', color: '#334155', marginBottom: '12px', border: '1px solid #e2e8f0' }}>
-                      ⚙️ <strong>Tools:</strong> {s.equipment_included}
+                    <div style={{ background: '#f8fafc', padding: '8px 10px', borderRadius: '6px', fontSize: '0.8rem', color: '#334155', marginBottom: '12px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <Icon name="settings" size={14} style={{ color: '#64748b' }} />
+                      <span><strong>Tools:</strong> {s.equipment_included}</span>
                     </div>
                   )}
 
@@ -305,8 +326,12 @@ export default function AgriculturalServices() {
             padding: '24px', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.2)'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#0f172a' }}>🛠️ Book {selectedService.title}</h3>
-              <button className="btn-close" onClick={() => setSelectedService(null)} style={{ border: 'none', background: 'transparent', fontSize: '1.4rem', cursor: 'pointer' }}>×</button>
+              <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Icon name="wrench" size={20} /> Book {selectedService.title}
+              </h3>
+              <button className="btn-close" onClick={() => setSelectedService(null)} style={{ border: 'none', background: 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '4px' }}>
+                <Icon name="x" size={20} />
+              </button>
             </div>
 
             <form onSubmit={handleConfirmBooking}>
@@ -381,8 +406,9 @@ export default function AgriculturalServices() {
                     ₹{(selectedService.price * (selectedService.pricing_type === 'per_acre' ? (Number(farmSize) || 1) : 1)).toLocaleString()}
                   </div>
                 </div>
-                <div style={{ fontSize: '0.78rem', color: '#15803d', textAlign: 'right' }}>
-                  🛡️ 100% Escrow Protected
+                <div style={{ fontSize: '0.78rem', color: '#15803d', textAlign: 'right', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <Icon name="shield" size={14} style={{ color: '#16a34a' }} />
+                  <span>100% Escrow Protected</span>
                 </div>
               </div>
 

@@ -58,8 +58,32 @@ router.get('/', async (req, res) => {
     const params = [];
 
     if (search) {
-      query += ` AND (s.title ILIKE ? OR s.category ILIKE ? OR s.description ILIKE ? OR s.location ILIKE ? OR s.equipment_included ILIKE ?)`;
-      params.push(`%${search}%`, `%${search}%`, `%${search}%`, `%${search}%`, `%${search}%`);
+      let aliasTerms = [search];
+      try {
+        const catItems = await db.prepare(
+          `SELECT service_name, regional_names FROM catalog_agri_services
+           WHERE service_name ILIKE ? OR regional_names ILIKE ?`
+        ).all(`%${search}%`, `%${search}%`);
+        for (const ci of catItems) {
+          if (ci.service_name && !aliasTerms.includes(ci.service_name)) aliasTerms.push(ci.service_name);
+          if (ci.regional_names) {
+            ci.regional_names.split(',').forEach((a) => {
+              const tr = a.trim();
+              if (tr && !aliasTerms.includes(tr)) aliasTerms.push(tr);
+            });
+          }
+        }
+      } catch (e) {
+        // Fallback gracefully if catalog table is initializing
+      }
+
+      const searchClauses = aliasTerms
+        .map(() => `(s.title ILIKE ? OR s.category ILIKE ? OR s.description ILIKE ? OR s.location ILIKE ? OR s.equipment_included ILIKE ?)`)
+        .join(' OR ');
+      query += ` AND (${searchClauses})`;
+      aliasTerms.forEach((term) => {
+        params.push(`%${term}%`, `%${term}%`, `%${term}%`, `%${term}%`, `%${term}%`);
+      });
     }
     if (category && category !== 'All') {
       query += ` AND s.category ILIKE ?`;

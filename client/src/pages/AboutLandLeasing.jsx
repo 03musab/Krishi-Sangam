@@ -49,20 +49,20 @@ export default function AboutLandLeasing() {
           <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
             <button
               className="btn-hero"
-              style={{ background: '#16a34a', color: 'white', padding: '12px 24px', fontSize: '0.95rem', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '700' }}
+              style={{ background: '#16a34a', color: 'white', padding: '12px 24px', fontSize: '0.95rem', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '700', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
               onClick={() => navigate('land-leasing')}
             >
-              🌾 {t('aboutLand.browseCta', 'Browse Land Listings')}
+              <Icon name="wheat" size={16} /> {t('aboutLand.browseCta', 'Browse Land Listings')}
             </button>
             <button
               className="btn-hero"
-              style={{ background: '#ffffff', color: '#15803d', border: '2px solid #16a34a', padding: '12px 24px', fontSize: '0.95rem', borderRadius: '8px', cursor: 'pointer', fontWeight: '700' }}
+              style={{ background: '#ffffff', color: '#15803d', border: '2px solid #16a34a', padding: '12px 24px', fontSize: '0.95rem', borderRadius: '8px', cursor: 'pointer', fontWeight: '700', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
               onClick={() => {
                 if (!user) { navigate('signup'); return; }
                 navigate('list-land');
               }}
             >
-              📍 {t('aboutLand.listCta', 'List Your Land for Lease')}
+              <Icon name="pin" size={16} /> {t('aboutLand.listCta', 'List Your Land for Lease')}
             </button>
           </div>
         </section>
@@ -73,7 +73,9 @@ export default function AboutLandLeasing() {
           {/* For Farmers */}
           <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '14px', padding: '28px', boxShadow: '0 2px 10px rgba(0,0,0,0.03)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-              <span style={{ fontSize: '1.8rem' }}>👨‍🌾</span>
+              <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#ecfdf5', color: '#16a34a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Icon name="farmer" size={24} />
+              </div>
               <h3 style={{ margin: 0, fontSize: '1.25rem', color: '#1e293b' }}>{t('aboutLand.farmersTitle', 'For Farmers (Lessees)')}</h3>
             </div>
             <ul style={{ paddingLeft: '20px', margin: 0, color: '#475569', lineHeight: '1.8', fontSize: '0.96rem' }}>
@@ -87,7 +89,9 @@ export default function AboutLandLeasing() {
           {/* For Landowners */}
           <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '14px', padding: '28px', boxShadow: '0 2px 10px rgba(0,0,0,0.03)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-              <span style={{ fontSize: '1.8rem' }}>🏞️</span>
+              <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#eff6ff', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Icon name="landscape" size={24} />
+              </div>
               <h3 style={{ margin: 0, fontSize: '1.25rem', color: '#1e293b' }}>{t('aboutLand.ownersTitle', 'For Landowners (Lessors)')}</h3>
             </div>
             <ul style={{ paddingLeft: '20px', margin: 0, color: '#475569', lineHeight: '1.8', fontSize: '0.96rem' }}>

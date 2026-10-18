@@ -7,6 +7,7 @@ import { signin, signinOtp, sendOtp } from '../lib/api';
 import WelcomeOverlay from '../components/WelcomeOverlay';
 import OtpInput from '../components/OtpInput';
 import OtpResend from '../components/OtpResend';
+import Icon from '../components/Icon';
 
 const DEMO_ACCOUNTS = [
   {
@@ -14,42 +15,42 @@ const DEMO_ACCOUNTS = [
     phone: '9876543210',
     username: 'farmer_ramesh',
     pass: 'password123',
-    icon: '🌾'
+    icon: 'wheat'
   },
   {
     role: 'Farmer 2 (Completed Booking & Reviews)',
     phone: '9876543211',
     username: 'farmer_anita',
     pass: 'password123',
-    icon: '👩‍🌾'
+    icon: 'farmer'
   },
   {
     role: 'Equipment Provider',
     phone: '9833334444',
     username: 'provider_suresh',
     pass: 'password123',
-    icon: '🚜'
+    icon: 'tractor'
   },
   {
     role: 'Labour Leader',
     phone: '9855556666',
     username: 'labour_leader_mahesh',
     pass: 'password123',
-    icon: '👷'
+    icon: 'worker'
   },
   {
     role: 'Service Specialist',
     phone: '9899990000',
     username: 'service_expert_dharani',
     pass: 'password123',
-    icon: '🛠️'
+    icon: 'wrench'
   },
   {
     role: 'Admin User',
     phone: '9999999999',
     username: 'admin',
     pass: 'password123',
-    icon: '👑'
+    icon: 'crown'
   }
 ];
 
@@ -275,8 +276,8 @@ export default function SignIn() {
         )}
 
         <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px dashed #cbd5e1' }}>
-          <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#475569', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-            ⚡ 1-Tap Quick Fill Demo Profiles
+          <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#475569', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <Icon name="sparkles" size={14} style={{ color: '#eab308' }} /> 1-Tap Quick Fill Demo Profiles
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(170px, 1fr))', gap: '8px' }}>
             {DEMO_ACCOUNTS.map((acc) => (
@@ -303,8 +304,8 @@ export default function SignIn() {
                   showToast(`Pre-filled: ${acc.role}`);
                 }}
               >
-                <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#0f172a' }}>
-                  {acc.icon} {acc.role}
+                <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Icon name={acc.icon} size={15} /> {acc.role}
                 </span>
                 <span style={{ fontSize: '0.75rem', color: '#64748b', fontFamily: 'monospace' }}>
                   {acc.username} / {acc.phone}

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { fetchMe, getUser } from '../lib/api';
 import { useLanguage } from '../i18n/LanguageContext';
+import Icon from './Icon';
 
 /* Deduplicate location tokens to avoid repeating "Mumbai, Mumbai City, Mumbai City, Maharashtra," */
 function cleanLocationString(profile) {
@@ -98,8 +99,9 @@ export default function SmartFarmSelector({ farmFor, setFarmFor, farmDetails, se
       padding: '16px',
       marginBottom: '20px'
     }}>
-      <label className="form-label" style={{ fontWeight: '700', fontSize: '1rem', color: '#1e293b', marginBottom: '8px', display: 'block' }}>
-        🚜 {t('farmSelect.whoIsBookingFor')} *
+      <label className="form-label" style={{ fontWeight: '700', fontSize: '1rem', color: '#1e293b', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <Icon name="tractor" size={18} style={{ color: '#16a34a' }} />
+        {t('farmSelect.whoIsBookingFor')} *
       </label>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '16px' }}>
@@ -118,7 +120,10 @@ export default function SmartFarmSelector({ farmFor, setFarmFor, farmDetails, se
             textAlign: 'left'
           }}
         >
-          🌾 {t('farmSelect.myFarm')}
+          <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Icon name="wheat" size={18} />
+            {t('farmSelect.myFarm')}
+          </span>
         </button>
 
         <button
@@ -139,7 +144,10 @@ export default function SmartFarmSelector({ farmFor, setFarmFor, farmDetails, se
             textAlign: 'left'
           }}
         >
-          📍 {t('farmSelect.otherFarm')}
+          <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Icon name="pin" size={18} />
+            {t('farmSelect.otherFarm')}
+          </span>
         </button>
       </div>
 
@@ -147,14 +155,26 @@ export default function SmartFarmSelector({ farmFor, setFarmFor, farmDetails, se
       {farmFor === 'my_farm' && (
         <div style={{ background: '#ffffff', padding: '14px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-            <span style={{ fontWeight: '600', color: '#16a34a' }}>✓ {t('farmSelect.savedFarmDetails')}</span>
+            <span style={{ fontWeight: '600', color: '#16a34a', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Icon name="check-circle" size={16} />
+              {t('farmSelect.savedFarmDetails')}
+            </span>
             <span style={{ fontSize: '0.8rem', color: '#64748b' }}>{profile.username || 'Farmer'}</span>
           </div>
 
           <div style={{ fontSize: '0.88rem', color: '#334155', lineHeight: '1.5' }}>
-            <p style={{ margin: '2px 0' }}>📍 <strong>Location:</strong> {formattedLocation}</p>
-            <p style={{ margin: '2px 0' }}>📏 <strong>Size & Soil:</strong> {profile.farm_size ? `${profile.farm_size} ${profile.farm_size_unit || 'Acres'}` : 'Not set'} • {profile.soil_type || 'Not set'}</p>
-            <p style={{ margin: '2px 0' }}>🌱 <strong>Crop & Irrigation:</strong> {profile.main_crops || 'Not set'} • {profile.irrigation_type || 'Not set'}</p>
+            <p style={{ margin: '4px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Icon name="pin" size={15} style={{ color: '#2563eb', flexShrink: 0 }} />
+              <span><strong>Location:</strong> {formattedLocation}</span>
+            </p>
+            <p style={{ margin: '4px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Icon name="ruler" size={15} style={{ color: '#b45309', flexShrink: 0 }} />
+              <span><strong>Size & Soil:</strong> {profile.farm_size ? `${profile.farm_size} ${profile.farm_size_unit || 'Acres'}` : 'Not set'} • {profile.soil_type || 'Not set'}</span>
+            </p>
+            <p style={{ margin: '4px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Icon name="seedling" size={15} style={{ color: '#16a34a', flexShrink: 0 }} />
+              <span><strong>Crop & Irrigation:</strong> {profile.main_crops || 'Not set'} • {profile.irrigation_type || 'Not set'}</span>
+            </p>
           </div>
         </div>
       )}

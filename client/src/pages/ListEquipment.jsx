@@ -1,23 +1,37 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import FormCard from '../components/FormCard';
 import PhotoUpload from '../components/PhotoUpload';
 import FarmLocationField from '../components/FarmLocationField';
 import { useNav } from '../context/NavContext';
 import { useToast } from '../context/ToastContext';
 import { useLanguage } from '../i18n/LanguageContext';
-import { createEquipment } from '../lib/api';
+import Icon from '../components/Icon';
+import { createEquipment, getCatalogEquipment } from '../lib/api';
 
 export default function ListEquipment() {
   const { navigate } = useNav();
   const { showToast } = useToast();
   const { t } = useLanguage();
   const [photoUrl, setPhotoUrl] = useState(null);
+  const [catalogItems, setCatalogItems] = useState([]);
   const [form, setForm] = useState({
     name: '', type: 'Tractor', price_per_hour: '', price_per_day: '', deposit: '',
     location: '', district: '', state: '', with_operator: true, description: '',
     hp: '', attachment: '', brand: '', model: '', year: '', registration_number: '',
     attachments_list: '', max_distance: '25'
   });
+
+  useEffect(() => {
+    let cancelled = false;
+    getCatalogEquipment()
+      .then((d) => {
+        if (!cancelled && d.equipment?.length) {
+          setCatalogItems(d.equipment);
+        }
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
 
   const set = (key) => (e) => setForm({ ...form, [key]: e.target.value });
 
@@ -79,16 +93,54 @@ export default function ListEquipment() {
           <input type="text" className="form-input" placeholder="e.g. Mahindra 575 DI Tractor" value={form.name} onChange={set('name')} required />
         </div>
         <div className="form-group">
-          <label className="form-label">{t('equip.type', 'Equipment Category')} *</label>
+          <label className="form-label">{t('equip.type', 'Equipment Category & Type')} *</label>
           <select className="form-select" value={form.type} onChange={set('type')} required>
-            <option value="Tractor">Tractor</option>
-            <option value="Harvester">Combine Harvester</option>
-            <option value="Sprayer">Tractor / Drone Sprayer</option>
-            <option value="Rotavator">Rotavator</option>
-            <option value="Seed Drill">Seed Drill</option>
-            <option value="Thresher">Thresher</option>
-            <option value="Other">Other Equipment</option>
+            {catalogItems.length > 0 ? (
+              <>
+                {[...new Set(catalogItems.map((i) => i.category))].map((cat) => (
+                  <optgroup key={cat} label={cat}>
+                    {catalogItems
+                      .filter((i) => i.category === cat)
+                      .map((i) => {
+                        const aliasHint = i.regional_names
+                          ? ` (${i.regional_names.split(',').slice(0, 2).map((s) => s.trim()).join(' / ')})`
+                          : '';
+                        return (
+                          <option key={i.id} value={i.name}>
+                            {i.name}{aliasHint}
+                          </option>
+                        );
+                      })}
+                  </optgroup>
+                ))}
+                <option value="Other">Other Equipment</option>
+              </>
+            ) : (
+              <>
+                <option value="Tractor">Tractor (ट्रॅक्टर)</option>
+                <option value="Rotavator">Rotavator (रोटाव्हेटर / Churner)</option>
+                <option value="Seed Drill">Seed Drill (पाभर / Pabhara / पेरणी यंत्र)</option>
+                <option value="Harvester">Combine Harvester (हार्वेस्टर)</option>
+                <option value="Sprayer">Tractor / Drone Sprayer (फवारणी यंत्र)</option>
+                <option value="Thresher">Thresher (मळणी यंत्र / Kadbi Kutti)</option>
+                <option value="Other">Other Equipment</option>
+              </>
+            )}
           </select>
+          {(() => {
+            const matched = catalogItems.find(
+              (i) => i.name.toLowerCase() === form.type.toLowerCase() ||
+                     (i.regional_names && i.regional_names.toLowerCase().includes(form.type.toLowerCase()))
+            );
+            if (matched && matched.regional_names) {
+              return (
+                <div style={{ marginTop: '6px', fontSize: '0.8rem', color: '#b45309', background: '#fffbeb', padding: '4px 8px', borderRadius: '6px', border: '1px solid #fef3c7', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  <Icon name="tag" size={14} /> <span><strong>Regional / Local Names (within 20km):</strong> {matched.regional_names}</span>
+                </div>
+              );
+            }
+            return null;
+          })()}
         </div>
       </div>
 

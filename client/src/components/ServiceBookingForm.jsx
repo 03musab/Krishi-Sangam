@@ -144,8 +144,9 @@ export default function ServiceBookingForm({ category, service, onBack, onSubmit
         marginBottom: '18px'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-          <span style={{ fontSize: '12px', fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-            🛠️ {t('labour.selectedService', 'Selected Agricultural Service')}
+          <span style={{ fontSize: '12px', fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <Icon name="wrench" size={14} />
+            {t('labour.selectedService', 'Selected Agricultural Service')}
           </span>
         </div>
 
@@ -195,8 +196,9 @@ export default function ServiceBookingForm({ category, service, onBack, onSubmit
       {/* ── Service-Specific Questions ── */}
       {questions.length > 0 && (
         <div className="service-specific-questions" style={{ marginBottom: '16px', background: '#ffffff', padding: '14px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-          <h4 className="svc-q-heading" style={{ margin: '0 0 12px 0', color: '#0f172a', fontSize: '0.95rem' }}>
-            📋 {t('svc.q.heading', 'Service-Specific Details')}
+          <h4 className="svc-q-heading" style={{ margin: '0 0 12px 0', color: '#0f172a', fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <Icon name="clipboard" size={16} />
+            {t('svc.q.heading', 'Service-Specific Details')}
           </h4>
           {questions.map((q) => {
             const fieldKey = `q_${q.key}`;

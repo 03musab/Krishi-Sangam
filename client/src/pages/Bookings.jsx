@@ -5,6 +5,7 @@ import RatingReviewModal from '../components/RatingReviewModal';
 import BankDetailsCard from '../components/BankDetailsCard';
 import SkeletonLoader from '../components/SkeletonLoader';
 import OtpInput from '../components/OtpInput';
+import Icon from '../components/Icon';
 import { useToast } from '../context/ToastContext';
 import { useLanguage } from '../i18n/LanguageContext';
 import {
@@ -15,31 +16,36 @@ import {
 
 const STATUS_CONFIG = {
   pending: {
-    label: '🟡 Finding Nearby Provider...',
+    label: 'Finding Nearby Provider...',
+    icon: 'clock',
     color: '#d97706',
     bg: '#fef3c7',
     step: 1
   },
   confirmed: {
-    label: '🟢 Provider Confirmed & Scheduled',
+    label: 'Provider Confirmed & Scheduled',
+    icon: 'check-circle',
     color: '#2563eb',
     bg: '#dbeafe',
     step: 2
   },
   active: {
-    label: '⚡ Work in Progress',
+    label: 'Work in Progress',
+    icon: 'wrench',
     color: '#16a34a',
     bg: '#dcfce7',
     step: 3
   },
   completed: {
-    label: '✅ Service Completed',
+    label: 'Service Completed',
+    icon: 'check-circle',
     color: '#475569',
     bg: '#f1f5f9',
     step: 4
   },
   cancelled: {
-    label: '❌ Request Cancelled',
+    label: 'Request Cancelled',
+    icon: 'x-circle',
     color: '#dc2626',
     bg: '#fee2e2',
     step: 0
@@ -98,7 +104,7 @@ function BookingTrackerBar({ currentStep }) {
                 boxShadow: isCurrent ? '0 0 0 4px rgba(22, 163, 74, 0.2)' : 'none',
                 transition: 'all 0.3s ease'
               }}>
-                {isDone ? '✓' : s.num}
+                {isDone ? <Icon name="check" size={13} strokeWidth={2.5} /> : s.num}
               </div>
               <span style={{
                 fontSize: '0.72rem',
@@ -136,7 +142,7 @@ function BookingItem({ booking, onStatusChange, onPayEscrow, onOpenReview, t, is
     setVerifyingOtp(true);
     try {
       await verifyServiceOtp(booking.id, otpInput.trim());
-      showToast('✅ OTP verified! Work has officially started.');
+      showToast('OTP verified! Work has officially started.');
       onStatusChange();
     } catch (err) {
       showToast(t('common.error', { msg: err.message }));
@@ -148,7 +154,7 @@ function BookingItem({ booking, onStatusChange, onPayEscrow, onOpenReview, t, is
   const handleCompleteWork = async () => {
     try {
       await completeServiceWork(booking.id);
-      showToast('🎉 Work completed! Payment released from Escrow.');
+      showToast('Work completed! Payment released from Escrow.');
       onStatusChange();
     } catch (err) {
       showToast(t('common.error', { msg: err.message }));
@@ -174,13 +180,30 @@ function BookingItem({ booking, onStatusChange, onPayEscrow, onOpenReview, t, is
               </span>
             )}
           </div>
-          <span className="muted" style={{ fontSize: '0.85rem', color: '#64748b', display: 'block', marginTop: '4px' }}>
-            {partnerName && `${isIncoming ? 'Farmer: ' : 'Provider: '}${partnerName}`}
-            {booking.farm_for && ` • ${booking.farm_for === 'my_farm' ? '🌾 Saved Farm' : '📍 Custom Location'}`}
+          <span className="muted" style={{ fontSize: '0.85rem', color: '#64748b', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '6px', marginTop: '4px' }}>
+            {partnerName && <span>{isIncoming ? 'Farmer: ' : 'Provider: '}{partnerName}</span>}
+            {booking.farm_for && (
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                • <Icon name={booking.farm_for === 'my_farm' ? 'wheat' : 'pin'} size={13} />
+                {booking.farm_for === 'my_farm' ? 'Saved Farm' : 'Custom Location'}
+              </span>
+            )}
           </span>
-          {booking.location && <span className="muted" style={{ fontSize: '0.84rem', color: '#475569', display: 'block', marginTop: '2px' }}>📍 {booking.location}</span>}
-          {booking.description && <span className="muted" style={{ fontSize: '0.84rem', color: '#475569', display: 'block', marginTop: '2px' }}>💬 {booking.description}</span>}
-          {booking.farm_details && <span className="muted" style={{ fontSize: '0.82rem', color: '#475569', display: 'block', marginTop: '2px' }}>🏡 {booking.farm_details}</span>}
+          {booking.location && (
+            <span className="muted" style={{ fontSize: '0.84rem', color: '#475569', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '3px' }}>
+              <Icon name="pin" size={13} /> {booking.location}
+            </span>
+          )}
+          {booking.description && (
+            <span className="muted" style={{ fontSize: '0.84rem', color: '#475569', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '3px' }}>
+              <Icon name="message" size={13} /> {booking.description}
+            </span>
+          )}
+          {booking.farm_details && (
+            <span className="muted" style={{ fontSize: '0.82rem', color: '#475569', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '3px' }}>
+              <Icon name="home" size={13} /> {booking.farm_details}
+            </span>
+          )}
         </div>
 
         <div style={{ textAlign: 'right' }}>
@@ -191,8 +214,11 @@ function BookingItem({ booking, onStatusChange, onPayEscrow, onOpenReview, t, is
             padding: '5px 12px',
             background: statusCfg.bg,
             borderRadius: '20px',
-            display: 'inline-block'
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '5px'
           }}>
+            <Icon name={statusCfg.icon} size={14} />
             {statusCfg.label}
           </span>
 
@@ -201,24 +227,28 @@ function BookingItem({ booking, onStatusChange, onPayEscrow, onOpenReview, t, is
               fontSize: '0.78rem',
               marginTop: '6px',
               fontWeight: '600',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
               color: booking.payment_status === 'escrow' ? '#16a34a' : booking.payment_status === 'released' ? '#059669' : '#64748b'
             }}>
-              {booking.payment_status === 'escrow' ? '🛡️ Payment Secured in Escrow' :
-               booking.payment_status === 'released' ? '💳 Payment Released' :
+              <Icon name={booking.payment_status === 'escrow' ? 'shield' : booking.payment_status === 'released' ? 'credit-card' : 'money'} size={13} />
+              {booking.payment_status === 'escrow' ? 'Payment Secured in Escrow' :
+               booking.payment_status === 'released' ? 'Payment Released' :
                `Payment: ${booking.payment_status}`}
             </div>
           )}
         </div>
       </div>
 
-      {/* ── Swiggy-like Step Progress Tracker ── */}
+      {/* ── Step Progress Tracker ── */}
       <BookingTrackerBar currentStep={statusCfg.step} />
 
       {/* ── OTP DISPLAY FOR FARMER ── */}
       {!isIncoming && booking.otp_code && booking.status !== 'completed' && booking.status !== 'cancelled' && (
         <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', padding: '12px 16px', borderRadius: '10px', marginTop: '12px' }}>
-          <span style={{ fontSize: '0.88rem', color: '#1e40af', fontWeight: '600' }}>
-            🔑 Start Work OTP: <strong style={{ fontSize: '1.15rem', letterSpacing: '2px', background: '#dbeafe', padding: '2px 10px', borderRadius: '6px', color: '#1e3a8a' }}>{booking.otp_code}</strong>
+          <span style={{ fontSize: '0.88rem', color: '#1e40af', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <Icon name="key" size={15} /> Start Work OTP: <strong style={{ fontSize: '1.15rem', letterSpacing: '2px', background: '#dbeafe', padding: '2px 10px', borderRadius: '6px', color: '#1e3a8a' }}>{booking.otp_code}</strong>
           </span>
           <p style={{ margin: '4px 0 0 0', fontSize: '0.8rem', color: '#3b82f6' }}>
             Share this 4-digit OTP with the provider when they arrive at your farm to start work.
@@ -229,8 +259,8 @@ function BookingItem({ booking, onStatusChange, onPayEscrow, onOpenReview, t, is
       {/* ── OTP VERIFICATION INPUT FOR PROVIDER ── */}
       {isIncoming && booking.status !== 'completed' && booking.status !== 'cancelled' && booking.status !== 'active' && (
         <div style={{ background: '#fefce8', border: '1px solid #fef08a', padding: '12px 16px', borderRadius: '10px', marginTop: '12px' }}>
-          <div style={{ fontSize: '0.88rem', fontWeight: '600', color: '#854d0e', marginBottom: '8px' }}>
-            🔑 Enter Farmer's OTP to Start Work:
+          <div style={{ fontSize: '0.88rem', fontWeight: '600', color: '#854d0e', marginBottom: '8px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <Icon name="key" size={15} /> Enter Farmer's OTP to Start Work:
           </div>
           <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
             <OtpInput value={otpInput} onChange={setOtpInput} length={4} autoFocus />
@@ -250,29 +280,29 @@ function BookingItem({ booking, onStatusChange, onPayEscrow, onOpenReview, t, is
       <div className="booking-actions" style={{ display: 'flex', gap: '10px', marginTop: '14px', flexWrap: 'wrap', alignItems: 'center' }}>
         {/* Owner Accept/Confirm Request */}
         {isIncoming && booking.status === 'pending' && (
-          <button className="btn-small" style={{ background: '#2563eb', color: '#fff', borderRadius: '8px', padding: '8px 16px', fontWeight: 600 }} onClick={() => onStatusChange(booking, 'confirmed', isService)}>
-            ✓ Accept Booking
+          <button className="btn-small" style={{ background: '#2563eb', color: '#fff', borderRadius: '8px', padding: '8px 16px', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' }} onClick={() => onStatusChange(booking, 'confirmed', isService)}>
+            <Icon name="check" size={14} strokeWidth={2.5} /> Accept Booking
           </button>
         )}
 
         {/* Booker Pay into Escrow */}
         {!isIncoming && (booking.status === 'confirmed' || booking.status === 'pending') && booking.payment_status !== 'escrow' && booking.payment_status !== 'released' && (
-          <button className="btn-small" style={{ background: '#16a34a', color: '#fff', borderRadius: '8px', padding: '8px 16px', fontWeight: 600 }} onClick={() => onPayEscrow(booking)}>
-            🛡️ Pay into Escrow
+          <button className="btn-small" style={{ background: '#16a34a', color: '#fff', borderRadius: '8px', padding: '8px 16px', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' }} onClick={() => onPayEscrow(booking)}>
+            <Icon name="shield" size={14} /> Pay into Escrow
           </button>
         )}
 
         {/* Work In Progress / Complete buttons */}
         {(booking.status === 'active' || booking.status === 'confirmed') && (
-          <button className="btn-small" style={{ background: '#059669', color: '#fff', borderRadius: '8px', padding: '8px 16px', fontWeight: 600 }} onClick={handleCompleteWork}>
-            ✅ Mark Work Complete & Release Payout
+          <button className="btn-small" style={{ background: '#059669', color: '#fff', borderRadius: '8px', padding: '8px 16px', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' }} onClick={handleCompleteWork}>
+            <Icon name="check-circle" size={14} /> Mark Work Complete & Release Payout
           </button>
         )}
 
         {/* Rate & Review Provider on Completed */}
         {!isIncoming && booking.status === 'completed' && (
-          <button className="btn-small" style={{ background: '#f59e0b', color: '#fff', borderRadius: '8px', padding: '8px 16px', fontWeight: 600 }} onClick={() => onOpenReview(booking)}>
-            {booking.rating ? `⭐ Rated ${booking.rating}/5 (Edit Review)` : '⭐ Rate & Review Provider'}
+          <button className="btn-small" style={{ background: '#f59e0b', color: '#fff', borderRadius: '8px', padding: '8px 16px', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' }} onClick={() => onOpenReview(booking)}>
+            <Icon name="star" size={14} /> {booking.rating ? `Rated ${booking.rating}/5 (Edit Review)` : 'Rate & Review Provider'}
           </button>
         )}
 

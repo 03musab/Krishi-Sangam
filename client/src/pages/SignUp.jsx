@@ -25,27 +25,27 @@ const ID_TYPES = [
 ];
 
 const EQUIPMENT_OPTIONS = [
-  { value: 'Tractor', icon: '🚜' },
-  { value: 'Harvester', icon: '🌾' },
-  { value: 'Rotavator', icon: '⚙️' },
-  { value: 'Thresher', icon: '🌀' },
-  { value: 'Sprayer', icon: '🚿' },
-  { value: 'Baler', icon: '📦' },
-  { value: 'Plough', icon: '🛠️' },
-  { value: 'Seeder', icon: '🌱' },
-  { value: 'Water Tanker', icon: '💧' },
-  { value: 'Other Equipment', icon: '🔧' }
+  { value: 'Tractor', icon: 'tractor' },
+  { value: 'Harvester', icon: 'wheat' },
+  { value: 'Rotavator', icon: 'settings' },
+  { value: 'Thresher', icon: 'sync' },
+  { value: 'Sprayer', icon: 'droplet' },
+  { value: 'Baler', icon: 'package' },
+  { value: 'Plough', icon: 'wrench' },
+  { value: 'Seeder', icon: 'seedling' },
+  { value: 'Water Tanker', icon: 'droplet' },
+  { value: 'Other Equipment', icon: 'toolbox' }
 ];
 
 const LABOUR_SKILL_OPTIONS = [
-  { value: 'Harvesting', icon: '🌾' },
-  { value: 'Sowing / Planting', icon: '🌱' },
-  { value: 'Weeding & Tillage', icon: '🧹' },
-  { value: 'Pesticide Spraying', icon: '🚿' },
-  { value: 'Pruning & Trimming', icon: '✂️' },
-  { value: 'Machine Operation', icon: '🚜' },
-  { value: 'Irrigation & Pipe Setup', icon: '💧' },
-  { value: 'Crop Packing & Grading', icon: '📦' }
+  { value: 'Harvesting', icon: 'wheat' },
+  { value: 'Sowing / Planting', icon: 'seedling' },
+  { value: 'Weeding & Tillage', icon: 'field' },
+  { value: 'Pesticide Spraying', icon: 'droplet' },
+  { value: 'Pruning & Trimming', icon: 'scissors' },
+  { value: 'Machine Operation', icon: 'tractor' },
+  { value: 'Irrigation & Pipe Setup', icon: 'droplet' },
+  { value: 'Crop Packing & Grading', icon: 'package' }
 ];
 
 function validateGovtId(id_type, id_number, t) {
@@ -146,7 +146,7 @@ function ChipGroup({ options, selected, onToggle, multi = true }) {
             className={`chip ${isSelected ? 'active' : ''}`}
             onClick={() => handleClick(opt.value)}
           >
-            {opt.icon && <span className="chip-icon">{opt.icon}</span>}
+            {opt.icon && <Icon name={opt.icon} size={15} className="chip-icon" style={{ verticalAlign: '-2px', marginRight: '5px' }} />}
             {opt.value}
           </button>
         );
@@ -545,8 +545,8 @@ export default function SignUp() {
                 <FarmLocationField value={farmLoc} onChange={setFarmLoc} onCoords={setFarmCoords} />
               </>
             ) : (
-              <div style={{ background: '#f8fafc', padding: '14px', borderRadius: '10px', color: '#475569', fontSize: '0.9rem', marginBottom: '16px' }}>
-                ℹ️ You can proceed to the next step. Farm details can be updated anytime later in your profile.
+              <div style={{ background: '#f8fafc', padding: '14px', borderRadius: '10px', color: '#475569', fontSize: '0.9rem', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Icon name="info" size={16} /> <span>You can proceed to the next step. Farm details can be updated anytime later in your profile.</span>
               </div>
             )}
 
@@ -684,7 +684,12 @@ export default function SignUp() {
               </div>
               <ReviewRow label={t('auth.idTypeLabel')} value={form.id_type ? (ID_TYPES.find((i) => i.value === form.id_type)?.labelKey ? t(ID_TYPES.find((i) => i.value === form.id_type).labelKey) : form.id_type) : ''} />
               <ReviewRow label={t('auth.idNumber')} value={form.id_number} />
-              {form.govt_id_url && <ReviewRow label={t('auth.govtIdPhoto')} value="Uploaded ✓" />}
+              {form.govt_id_url && (
+                <ReviewRow
+                  label={t('auth.govtIdPhoto')}
+                  value={<span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: '#16a34a' }}><Icon name="check" size={13} strokeWidth={2.5} /> Uploaded</span>}
+                />
+              )}
             </div>
 
             {role === 'farmer' && ownsLand === 'yes' && (

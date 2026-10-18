@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { getMyAvailability, toggleAvailability } from '../lib/api';
 import { useToast } from '../context/ToastContext';
 import { useLanguage } from '../i18n/LanguageContext';
+import Icon from './Icon';
 
 export default function AvailabilityCalendar() {
   const { t } = useLanguage();
@@ -72,7 +73,10 @@ export default function AvailabilityCalendar() {
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
         <div>
-          <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#1e293b' }}>📅 {t('avail.title', 'Provider Availability Calendar')}</h3>
+          <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#1e293b', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Icon name="calendar" size={20} style={{ color: '#2563eb' }} />
+            {t('avail.title', 'Provider Availability Calendar')}
+          </h3>
           <p style={{ margin: '4px 0 0 0', fontSize: '0.85rem', color: '#64748b' }}>
             {t('avail.subtitle', 'Click any date to mark it as Blocked/Unavailable for bookings')}
           </p>
@@ -112,16 +116,18 @@ export default function AvailabilityCalendar() {
                 <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', opacity: 0.8 }}>{item.weekday}</div>
                 <div style={{ fontSize: '1.1rem', fontWeight: '700', margin: '2px 0' }}>{item.dayNum}</div>
                 <div style={{ fontSize: '0.65rem' }}>{item.month}</div>
-                <div style={{ fontSize: '0.7rem', marginTop: '2px', fontWeight: '600' }}>
-                  {item.isUnavailable ? '🔴 Blocked' : '🟢 Free'}
+                <div style={{ fontSize: '0.7rem', marginTop: '2px', fontWeight: '600', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '3px' }}>
+                  <Icon name="dot" size={8} style={{ color: item.isUnavailable ? '#dc2626' : '#16a34a' }} />
+                  {item.isUnavailable ? 'Blocked' : 'Free'}
                 </div>
               </button>
             ))}
           </div>
 
           <div style={{ background: '#f8fafc', padding: '14px', borderRadius: '8px', border: '1px solid #cbd5e1' }}>
-            <h4 style={{ margin: '0 0 10px 0', fontSize: '0.9rem', color: '#334155' }}>
-              ➕ {t('avail.blockSpecificDate', 'Block / Update Specific Date')}
+            <h4 style={{ margin: '0 0 10px 0', fontSize: '0.9rem', color: '#334155', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Icon name="plus" size={15} style={{ color: '#2563eb' }} />
+              {t('avail.blockSpecificDate', 'Block / Update Specific Date')}
             </h4>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: '10px', alignItems: 'end' }}>
               <div>
@@ -140,8 +146,8 @@ export default function AvailabilityCalendar() {
                   value={status}
                   onChange={(e) => setStatus(e.target.value)}
                 >
-                  <option value="unavailable">🔴 Blocked / Unavailable</option>
-                  <option value="available">🟢 Available</option>
+                  <option value="unavailable">Blocked / Unavailable</option>
+                  <option value="available">Available</option>
                 </select>
               </div>
               <div>

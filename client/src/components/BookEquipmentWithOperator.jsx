@@ -1,12 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import BookingCard from './BookingCard';
 import FarmLocationField from './FarmLocationField';
 import AreaField from './AreaField';
 import SmartFarmSelector from './SmartFarmSelector';
 import { useToast } from '../context/ToastContext';
 import { useLanguage } from '../i18n/LanguageContext';
-import { bookEquipmentSmart } from '../lib/api';
+import { bookEquipmentSmart, getCatalogEquipment } from '../lib/api';
 import { EQUIPMENT_CATEGORIES, DEFAULT_EQUIPMENT_RATE } from '../data/services';
+import Icon from './Icon';
 
 export default function BookEquipmentWithOperator({ onBack, onSubmitted }) {
   const { showToast } = useToast();
@@ -30,6 +31,19 @@ export default function BookEquipmentWithOperator({ onBack, onSubmitted }) {
   const [coords, setCoords] = useState(null);
   const [matchedProviders, setMatchedProviders] = useState(null);
   const [searching, setSearching] = useState(false);
+  const [catalogItems, setCatalogItems] = useState([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    getCatalogEquipment()
+      .then((d) => {
+        if (!cancelled && d.equipment?.length) {
+          setCatalogItems(d.equipment);
+        }
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
 
   const set = (key) => (e) => setForm({ ...form, [key]: e.target.value });
 
@@ -77,8 +91,8 @@ export default function BookEquipmentWithOperator({ onBack, onSubmitted }) {
     return (
       <div className="service-booking-wrap">
         <div className="service-booking-head">
-          <button className="btn-back-icon" onClick={() => { setMatchedProviders(null); if (onBack) onBack(); }} aria-label="Back">←</button>
-          <span className="service-emoji">🚜</span>
+          <button className="btn-back-icon" onClick={() => { setMatchedProviders(null); if (onBack) onBack(); }} aria-label="Back"><Icon name="arrow-left" size={18} /></button>
+          <span className="service-emoji" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><Icon name="tractor" size={28} /></span>
           <div>
             <h1 className="service-booking-title">{t('equipBook.title', 'Tractor & Equipment Rental')}</h1>
             <p className="service-booking-subtitle">{matchedProviders.length > 0
@@ -152,19 +166,54 @@ export default function BookEquipmentWithOperator({ onBack, onSubmitted }) {
           onChange={handleEquipmentChange}
           required
         >
-          <optgroup label="Tractor & Tillage">
-            <option value="Tractor & Tillage::Tractor">Tractor</option>
-            <option value="Tractor & Tillage::Mini Tractor">Mini Tractor (35 HP)</option>
-            <option value="Tractor & Tillage::Heavy Duty Tractor">Heavy Duty Tractor (&gt;50 HP)</option>
-          </optgroup>
-          {EQUIPMENT_CATEGORIES.map((cat) => (
-            <optgroup key={cat.label} label={cat.label}>
-              {cat.items.map((item) => (
-                <option key={item} value={`${cat.label}::${item}`}>{item}</option>
+          {catalogItems.length > 0 ? (
+            [...new Set(catalogItems.map((i) => i.category))].map((cat) => (
+              <optgroup key={cat} label={cat}>
+                {catalogItems
+                  .filter((i) => i.category === cat)
+                  .map((item) => {
+                    const regionalHint = item.regional_names
+                      ? ` (${item.regional_names.split(',').slice(0, 2).map((s) => s.trim()).join(' / ')})`
+                      : '';
+                    return (
+                      <option key={item.id} value={`${item.category}::${item.name}`}>
+                        {item.name}{regionalHint}
+                      </option>
+                    );
+                  })}
+              </optgroup>
+            ))
+          ) : (
+            <>
+              <optgroup label="Tractor & Tillage">
+                <option value="Tractor & Tillage::Tractor">Tractor (ट्रॅक्टर)</option>
+                <option value="Tractor & Tillage::Mini Tractor">Mini Tractor (छोटा ट्रॅक्टर 35 HP)</option>
+                <option value="Tractor & Tillage::Heavy Duty Tractor">Heavy Duty Tractor (&gt;50 HP)</option>
+              </optgroup>
+              {EQUIPMENT_CATEGORIES.map((cat) => (
+                <optgroup key={cat.label} label={cat.label}>
+                  {cat.items.map((item) => (
+                    <option key={item} value={`${cat.label}::${item}`}>{item}</option>
+                  ))}
+                </optgroup>
               ))}
-            </optgroup>
-          ))}
+            </>
+          )}
         </select>
+        {(() => {
+          const matched = catalogItems.find(
+            (i) => i.name.toLowerCase() === (form.equipment || '').toLowerCase()
+          );
+          if (matched && matched.regional_names) {
+            return (
+              <div style={{ marginTop: '6px', fontSize: '0.8rem', color: '#b45309', background: '#fffbeb', padding: '6px 10px', borderRadius: '6px', border: '1px solid #fef3c7', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Icon name="tag" size={14} style={{ flexShrink: 0 }} />
+                <span><strong>Regional / Local Names (within 20km):</strong> {matched.regional_names}</span>
+              </div>
+            );
+          }
+          return null;
+        })()}
       </div>
 
       <div className="form-group">

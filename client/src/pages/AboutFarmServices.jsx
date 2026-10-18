@@ -49,20 +49,20 @@ export default function AboutFarmServices() {
           <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
             <button
               className="btn-hero"
-              style={{ background: '#2563eb', color: 'white', padding: '12px 24px', fontSize: '0.95rem', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '700' }}
+              style={{ background: '#2563eb', color: 'white', padding: '12px 24px', fontSize: '0.95rem', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '700', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
               onClick={() => navigate('farm-services')}
             >
-              🚜 {t('aboutFarm.exploreCta', 'Explore Farm Services')}
+              <Icon name="tractor" size={16} /> {t('aboutFarm.exploreCta', 'Explore Farm Services')}
             </button>
             <button
               className="btn-hero"
-              style={{ background: '#ffffff', color: '#1d4ed8', border: '2px solid #2563eb', padding: '12px 24px', fontSize: '0.95rem', borderRadius: '8px', cursor: 'pointer', fontWeight: '700' }}
+              style={{ background: '#ffffff', color: '#1d4ed8', border: '2px solid #2563eb', padding: '12px 24px', fontSize: '0.95rem', borderRadius: '8px', cursor: 'pointer', fontWeight: '700', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
               onClick={() => {
                 if (!user) { navigate('signup'); return; }
                 navigate('list-equipment');
               }}
             >
-              🛠️ {t('aboutFarm.registerCta', 'Register as a Provider')}
+              <Icon name="wrench" size={16} /> {t('aboutFarm.registerCta', 'Register as a Provider')}
             </button>
           </div>
         </section>

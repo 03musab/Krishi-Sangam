@@ -39,7 +39,7 @@ export default function ListingCard({ listing, type, onBook, trustTier }) {
       addOptimistic('pending'); // instant UI feedback — button flips to "Booking…"
       try {
         await createBooking({ listing_type: type, listing_id: listing.id });
-        setStatus('booked'); // real state settles, button shows "Booked ✓"
+        setStatus('booked'); // real state settles, button shows booked state
         showToast(t('common.toast.created'));
       } catch (err) {
         showToast(t('common.error', { msg: err.message }));
@@ -127,6 +127,7 @@ export default function ListingCard({ listing, type, onBook, trustTier }) {
             aria-live="polite"
           >
             {isPending && <span className="btn-spinner btn-spinner-sm" aria-hidden="true" />}
+            {isBooked && <Icon name="check" size={14} style={{ marginRight: '4px', verticalAlign: '-1px' }} />}
             {btnLabel}
           </button>
         </div>

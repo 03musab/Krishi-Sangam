@@ -209,9 +209,9 @@ export default function FarmLocationField({ value, onChange, onCoords, onDetails
     } else if (window.L) {
       const pinIcon = window.L.divIcon({
         className: 'custom-map-pin',
-        html: '<div style="font-size:34px;line-height:1;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.4));cursor:grab;transform:translate(-50%,-100%);">📍</div>',
-        iconSize: [34, 34],
-        iconAnchor: [17, 34]
+        html: '<div style="width:32px;height:32px;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.35));cursor:grab;transform:translate(-50%,-100%);"><svg viewBox="0 0 24 24" width="32" height="32" fill="#ef4444" stroke="#991b1b" stroke-width="1.5"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5" fill="#ffffff"/></svg></div>',
+        iconSize: [32, 32],
+        iconAnchor: [16, 32]
       });
       const marker = window.L.marker([coords.lat, coords.lng], {
         icon: pinIcon,
@@ -287,9 +287,9 @@ export default function FarmLocationField({ value, onChange, onCoords, onDetails
 
         const pinIcon = window.L.divIcon({
           className: 'custom-map-pin',
-          html: '<div style="font-size:34px;line-height:1;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.4));cursor:grab;transform:translate(-50%,-100%);">📍</div>',
-          iconSize: [34, 34],
-          iconAnchor: [17, 34]
+          html: '<div style="width:32px;height:32px;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.35));cursor:grab;transform:translate(-50%,-100%);"><svg viewBox="0 0 24 24" width="32" height="32" fill="#ef4444" stroke="#991b1b" stroke-width="1.5"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5" fill="#ffffff"/></svg></div>',
+          iconSize: [32, 32],
+          iconAnchor: [16, 32]
         });
 
         if (hasPin) {
@@ -404,7 +404,7 @@ export default function FarmLocationField({ value, onChange, onCoords, onDetails
               type="text"
               className="form-input"
               style={{ flex: 1, padding: '8px 12px', fontSize: '0.88rem' }}
-              placeholder="🔍 Search village, taluka, or city to move pin..."
+              placeholder={t('field.searchPinPlaceholder', 'Search village, taluka, or city to move pin...')}
               value={mapSearch}
               onChange={(e) => setMapSearch(e.target.value)}
               onKeyDown={(e) => {
@@ -428,10 +428,13 @@ export default function FarmLocationField({ value, onChange, onCoords, onDetails
             ref={mapContainerRef}
             style={{ width: '100%', height: '340px', borderRadius: '12px', overflow: 'hidden', border: '2px solid #3b82f6' }}
           />
-          <div className="map-hint" style={{ marginTop: '8px', fontSize: '0.85rem', color: '#1e40af', fontWeight: '600' }}>
-            {coords
-              ? `📍 Pin Location: ${coords.lat.toFixed(5)}, ${coords.lng.toFixed(5)} (Click map or drag pin to adjust)`
-              : '📍 Search your village above, or click anywhere on the map to drop your farm pin.'}
+          <div className="map-hint" style={{ marginTop: '8px', fontSize: '0.85rem', color: '#1e40af', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <Icon name="pin" size={15} style={{ color: '#2563eb', flexShrink: 0 }} />
+            <span>
+              {coords
+                ? `Pin Location: ${coords.lat.toFixed(5)}, ${coords.lng.toFixed(5)} (Click map or drag pin to adjust)`
+                : 'Search your village above, or click anywhere on the map to drop your farm pin.'}
+            </span>
           </div>
         </div>
       )}

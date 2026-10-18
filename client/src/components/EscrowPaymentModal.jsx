@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { createPayment } from '../lib/api';
 import { useToast } from '../context/ToastContext';
 import { useLanguage } from '../i18n/LanguageContext';
+import Icon from './Icon';
 
 export default function EscrowPaymentModal({ booking, onClose, onSuccess }) {
   const { t } = useLanguage();
@@ -51,12 +52,20 @@ export default function EscrowPaymentModal({ booking, onClose, onSuccess }) {
         boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.2)'
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-          <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#0f172a' }}>🛡️ {t('escrow.modalTitle', 'Krishi Escrow Payment')}</h3>
-          <button className="btn-close" onClick={onClose} style={{ border: 'none', background: 'transparent', fontSize: '1.4rem', cursor: 'pointer' }}>×</button>
+          <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Icon name="shield" size={20} style={{ color: '#16a34a' }} />
+            {t('escrow.modalTitle', 'Krishi Escrow Payment')}
+          </h3>
+          <button className="btn-close" onClick={onClose} style={{ border: 'none', background: 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '4px' }}>
+            <Icon name="x" size={20} />
+          </button>
         </div>
 
         <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', padding: '14px', borderRadius: '10px', marginBottom: '16px' }}>
-          <div style={{ fontSize: '0.85rem', color: '#166534', fontWeight: '600' }}>🔒 {t('escrow.protectionBanner', '100% Protected Escrow')}</div>
+          <div style={{ fontSize: '0.85rem', color: '#166534', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <Icon name="lock" size={15} />
+            {t('escrow.protectionBanner', '100% Protected Escrow')}
+          </div>
           <p style={{ margin: '4px 0 0 0', fontSize: '0.8rem', color: '#15803d' }}>
             {t('escrow.protectionDesc', 'Payment is safely held in Escrow and ONLY released to the provider after you confirm work completion at your farm.')}
           </p>
@@ -86,7 +95,10 @@ export default function EscrowPaymentModal({ booking, onClose, onSuccess }) {
               background: method === 'upi' ? '#eff6ff' : '#ffffff'
             }}>
               <input type="radio" name="payMethod" value="upi" checked={method === 'upi'} onChange={() => setMethod('upi')} />
-              <span>📱 Google Pay / PhonePe / BHIM UPI</span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 500 }}>
+                <Icon name="smartphone" size={18} style={{ color: '#2563eb' }} />
+                Google Pay / PhonePe / BHIM UPI
+              </span>
             </label>
 
             <label style={{
@@ -100,7 +112,10 @@ export default function EscrowPaymentModal({ booking, onClose, onSuccess }) {
               background: method === 'card' ? '#eff6ff' : '#ffffff'
             }}>
               <input type="radio" name="payMethod" value="card" checked={method === 'card'} onChange={() => setMethod('card')} />
-              <span>💳 Debit / Credit Card</span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 500 }}>
+                <Icon name="credit-card" size={18} style={{ color: '#2563eb' }} />
+                Debit / Credit Card
+              </span>
             </label>
 
             <label style={{
@@ -114,7 +129,10 @@ export default function EscrowPaymentModal({ booking, onClose, onSuccess }) {
               background: method === 'pod' ? '#eff6ff' : '#ffffff'
             }}>
               <input type="radio" name="payMethod" value="pod" checked={method === 'pod'} onChange={() => setMethod('pod')} />
-              <span>💵 Pay Cash on Arrival (Escrow Hold)</span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 500 }}>
+                <Icon name="money" size={18} style={{ color: '#16a34a' }} />
+                Pay Cash on Arrival (Escrow Hold)
+              </span>
             </label>
           </div>
         </div>

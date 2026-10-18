@@ -369,10 +369,10 @@ export default function Chatbot() {
         const counts = await fetchListingCounts();
         if (counts) {
           const relevant = [];
-          if (matched.keywords?.some((k) => ['land', 'lease'].includes(k))) relevant.push(`🌾 ${t('chatbot.xListings', { n: counts.land, type: t('nav.land') })}`);
-          if (matched.keywords?.some((k) => ['equipment', 'tractor', 'machine'].includes(k))) relevant.push(`🚜 ${t('chatbot.xListings', { n: counts.equipment, type: t('nav.equipment') })}`);
-          if (matched.keywords?.some((k) => ['labour', 'worker'].includes(k))) relevant.push(`👷 ${t('chatbot.xListings', { n: counts.labour, type: t('nav.labour') })}`);
-          if (matched.keywords?.some((k) => ['produce', 'crop', 'buy', 'sell'].includes(k))) relevant.push(`🌱 ${t('chatbot.xListings', { n: counts.produce, type: t('nav.produce') })}`);
+          if (matched.keywords?.some((k) => ['land', 'lease'].includes(k))) relevant.push(`• ${t('chatbot.xListings', { n: counts.land, type: t('nav.land') })}`);
+          if (matched.keywords?.some((k) => ['equipment', 'tractor', 'machine'].includes(k))) relevant.push(`• ${t('chatbot.xListings', { n: counts.equipment, type: t('nav.equipment') })}`);
+          if (matched.keywords?.some((k) => ['labour', 'worker'].includes(k))) relevant.push(`• ${t('chatbot.xListings', { n: counts.labour, type: t('nav.labour') })}`);
+          if (matched.keywords?.some((k) => ['produce', 'crop', 'buy', 'sell'].includes(k))) relevant.push(`• ${t('chatbot.xListings', { n: counts.produce, type: t('nav.produce') })}`);
           if (relevant.length > 0) {
             answer += '\n\n' + relevant.join('\n');
           }
@@ -405,10 +405,10 @@ export default function Chatbot() {
         const counts = await fetchListingCounts();
         if (counts) {
           const relevant = [];
-          if (faq.keywords?.some((k) => ['land', 'lease'].includes(k))) relevant.push(`🌾 ${t('chatbot.xListings', { n: counts.land, type: t('nav.land') })}`);
-          if (faq.keywords?.some((k) => ['equipment', 'tractor', 'machine'].includes(k))) relevant.push(`🚜 ${t('chatbot.xListings', { n: counts.equipment, type: t('nav.equipment') })}`);
-          if (faq.keywords?.some((k) => ['labour', 'worker'].includes(k))) relevant.push(`👷 ${t('chatbot.xListings', { n: counts.labour, type: t('nav.labour') })}`);
-          if (faq.keywords?.some((k) => ['produce', 'crop', 'buy', 'sell'].includes(k))) relevant.push(`🌱 ${t('chatbot.xListings', { n: counts.produce, type: t('nav.produce') })}`);
+          if (faq.keywords?.some((k) => ['land', 'lease'].includes(k))) relevant.push(`• ${t('chatbot.xListings', { n: counts.land, type: t('nav.land') })}`);
+          if (faq.keywords?.some((k) => ['equipment', 'tractor', 'machine'].includes(k))) relevant.push(`• ${t('chatbot.xListings', { n: counts.equipment, type: t('nav.equipment') })}`);
+          if (faq.keywords?.some((k) => ['labour', 'worker'].includes(k))) relevant.push(`• ${t('chatbot.xListings', { n: counts.labour, type: t('nav.labour') })}`);
+          if (faq.keywords?.some((k) => ['produce', 'crop', 'buy', 'sell'].includes(k))) relevant.push(`• ${t('chatbot.xListings', { n: counts.produce, type: t('nav.produce') })}`);
           if (relevant.length > 0) {
             answer += '\n\n' + relevant.join('\n');
           }
@@ -458,8 +458,9 @@ export default function Chatbot() {
               paddingTop: '10px',
               borderTop: '1px solid rgba(0,0,0,0.08)'
             }}>
-              <div style={{ fontSize: '0.78rem', fontWeight: '700', color: '#166534', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                💡 {t('chatbot.followupPrompt', 'You might also want to know:')}
+              <div style={{ fontSize: '0.78rem', fontWeight: '700', color: '#166534', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Icon name="lightbulb" size={14} style={{ color: '#16a34a' }} />
+                <span>{t('chatbot.followupPrompt', 'You might also want to know:')}</span>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                 {msg.suggestions.map((sFaq, sIdx) => (
@@ -544,10 +545,14 @@ export default function Chatbot() {
                   padding: '4px 10px',
                   fontSize: '0.78rem',
                   fontWeight: '600',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px'
                 }}
               >
-                💡 {showFaqs ? 'Hide Topics' : 'Topics'}
+                <Icon name="lightbulb" size={13} />
+                <span>{showFaqs ? 'Hide Topics' : 'Topics'}</span>
               </button>
 
               <button className="chatbot-close-btn" onClick={() => setOpen(false)} aria-label="Close">

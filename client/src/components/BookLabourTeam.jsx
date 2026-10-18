@@ -7,6 +7,7 @@ import { useToast } from '../context/ToastContext';
 import { useLanguage } from '../i18n/LanguageContext';
 import { bookLabourTeamSmart } from '../lib/api';
 import { DEFAULT_WORKER_RATE } from '../data/services';
+import Icon from './Icon';
 
 export default function BookLabourTeam({ onBack, onSubmitted }) {
   const { showToast } = useToast();
@@ -73,8 +74,8 @@ export default function BookLabourTeam({ onBack, onSubmitted }) {
     return (
       <div className="service-booking-wrap">
         <div className="service-booking-head">
-          <button className="btn-back-icon" onClick={() => { setMatchedProviders(null); if (onBack) onBack(); }} aria-label="Back">←</button>
-          <span className="service-emoji">👷</span>
+          <button className="btn-back-icon" onClick={() => { setMatchedProviders(null); if (onBack) onBack(); }} aria-label="Back"><Icon name="arrow-left" size={18} /></button>
+          <span className="service-emoji" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><Icon name="worker" size={28} /></span>
           <div>
             <h1 className="service-booking-title">{t('labour.bookLabourTeam', 'Book Labour Team')}</h1>
             <p className="service-booking-subtitle">{matchedProviders.length > 0
@@ -99,8 +100,9 @@ export default function BookLabourTeam({ onBack, onSubmitted }) {
                       {t('booking.pending', 'PENDING').toUpperCase()}
                     </span>
                   </div>
-                  <p style={{ fontSize: '0.85rem', color: '#475569', marginTop: '8px' }}>
-                    ⌛ Request sent for {form.workers} workers! Waiting for provider acceptance.
+                  <p style={{ fontSize: '0.85rem', color: '#475569', marginTop: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <Icon name="clock" size={14} style={{ color: '#eab308' }} />
+                    <span>Request sent for {form.workers} workers! Waiting for provider acceptance.</span>
                   </p>
                 </div>
               ))}
@@ -142,8 +144,9 @@ export default function BookLabourTeam({ onBack, onSubmitted }) {
 
       <div className="form-grid-row">
         <div className="form-group">
-          <label className="form-label" style={{ fontWeight: '700', color: '#0f172a' }}>
-            👷 {t('labour.numWorkers', 'Number of Labourers Required')} *
+          <label className="form-label" style={{ fontWeight: '700', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <Icon name="worker" size={16} />
+            {t('labour.numWorkers', 'Number of Labourers Required')} *
           </label>
           <input
             type="number"

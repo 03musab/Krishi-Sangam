@@ -151,7 +151,15 @@ export default function BankDetailsCard({ title, subtitle }) {
             }}
             disabled={loading}
           >
-            {loading ? t('common.saving', 'Saving...') : saved ? '✓ Saved!' : t('bank.saveBtn', 'Save Bank Details')}
+            {loading ? (
+              t('common.saving', 'Saving...')
+            ) : saved ? (
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                <Icon name="check" size={16} strokeWidth={2.5} /> {t('common.saved', 'Saved!')}
+              </span>
+            ) : (
+              t('bank.saveBtn', 'Save Bank Details')
+            )}
           </button>
         </div>
       </form>

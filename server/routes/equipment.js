@@ -22,8 +22,33 @@ router.get('/', async (req, res) => {
     const params = [];
 
     if (search) {
-      query += ` AND (e.name ILIKE ? OR e.type ILIKE ? OR e.location ILIKE ? OR e.brand ILIKE ? OR e.model ILIKE ?)`;
-      params.push(`%${search}%`, `%${search}%`, `%${search}%`, `%${search}%`, `%${search}%`);
+      // Check catalog for regional dialect aliases and match equivalents
+      let aliasTerms = [search];
+      try {
+        const catItems = await db.prepare(
+          `SELECT name, regional_names FROM catalog_equipment
+           WHERE name ILIKE ? OR regional_names ILIKE ?`
+        ).all(`%${search}%`, `%${search}%`);
+        for (const ci of catItems) {
+          if (ci.name && !aliasTerms.includes(ci.name)) aliasTerms.push(ci.name);
+          if (ci.regional_names) {
+            ci.regional_names.split(',').forEach((a) => {
+              const tr = a.trim();
+              if (tr && !aliasTerms.includes(tr)) aliasTerms.push(tr);
+            });
+          }
+        }
+      } catch (e) {
+        // Fallback gracefully if catalog table is initializing
+      }
+
+      const searchClauses = aliasTerms
+        .map(() => `(e.name ILIKE ? OR e.type ILIKE ? OR e.location ILIKE ? OR e.brand ILIKE ? OR e.model ILIKE ?)`)
+        .join(' OR ');
+      query += ` AND (${searchClauses})`;
+      aliasTerms.forEach((term) => {
+        params.push(`%${term}%`, `%${term}%`, `%${term}%`, `%${term}%`, `%${term}%`);
+      });
     }
     if (type) { query += ` AND e.type = ?`; params.push(type); }
     if (district) { query += ` AND e.district = ?`; params.push(district); }

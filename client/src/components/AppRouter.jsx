@@ -75,6 +75,7 @@ const VIEWS = {
   'agri-services': AgriculturalServices,
   'list-agri-service': ListAgriService,
   'how-it-works': HowItWorks,
+  'admin-catalog': Admin,
   contact: Home
 };
 
@@ -88,7 +89,7 @@ export default function AppRouter() {
   const ViewComponent = VIEWS[view] || Home;
 
   // Admin panel is restricted to users with the admin role.
-  if (view === 'admin' && (!user || user.role !== 'admin')) {
+  if ((view === 'admin' || view === 'admin-catalog') && (!user || user.role !== 'admin')) {
     return (
       <div className="page-view" key={view}>
         {loading ? (

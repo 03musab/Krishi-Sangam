@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { submitReview } from '../lib/api';
 import { useToast } from '../context/ToastContext';
 import { useLanguage } from '../i18n/LanguageContext';
+import Icon from './Icon';
 
 export default function RatingReviewModal({ booking, isService, onClose, onSuccess }) {
   const { t } = useLanguage();
@@ -59,8 +60,13 @@ export default function RatingReviewModal({ booking, isService, onClose, onSucce
         boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.2)'
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-          <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#0f172a' }}>⭐ {t('review.modalTitle', 'Rate & Review Provider')}</h3>
-          <button className="btn-close" onClick={onClose} style={{ border: 'none', background: 'transparent', fontSize: '1.4rem', cursor: 'pointer' }}>×</button>
+          <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Icon name="star" size={20} style={{ color: '#f59e0b', fill: '#f59e0b' }} />
+            {t('review.modalTitle', 'Rate & Review Provider')}
+          </h3>
+          <button className="btn-close" onClick={onClose} style={{ border: 'none', background: 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '4px' }}>
+            <Icon name="x" size={20} />
+          </button>
         </div>
 
         <p style={{ fontSize: '0.88rem', color: '#64748b', marginTop: 0, marginBottom: '16px' }}>
@@ -77,13 +83,22 @@ export default function RatingReviewModal({ booking, isService, onClose, onSucce
               style={{
                 background: 'transparent',
                 border: 'none',
-                fontSize: '2.2rem',
+                padding: '4px',
                 cursor: 'pointer',
-                color: star <= rating ? '#f59e0b' : '#cbd5e1',
-                transition: 'transform 0.1s ease'
+                transition: 'transform 0.15s ease'
               }}
+              onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.15)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
             >
-              ★
+              <Icon
+                name="star"
+                size={30}
+                style={{
+                  color: star <= rating ? '#f59e0b' : '#cbd5e1',
+                  fill: star <= rating ? '#f59e0b' : 'none',
+                  transition: 'color 0.15s ease, fill 0.15s ease'
+                }}
+              />
             </button>
           ))}
         </div>

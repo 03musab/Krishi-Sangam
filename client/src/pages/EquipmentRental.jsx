@@ -10,7 +10,7 @@ import { useNav } from '../context/NavContext';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../i18n/LanguageContext';
 import { useLocation } from '../context/LocationContext';
-import { getEquipment, getMyBookings } from '../lib/api';
+import { getEquipment, getMyBookings, getCatalogEquipment } from '../lib/api';
 import { sortListingsByProximity } from '../lib/geo';
 import { EQUIPMENT_CATEGORIES } from '../data/services';
 import { getTrustTier } from '../lib/trust';
@@ -30,9 +30,22 @@ export default function EquipmentRental() {
   const [bookGateOpen, setBookGateOpen] = useState(false);
   const [bookingOpen, setBookingOpen] = useState(false);
   const [sortedListings, setSortedListings] = useState([]);
+  const [catalogGroups, setCatalogGroups] = useState([]);
   // Defer the search value so the input stays responsive while results update
   const deferredSearch = useDeferredValue(search);
   const { status: locStatus, coords: locCoords, place: locPlace } = useLocation();
+
+  useEffect(() => {
+    let cancelled = false;
+    getCatalogEquipment()
+      .then((d) => {
+        if (!cancelled && d.grouped?.length) {
+          setCatalogGroups(d.grouped);
+        }
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -133,22 +146,32 @@ export default function EquipmentRental() {
             <p className="equip-browse-sub">{t('equip.browseSub')}</p>
           </div>
           <div className="equip-browse-grid">
-            {EQUIPMENT_CATEGORIES.map((cat) => (
-              <div key={cat.label} className="equip-browse-card">
+            {(catalogGroups.length > 0 ? catalogGroups : EQUIPMENT_CATEGORIES.map(c => ({ category: c.label, icon: c.icon, items: c.items }))).map((cat) => (
+              <div key={cat.category || cat.label} className="equip-browse-card">
                 <div className="equip-browse-card-head">
-                  <span className="equip-browse-emoji"><Icon name={cat.icon} size={24} /></span>
-                  <span className="equip-browse-label">{cat.label}</span>
+                  <span className="equip-browse-emoji"><Icon name={cat.icon || 'toolbox'} size={24} /></span>
+                  <span className="equip-browse-label">{cat.category || cat.label}</span>
                 </div>
                 <div className="equip-browse-chips">
-                  {cat.items.map((item) => (
-                    <button
-                      key={item}
-                      className={`equip-browse-chip ${search === item ? 'active' : ''}`}
-                      onClick={() => toggleItem(item)}
-                    >
-                      {item}
-                    </button>
-                  ))}
+                  {cat.items.map((item) => {
+                    const itemName = typeof item === 'string' ? item : item.name;
+                    const regionalHint = typeof item === 'object' && item.regional_names
+                      ? ` (${item.regional_names.split(',')[0].trim()})`
+                      : '';
+                    const fullHint = typeof item === 'object' && item.regional_names
+                      ? `Regional names: ${item.regional_names}`
+                      : itemName;
+                    return (
+                      <button
+                        key={itemName}
+                        className={`equip-browse-chip ${search === itemName ? 'active' : ''}`}
+                        onClick={() => toggleItem(itemName)}
+                        title={fullHint}
+                      >
+                        {itemName}{regionalHint}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             ))}

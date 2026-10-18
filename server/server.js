@@ -24,6 +24,7 @@ const servicesRoutes = require('./routes/services');
 const availabilityRoutes = require('./routes/availability');
 const reviewsRoutes = require('./routes/reviews');
 const agriServicesRoutes = require('./routes/agriServices');
+const catalogRoutes = require('./routes/catalog');
 const { getPool } = require('./db');
 
 const app = express();
@@ -71,6 +72,7 @@ app.use('/api/services', servicesRoutes);
 app.use('/api/availability', availabilityRoutes);
 app.use('/api/reviews', reviewsRoutes);
 app.use('/api/agri-services', agriServicesRoutes);
+app.use('/api/catalog', catalogRoutes);
 
 /* ── Health Check ─────────────────────────── */
 app.get('/api/health', (req, res) => {
@@ -163,6 +165,9 @@ async function init() {
       console.log(`🧹 Cleaned up ${deleted.rowCount} expired session(s)`);
     }
 
+    const { getDb } = require('./db');
+    await catalogRoutes.ensureCatalogTables(getDb());
+
     console.log('✅ PostgreSQL database connected');
 
     app.listen(PORT, () => {
@@ -180,6 +185,7 @@ async function init() {
     console.log(`   └── Profile:  http://localhost:${PORT}/api/profile`);
     console.log(`   └── Upload:   http://localhost:${PORT}/api/upload`);
     console.log(`   └── Admin:    http://localhost:${PORT}/api/admin`);
+    console.log(`   └── Catalog:  http://localhost:${PORT}/api/catalog`);
     console.log(`   └── Services: http://localhost:${PORT}/api/services`);
     console.log(`   └── App:    http://localhost:${PORT}\n`);
     });

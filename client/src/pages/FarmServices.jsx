@@ -208,16 +208,16 @@ export default function FarmServices() {
             className="form-input"
             value={serviceSearch}
             onChange={(e) => setServiceSearch(e.target.value)}
-            placeholder={t('farmServices.searchServices', '🔍 Search service by name (e.g., Drone Spraying, Harvesting, Ploughing, Soil Testing...)')}
+            placeholder={t('farmServices.searchServices', 'Search service by name (e.g., Drone Spraying, Harvesting, Ploughing, Soil Testing...)')}
             style={{ width: '100%', padding: '13px 18px', fontSize: '15px', borderRadius: '12px', border: '1.5px solid #cbd5e1', boxShadow: '0 2px 6px rgba(0,0,0,0.04)' }}
           />
           {serviceSearch && (
             <button
               onClick={() => setServiceSearch('')}
-              style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', fontSize: '16px', cursor: 'pointer', color: '#94a3b8' }}
+              style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#94a3b8', padding: 0 }}
               aria-label="Clear search"
             >
-              ✕
+              <Icon name="x" size={16} />
             </button>
           )}
         </div>

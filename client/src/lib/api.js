@@ -191,3 +191,14 @@ export const createAgriService = (data) => apiCall('/agri-services', 'POST', dat
 export const updateAgriService = (id, data) => apiCall(`/agri-services/${id}`, 'PUT', data);
 export const deleteAgriService = (id) => apiCall(`/agri-services/${id}`, 'DELETE');
 
+/* Catalog: Equipment & Services with Regional Dialect Names */
+export const getCatalogEquipment = (params = '') => apiCall(`/catalog/equipment${params ? '?' + params : ''}`);
+export const getCatalogServices = (params = '') => apiCall(`/catalog/services${params ? '?' + params : ''}`);
+export const createCatalogEquipment = (data) => apiCall('/catalog/equipment', 'POST', data);
+export const updateCatalogEquipment = (id, data) => apiCall(`/catalog/equipment/${id}`, 'PUT', data);
+export const deleteCatalogEquipment = (id) => apiCall(`/catalog/equipment/${id}`, 'DELETE');
+export const createCatalogService = (data) => apiCall('/catalog/services', 'POST', data);
+export const updateCatalogService = (id, data) => apiCall(`/catalog/services/${id}`, 'PUT', data);
+export const deleteCatalogService = (id) => apiCall(`/catalog/services/${id}`, 'DELETE');
+export const seedCatalogDefaults = () => apiCall('/catalog/seed-defaults', 'POST');
+

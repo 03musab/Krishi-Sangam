@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import FormCard from '../components/FormCard';
 import PhotoUpload from '../components/PhotoUpload';
 import FarmLocationField from '../components/FarmLocationField';
 import { useNav } from '../context/NavContext';
 import { useToast } from '../context/ToastContext';
 import { useLanguage } from '../i18n/LanguageContext';
-import { createAgriService } from '../lib/api';
+import Icon from '../components/Icon';
+import { createAgriService, getCatalogServices } from '../lib/api';
 
 const SERVICE_CATEGORIES = [
   'Land Preparation & Tilling',
@@ -33,6 +34,19 @@ export default function ListAgriService() {
 
   const [photoUrl, setPhotoUrl] = useState('');
   const [coords, setCoords] = useState(null);
+  const [catalogServices, setCatalogServices] = useState([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    getCatalogServices()
+      .then((d) => {
+        if (!cancelled && d.services?.length) {
+          setCatalogServices(d.services);
+        }
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
 
   const [form, setForm] = useState({
     title: '',
@@ -86,7 +100,7 @@ export default function ListAgriService() {
       title={t('agriService.listBannerTitle', 'List Your Agricultural Service')}
       color="banner-teal"
       backTo="agri-services"
-      submitLabel={t('agriService.submit', '✨ List Agricultural Service')}
+      submitLabel={t('agriService.submit', 'List Agricultural Service')}
       onSubmit={handleSubmit}
     >
       <PhotoUpload onUploaded={setPhotoUrl} />
@@ -107,7 +121,10 @@ export default function ListAgriService() {
         <div className="form-group">
           <label className="form-label">Service Category *</label>
           <select className="form-select" value={form.category} onChange={set('category')}>
-            {SERVICE_CATEGORIES.map((c) => (
+            {(catalogServices.length > 0
+              ? [...new Set(catalogServices.map((s) => s.category))]
+              : SERVICE_CATEGORIES
+            ).map((c) => (
               <option key={c} value={c}>{c}</option>
             ))}
           </select>
@@ -118,10 +135,38 @@ export default function ListAgriService() {
           <input
             type="text"
             className="form-input"
-            placeholder="e.g. Fungicide Spraying, Deep Ploughing"
+            list="subCategoryOptions"
+            placeholder="e.g. Drone Fungicide Spraying, Deep Ploughing, भात लावणी"
             value={form.sub_category}
             onChange={set('sub_category')}
           />
+          <datalist id="subCategoryOptions">
+            {catalogServices
+              .filter((s) => !form.category || s.category === form.category)
+              .map((s) => (
+                <option
+                  key={s.id}
+                  value={s.service_name}
+                  label={s.regional_names ? `Local names: ${s.regional_names}` : s.service_name}
+                />
+              ))}
+          </datalist>
+          {(() => {
+            const matched = catalogServices.find(
+              (s) =>
+                (form.title && s.service_name.toLowerCase().includes(form.title.toLowerCase())) ||
+                (form.sub_category && s.service_name.toLowerCase().includes(form.sub_category.toLowerCase())) ||
+                (s.regional_names && form.title && s.regional_names.toLowerCase().includes(form.title.toLowerCase()))
+            );
+            if (matched && matched.regional_names) {
+              return (
+                <div style={{ marginTop: '6px', fontSize: '0.8rem', color: '#1e40af', background: '#eff6ff', padding: '4px 8px', borderRadius: '6px', border: '1px solid #dbeafe', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  <Icon name="tag" size={14} /> <span><strong>Regional / Local Dialect Names (within 20km):</strong> {matched.regional_names}</span>
+                </div>
+              );
+            }
+            return null;
+          })()}
         </div>
       </div>
 
