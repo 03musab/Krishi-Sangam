@@ -17,7 +17,16 @@ const BUCKET = 'krishi-sangam';
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const supabase = supabaseUrl && supabaseKey
-  ? createClient(supabaseUrl, supabaseKey)
+  ? createClient(supabaseUrl, supabaseKey, {
+      auth: { persistSession: false },
+      realtime: {
+        transport: class {
+          constructor() {}
+          close() {}
+          send() {}
+        }
+      }
+    })
   : null;
 
 async function ensureBucket() {

@@ -110,6 +110,7 @@ export default function Navbar() {
     logout();
     setSigningOut(false);
     setDdOpen(false);
+    setMenuOpen(false);
     showToast(t('common.toast.signedOut'));
     navigate('home');
   };
@@ -124,7 +125,8 @@ export default function Navbar() {
           <div className="brand-main">
             <div className="brand-logo">
               <img src={krishiSangamLogo} alt="Krishi Sangam" className="brand-logo-img" />
-            </div>          <span className="brand-name">Krishi Sangam</span>
+            </div>
+            <span className="brand-name">Krishi Sangam</span>
           </div>
         </div>
         <div className="brand-dpiit brand-recognitions" aria-label="Institutional Recognitions & Incubation">
@@ -138,7 +140,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      <ul className={`nav-links ${menuOpen ? 'show' : ''}`}>
+      <ul className="nav-links">
         {NAV_ITEMS.filter((i) => !i.adminOnly || (user && user.role === 'admin')).map((item) => (
           <li key={item.id}>
             <a
@@ -154,10 +156,10 @@ export default function Navbar() {
 
       <div className="nav-right">
         {!user && (
-          <>
+          <div className="nav-desktop-auth">
             <button className="nav-auth-btn" onClick={() => navigate('signin')}>{t('nav.signin')}</button>
             <button className="nav-auth-btn nav-auth-btn-primary" onClick={() => navigate('signup')}>{t('nav.signup')}</button>
-          </>
+          </div>
         )}
         {user && (
           <div className="nav-user-menu">
@@ -230,10 +232,109 @@ export default function Navbar() {
             </div>
           )}
         </div>
-        <button className="hamburger" aria-label="Menu" onClick={() => setMenuOpen((o) => !o)}>
+        <button
+          className={`hamburger ${menuOpen ? 'active' : ''}`}
+          aria-label="Menu"
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen((o) => !o)}
+        >
           <span></span><span></span><span></span>
         </button>
       </div>
+
+      {menuOpen && (
+        <>
+          <div className="dropdown-backdrop" onClick={() => setMenuOpen(false)} />
+          <div className="mobile-menu-drawer">
+            {!user ? (
+              <div className="mobile-menu-auth-group">
+                <button
+                  className="mobile-menu-btn mobile-menu-btn-signin"
+                  onClick={() => { setMenuOpen(false); navigate('signin'); }}
+                >
+                  <svg {...ICON_PROPS} width="16" height="16">
+                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                    <polyline points="10 17 15 12 10 7" />
+                    <line x1="15" y1="12" x2="3" y2="12" />
+                  </svg>
+                  <span>{t('nav.signin')}</span>
+                </button>
+                <button
+                  className="mobile-menu-btn mobile-menu-btn-signup"
+                  onClick={() => { setMenuOpen(false); navigate('signup'); }}
+                >
+                  <svg {...ICON_PROPS} width="16" height="16">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="8.5" cy="7" r="4" />
+                    <line x1="20" y1="8" x2="20" y2="14" />
+                    <line x1="23" y1="11" x2="17" y2="11" />
+                  </svg>
+                  <span>{t('nav.signup')}</span>
+                </button>
+              </div>
+            ) : (
+              <div className="mobile-menu-user-group">
+                <div className="mobile-menu-user-header">
+                  <span className="nav-user-avatar">
+                    <svg {...ICON_PROPS} width="16" height="16"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+                  </span>
+                  <div className="mobile-menu-user-info">
+                    <span className="mobile-menu-username">{user.username}</span>
+                    <span className="mobile-menu-role">{user.role || 'Member'}</span>
+                  </div>
+                </div>
+                <hr className="mobile-menu-divider" />
+                {DROPDOWN_ITEMS.map((item) => {
+                  const itemUnread = item.id === 'messages' ? unreadMessages : item.id === 'bookings' ? pendingBookings : 0;
+                  return (
+                    <button
+                      key={item.id}
+                      className="nav-user-dropdown-item"
+                      onClick={() => { setMenuOpen(false); navigate(item.view); }}
+                    >
+                      {item.icon}
+                      <span>{t(item.labelKey)}</span>
+                      {itemUnread > 0 && (
+                        <span className={`nav-dropdown-badge ${item.id === 'bookings' ? 'orange' : ''}`}>
+                          {itemUnread}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+                {user.role === 'admin' && (
+                  <button className="nav-user-dropdown-item" onClick={() => { setMenuOpen(false); navigate('admin'); }}>
+                    <svg {...ICON_PROPS}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
+                    <span>{t('nav.adminPanel')}</span>
+                  </button>
+                )}
+                <hr className="mobile-menu-divider" />
+                <button className="nav-user-dropdown-item mobile-signout-item" onClick={() => { setMenuOpen(false); handleSignOut(); }} disabled={signingOut}>
+                  {signingOut
+                    ? <span className="btn-spinner btn-spinner-dark" aria-hidden="true" />
+                    : <svg {...ICON_PROPS}><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></svg>}
+                  <span>{t('nav.signout')}</span>
+                </button>
+              </div>
+            )}
+            {!user && (
+              <>
+                <hr className="mobile-menu-divider" />
+                <div className="mobile-menu-extra-links">
+                  <button className="nav-user-dropdown-item" onClick={() => { setMenuOpen(false); navigate('about'); }}>
+                    <svg {...ICON_PROPS}><circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" /></svg>
+                    <span>{t('nav.about')}</span>
+                  </button>
+                  <button className="nav-user-dropdown-item" onClick={() => { setMenuOpen(false); navigate('help'); }}>
+                    <svg {...ICON_PROPS}><circle cx="12" cy="12" r="10" /><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" /><line x1="12" y1="17" x2="12.01" y2="17" /></svg>
+                    <span>{t('nav.help')}</span>
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </>
+      )}
     </nav>
   );
 }
