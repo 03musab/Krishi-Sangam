@@ -6,3 +6,5 @@ server/uploads/
 *.db-shm
 *.db-wal
 .env
+server/server-console.log
+server/messages-backup-*.json

@@ -3,6 +3,7 @@
    (Express server entry point)
    ═══════════════════════════════════════════ */
 
+const fs = require('fs');
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '.env') });
 require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
@@ -29,21 +30,31 @@ const { getPool } = require('./db');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+const isProd = process.env.NODE_ENV === 'production';
+
+// Trust reverse proxy (Render / Cloudflare / Nginx) for accurate req.ip and req.protocol
+app.set('trust proxy', 1);
 
 /* ── Middleware ───────────────────────────── */
+const configuredOrigins = (process.env.CORS_ORIGIN || '')
+  .split(',')
+  .map((o) => o.trim())
+  .filter(Boolean);
+
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (mobile apps, curl, file:// protocol)
-    const allowedOrigins = [
+    // Allow requests with no origin (same-origin, mobile apps, curl)
+    if (!origin) return callback(null, true);
+    const devOrigins = [
       'http://localhost:3000', 'http://127.0.0.1:3000',
+      'http://localhost:5173', 'http://127.0.0.1:5173',
       'http://localhost:5500', 'http://127.0.0.1:5500',
       `http://localhost:${PORT}`, `http://127.0.0.1:${PORT}`
     ];
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(null, true); // Allow all origins in development
+    if (!isProd || configuredOrigins.includes(origin) || devOrigins.includes(origin)) {
+      return callback(null, true);
     }
+    return callback(null, false);
   },
   credentials: true
 }));
@@ -92,7 +103,17 @@ app.all('/api/*', (req, res) => {
 /* ── Serve Static Frontend Files ──────────── */
 // Serve the React build (client/dist); NOTE: placed AFTER API routes so API requests are never intercepted
 const clientDist = path.join(__dirname, '..', 'client', 'dist');
-app.use(express.static(clientDist));
+app.use('/assets', express.static(path.join(clientDist, 'assets'), {
+  maxAge: '1y',
+  immutable: true
+}));
+app.use(express.static(clientDist, {
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('index.html')) {
+      res.setHeader('Cache-Control', 'no-cache');
+    }
+  }
+}));
 
 /* ── Serve Uploads ───────────────────────── */
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -101,7 +122,12 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 const indexFile = path.join(clientDist, 'index.html');
 app.get('*', (req, res) => {
   if (!req.path.startsWith('/api')) {
-    res.sendFile(indexFile);
+    if (fs.existsSync(indexFile)) {
+      res.setHeader('Cache-Control', 'no-cache');
+      res.sendFile(indexFile);
+    } else {
+      res.status(503).send('Frontend build not found. Run "npm run build" first.');
+    }
   }
 });
 
@@ -170,7 +196,7 @@ async function init() {
 
     console.log('✅ PostgreSQL database connected');
 
-    app.listen(PORT, () => {
+    const server = app.listen(PORT, () => {
     console.log(`\n🌾 Krishi Sangam API Server`);
     console.log(`   └── Running on http://localhost:${PORT}`);
     console.log(`   └── Health: http://localhost:${PORT}/api/health`);
@@ -189,6 +215,18 @@ async function init() {
     console.log(`   └── Services: http://localhost:${PORT}/api/services`);
     console.log(`   └── App:    http://localhost:${PORT}\n`);
     });
+
+    const shutdown = async (signal) => {
+      console.log(`\n${signal} received — closing HTTP server and DB pool...`);
+      server.close(async () => {
+        try {
+          await pool.end();
+        } catch (e) { /* noop */ }
+        process.exit(0);
+      });
+    };
+    process.on('SIGTERM', () => shutdown('SIGTERM'));
+    process.on('SIGINT', () => shutdown('SIGINT'));
   } catch (err) {
     console.error('❌ Failed to start server:', err);
     console.error('   → Is DATABASE_URL set in server/.env? (see .env.example)');
