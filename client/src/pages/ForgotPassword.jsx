@@ -67,7 +67,7 @@ export default function ForgotPassword() {
   return (
     <div className="form-card-container auth-container">
       <div className="form-card">
-        <button className="btn-back-icon" onClick={back} aria-label="Back" style={{ marginBottom: '14px' }}>←</button>
+        <button className="btn-back-icon" onClick={back} aria-label="Back" style={{ marginBottom: '14px' }}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" /></svg></button>
         <h2 className="auth-title">
           <Icon name="lock" size={20} style={{ verticalAlign: '-4px', marginRight: '8px' }} />
           {t('auth.forgotTitle')}

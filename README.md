@@ -109,7 +109,7 @@ npm start              # → http://localhost:3001
 # 2. Frontend (new terminal)
 cd client
 npm install          # react 19, react-dom, vite
-npm run dev          # → http://localhost:5173
+npm start            # or npm run dev → http://localhost:5173
 ```
 
 Then open **http://localhost:5173**.

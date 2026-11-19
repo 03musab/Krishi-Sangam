@@ -187,7 +187,7 @@ export default function FarmServices() {
     return (
       <div className="section" style={{ maxWidth: '1000px', margin: '20px auto 40px', padding: '0 20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '24px' }}>
-          <button className="btn-back-icon" onClick={() => setLabFlow({ view: 'home' })} aria-label="Back">←</button>
+          <button className="btn-back-icon" onClick={() => setLabFlow({ view: 'home' })} aria-label="Back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" /></svg></button>
           <div>
             <h1 style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--text-dark)', margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
               <span className="farm-service-icon-teal" style={{ display: 'inline-flex', padding: '6px', borderRadius: '10px' }}>
@@ -240,7 +240,7 @@ export default function FarmServices() {
                 </button>
               </div>
             ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: '16px' }}>
                 {filteredServices.map(({ category, service }) => (
                   <button
                     key={`${category.id}-${service.name}`}
@@ -319,7 +319,7 @@ export default function FarmServices() {
             onClick={() => setLabFlow({ view: labFlow.fromChoose ? 'choose-service' : 'home' })}
             aria-label="Back"
           >
-            ←
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" /></svg>
           </button>
           <span className="service-emoji"><Icon name={category.icon} size={40} /></span>
           <div>

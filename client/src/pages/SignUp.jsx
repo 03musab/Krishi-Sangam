@@ -354,7 +354,7 @@ export default function SignUp() {
     <div className="form-card-container auth-container">
       {status === 'success' && <WelcomeOverlay name={welcomeName} />}
       <div className="form-card">
-        <button className="btn-back-icon" onClick={() => step > 0 ? setStep(step - 1) : back()} aria-label="Back" style={{ marginBottom: '14px' }}>←</button>
+        <button className="btn-back-icon" onClick={() => step > 0 ? setStep(step - 1) : back()} aria-label="Back" style={{ marginBottom: '14px' }}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" /></svg></button>
         <h2 className="auth-title">{getHeaderTitle()}</h2>
 
         {step > 0 && <RoleStepIndicator role={role} current={step} t={t} />}

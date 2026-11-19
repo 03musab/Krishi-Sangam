@@ -52,12 +52,12 @@ export default function Services() {
                 src={s.img}
                 alt={t(`services.${s.id}`)}
                 loading="lazy"
-                style={{ width: 'calc(100% + 48px)', height: '150px', objectFit: 'cover', display: 'block', margin: '-28px -24px 18px', borderTopLeftRadius: '20px', borderTopRightRadius: '20px' }}
+                style={{ width: 'calc(100% + 48px)', maxWidth: 'none', height: '150px', objectFit: 'cover', display: 'block', margin: '-28px -24px 18px', borderTopLeftRadius: '12px', borderTopRightRadius: '12px' }}
               />
               <h3>{t(`services.${s.id}`)}</h3>
               <p>{t(`services.${s.id}Body`)}</p>
               <span className="service-card-link">
-                {t('services.cta')} <span aria-hidden="true">→</span>
+                {t('services.cta')} <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
               </span>
             </div>
           ))}
@@ -73,7 +73,7 @@ export default function Services() {
           <div className="coming-soon-grid">
             {COMING_SOON.map((c) => (
               <div key={c.key} className="coming-soon-card hover-lift">
-                <img src={c.img} alt={t(`home.${c.key}Title`)} loading="lazy" style={{ width: 'calc(100% + 48px)', height: '110px', objectFit: 'cover', display: 'block', margin: '-24px -24px 14px', borderTopLeftRadius: '20px', borderTopRightRadius: '20px' }} />
+                <img src={c.img} alt={t(`home.${c.key}Title`)} loading="lazy" style={{ width: 'calc(100% + 48px)', maxWidth: 'none', height: '110px', objectFit: 'cover', display: 'block', margin: '-24px -24px 14px', borderTopLeftRadius: '12px', borderTopRightRadius: '12px' }} />
                 <h4>{t(`home.${c.key}Title`)}</h4>
                 <p>{t(`home.${c.key}Body`)}</p>
               </div>

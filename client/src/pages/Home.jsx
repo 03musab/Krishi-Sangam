@@ -78,7 +78,7 @@ export default function Home() {
       <section className="section">
         <div style={{ maxWidth: 'var(--container-max)', margin: '0 auto' }}>
           <h2 className="section-title section-title-center" style={{ marginBottom: '32px' }}>{t('home.aboutTitle')}</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '32px', alignItems: 'center', marginBottom: '40px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: '32px', alignItems: 'center', marginBottom: '40px' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <p style={{ fontSize: '17px', color: 'var(--text-mid)', lineHeight: '1.85' }}>{t('home.aboutP1')}</p>
               <p style={{ fontSize: '17px', color: 'var(--text-mid)', lineHeight: '1.85' }}>{t('home.aboutP2')}</p>
@@ -177,7 +177,7 @@ export default function Home() {
               style={{ background: 'var(--green-mid)', color: 'white', border: 'none', padding: 'clamp(10px, 2vw, 14px) clamp(22px, 4.5vw, 32px)', fontSize: 'clamp(14px, 2vw, 16px)', boxShadow: '0 8px 20px rgba(34, 197, 94, 0.35)' }}
               onClick={() => navigate('about')}
             >
-              {t('home.aboutCta')} <span aria-hidden="true">→</span>
+              {t('home.aboutCta')} <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
             </button>
           </div>
         </div>
@@ -194,11 +194,11 @@ export default function Home() {
                 src="https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=800&q=80"
                 alt={t('home.landLeasing')}
                 loading="lazy"
-                style={{ width: 'calc(100% + 48px)', height: '150px', objectFit: 'cover', display: 'block', margin: '-28px -24px 18px', borderTopLeftRadius: '20px', borderTopRightRadius: '20px' }}
+                style={{ width: 'calc(100% + 48px)', maxWidth: 'none', height: '150px', objectFit: 'cover', display: 'block', margin: '-28px -24px 18px', borderTopLeftRadius: '12px', borderTopRightRadius: '12px' }}
               />
               <h3>{t('home.landLeasing')}</h3>
               <p>{t('home.landLeasingBody')}</p>
-              <span className="service-card-link">{t('services.cta')} <span aria-hidden="true">→</span></span>
+              <span className="service-card-link">{t('services.cta')} <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg></span>
             </div>
 
             <div className="service-card hover-lift" onClick={() => navigate('farm-services')}>
@@ -206,11 +206,11 @@ export default function Home() {
                 src="https://images.unsplash.com/photo-1530267981375-f0de937f5f13?auto=format&fit=crop&w=800&q=80"
                 alt={t('home.farmServices')}
                 loading="lazy"
-                style={{ width: 'calc(100% + 48px)', height: '150px', objectFit: 'cover', display: 'block', margin: '-28px -24px 18px', borderTopLeftRadius: '20px', borderTopRightRadius: '20px' }}
+                style={{ width: 'calc(100% + 48px)', maxWidth: 'none', height: '150px', objectFit: 'cover', display: 'block', margin: '-28px -24px 18px', borderTopLeftRadius: '12px', borderTopRightRadius: '12px' }}
               />
               <h3>{t('home.farmServices')}</h3>
               <p>{t('home.farmServicesBody')}</p>
-              <span className="service-card-link">{t('services.cta')} <span aria-hidden="true">→</span></span>
+              <span className="service-card-link">{t('services.cta')} <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg></span>
             </div>
           </div>
         </div>
@@ -290,7 +290,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer style={{ background: '#0f172a', color: '#94a3b8', padding: 'clamp(40px, 6vw, 64px) 20px 32px', marginTop: '48px' }}>
+      <footer style={{ background: '#0f172a', color: '#94a3b8', padding: 'clamp(40px, 6vw, 64px) 20px calc(32px + env(safe-area-inset-bottom))', marginTop: '48px' }}>
         <div style={{ maxWidth: 'var(--container-max)', margin: '0 auto', display: 'flex', flexWrap: 'wrap', gap: '40px', justifyContent: 'space-between', borderBottom: '1px solid #334155', paddingBottom: '40px' }}>
           {/* Brand + tagline */}
           <div style={{ flex: '1 1 300px', maxWidth: '360px' }}>

@@ -334,7 +334,7 @@ export default function Profile() {
         )}
 
         {/* ── MULTIPLE INFORMATION GRID (4 CARDS) ── */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px', marginTop: '24px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '20px', marginTop: '24px' }}>
 
           {/* Card 1: Identity & Verification */}
           <div style={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '14px', padding: '22px 24px', boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>

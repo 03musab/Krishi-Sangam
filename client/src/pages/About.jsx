@@ -20,18 +20,25 @@ export default function About() {
 
   return (
     <div style={{ paddingBottom: '60px' }}>
-      <div style={{ maxWidth: 'var(--container-max)', margin: '0 auto', padding: '16px 24px 0' }}>
-        <button className="btn-back-icon" onClick={back} aria-label="Back">←</button>
-      </div>
       {/* Header */}
-      <section className="section" style={{ position: 'relative', overflow: 'hidden', background: 'linear-gradient(135deg, rgba(20, 83, 45, 0.88), rgba(15, 63, 33, 0.9))', textAlign: 'center', padding: 'clamp(36px, 6vw, 56px) clamp(16px, 4vw, 24px)' }}>
+      <section className="section" style={{ position: 'relative', overflow: 'hidden', background: 'linear-gradient(135deg, rgba(20, 83, 45, 0.88), rgba(15, 63, 33, 0.9))', textAlign: 'center', padding: 'clamp(20px, 4vw, 32px) clamp(16px, 4vw, 24px) clamp(36px, 6vw, 56px)' }}>
         <img
           src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=1600&q=80"
           alt=""
           aria-hidden="true"
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
         />
-        <div style={{ position: 'relative', zIndex: 1 }}>
+        <div style={{ position: 'relative', zIndex: 1, maxWidth: 'var(--container-max)', margin: '0 auto' }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: '12px' }}>
+            <button
+              className="btn-back-icon"
+              onClick={back}
+              aria-label="Back"
+              style={{ background: 'rgba(255, 255, 255, 0.92)', boxShadow: '0 2px 10px rgba(0, 0, 0, 0.18)' }}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" /></svg>
+            </button>
+          </div>
           <h1 style={{ fontSize: 'var(--fs-5xl)', fontWeight: '800', color: 'white', textShadow: '0 4px 16px rgba(0,0,0,0.3)' }}>{t('about.title')}</h1>
           <p style={{ fontSize: 'clamp(15px, 2.2vw, 18px)', color: 'rgba(255,255,255,0.92)', marginTop: '20px', maxWidth: '800px', margin: '20px auto 0', textShadow: '0 2px 8px rgba(0,0,0,0.25)' }}>
             {t('about.subtitle')}
@@ -42,7 +49,7 @@ export default function About() {
       {/* What is Krishi Sangam */}
       <section className="section" style={{ maxWidth: '1120px', margin: '12px auto 0', padding: '24px 24px' }}>
         <h2 className="section-title">{t('about.whatIsTitle')}</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '32px', alignItems: 'center' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '32px', alignItems: 'center' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {t('about.whatIsBody').split('\n').filter(Boolean).map((para, i) => (
               <p key={i} style={{ fontSize: '17px', color: 'var(--text-mid)', lineHeight: '1.85' }}>{para}</p>

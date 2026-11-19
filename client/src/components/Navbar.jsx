@@ -64,9 +64,31 @@ export default function Navbar() {
     const onClickOutside = (e) => {
       if (langRef.current && !langRef.current.contains(e.target)) setLangOpen(false);
     };
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setMenuOpen(false);
+        setDdOpen(false);
+        setLangOpen(false);
+      }
+    };
     document.addEventListener('mousedown', onClickOutside);
-    return () => document.removeEventListener('mousedown', onClickOutside);
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', onClickOutside);
+      document.removeEventListener('keydown', onKeyDown);
+    };
   }, []);
+
+  useEffect(() => {
+    setMenuOpen(false);
+    setDdOpen(false);
+    setLangOpen(false);
+  }, [view]);
+
+  useEffect(() => {
+    document.body.classList.toggle('mobile-menu-open', menuOpen);
+    return () => document.body.classList.remove('mobile-menu-open');
+  }, [menuOpen]);
 
   useEffect(() => {
     if (!user) return;
@@ -209,7 +231,15 @@ export default function Navbar() {
           </div>
         )}
         <div className="nav-lang" ref={langRef}>
-          <button className="nav-lang-btn" onClick={() => setLangOpen((o) => !o)} title={t('nav.selectLanguage')}>
+          <button
+            className="nav-lang-btn"
+            onClick={() => {
+              setLangOpen((o) => !o);
+              setMenuOpen(false);
+              setDdOpen(false);
+            }}
+            title={t('nav.selectLanguage')}
+          >
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
               <circle cx="12" cy="12" r="10" />
               <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
@@ -233,19 +263,51 @@ export default function Navbar() {
           )}
         </div>
         <button
+          type="button"
           className={`hamburger ${menuOpen ? 'active' : ''}`}
           aria-label="Menu"
           aria-expanded={menuOpen}
-          onClick={() => setMenuOpen((o) => !o)}
+          onClick={() => {
+            setMenuOpen((o) => !o);
+            setLangOpen(false);
+            setDdOpen(false);
+          }}
         >
           <span></span><span></span><span></span>
+          {user && totalNotifications > 0 && !menuOpen && (
+            <span className="hamburger-badge" aria-hidden="true">
+              {totalNotifications > 9 ? '9+' : totalNotifications}
+            </span>
+          )}
         </button>
       </div>
 
       {menuOpen && (
         <>
           <div className="dropdown-backdrop" onClick={() => setMenuOpen(false)} />
-          <div className="mobile-menu-drawer">
+          <div className="mobile-menu-drawer" role="dialog" aria-label="Navigation Menu">
+            <div className="mobile-menu-nav-group">
+              {NAV_ITEMS.filter((i) => !i.adminOnly || (user && user.role === 'admin')).map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  className={`nav-user-dropdown-item mobile-nav-item ${view === item.view ? 'active' : ''}`}
+                  onClick={() => handleNav(item)}
+                >
+                  {item.id === 'land' && (
+                    <svg {...ICON_PROPS}><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg>
+                  )}
+                  {item.id === 'farmServices' && (
+                    <svg {...ICON_PROPS}><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" /></svg>
+                  )}
+                  {item.id === 'admin' && (
+                    <svg {...ICON_PROPS}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
+                  )}
+                  <span>{t(item.labelKey)}</span>
+                </button>
+              ))}
+            </div>
+            <hr className="mobile-menu-divider" />
             {!user ? (
               <div className="mobile-menu-auth-group">
                 <button

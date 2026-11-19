@@ -10,7 +10,7 @@ export default function InfoPage({ title, subtitle, children, actions = [] }) {
   return (
     <div style={{ paddingBottom: '60px' }}>
       <div style={{ maxWidth: 'var(--container-max)', margin: '0 auto', padding: '16px 24px 0' }}>
-        <button className="btn-back-icon" onClick={back} aria-label="Back">←</button>
+        <button className="btn-back-icon" onClick={back} aria-label="Back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" /></svg></button>
       </div>
       <section className="section" style={{ background: 'var(--surface-2)', textAlign: 'center', paddingBottom: '28px' }}>
         <h1 style={{ fontSize: 'var(--fs-5xl)', fontWeight: '800', color: 'var(--text-dark)' }}>{title}</h1>
@@ -36,7 +36,7 @@ export default function InfoPage({ title, subtitle, children, actions = [] }) {
                   : { background: 'white', color: 'var(--green-dark)', border: '1.5px solid var(--green-mid)', padding: 'clamp(10px, 2vw, 14px) clamp(22px, 4.5vw, 32px)' }}
                 onClick={() => a.view && navigate(a.view)}
               >
-                {a.label} {a.view && <span aria-hidden="true">→</span>}
+                {a.label} {a.view && <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>}
               </button>
             ))}
           </div>

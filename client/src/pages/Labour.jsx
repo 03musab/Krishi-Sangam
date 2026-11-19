@@ -43,7 +43,7 @@ export default function Labour() {
       <>
         <div className="service-booking-wrap">
           <div className="service-booking-head">
-            <button className="btn-back-icon" onClick={() => setFlow({ view: 'home' })}>←</button>
+            <button className="btn-back-icon" onClick={() => setFlow({ view: 'home' })} aria-label="Back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" /></svg></button>
             <span className="service-emoji"><Icon name={category.icon} size={40} /></span>
             <div>
               <h1 className="service-booking-title">{category.name}</h1>
@@ -82,7 +82,7 @@ export default function Labour() {
   return (
     <>
       <div className="page-banner banner-purple">
-        <button className="btn-back-icon" onClick={back} aria-label="Back">←</button>
+        <button className="btn-back-icon" onClick={back} aria-label="Back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" /></svg></button>
         <h1 className="page-banner-title"><Icon name="worker" size={28} style={{ verticalAlign: '-6px', marginRight: '10px' }} />{t('labour.bookServices')}</h1>
       </div>
 

@@ -54,7 +54,7 @@ export default function ContactSection({ showImage = false }) {
   ];
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '32px', alignItems: 'start' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: '32px', alignItems: 'start' }}>
       {/* Contact form — React 19 form action */}
       <form action={formAction} style={{ background: 'var(--white)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-sm)', padding: 'clamp(20px, 4vw, 32px)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
         <div>
