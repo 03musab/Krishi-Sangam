@@ -3825,10 +3825,6 @@ img {
     display: none !important;
   }
 
-  .nav-links {
-    display: none !important;
-  }
-
   .nav-user-menu {
     display: none !important;
   }
@@ -5930,11 +5926,11 @@ img {
    ═══════════════════════════════════════════ */
 @media (max-width: 768px) {
 
-  /* Slimmer navbar (80px → 64px) with a compact logo. Overriding the
-     --nav-h custom property keeps every var(--nav-h) consumer in sync
-     (navbar height, .main-content min-height, mobile menu top offset). */
+  /* Two-row fixed mobile navbar:
+     Row 1 (56px): Brand + Language + Hamburger
+     Row 2 (~44px): Land Leasing & Farm Services always visible on all screen sizes */
   :root {
-    --nav-h: 64px;
+    --nav-h: 102px;
   }
 
   .navbar {
@@ -5943,8 +5939,11 @@ img {
     left: 0;
     right: 0;
     width: 100%;
-    height: calc(var(--nav-h) + env(safe-area-inset-top));
-    padding: env(safe-area-inset-top) max(10px, env(safe-area-inset-right)) 0 max(14px, env(safe-area-inset-left));
+    height: auto;
+    min-height: calc(var(--nav-h) + env(safe-area-inset-top));
+    flex-wrap: wrap;
+    align-items: center;
+    padding: env(safe-area-inset-top) 0 0 0;
   }
 
   .main-content {
@@ -5954,8 +5953,8 @@ img {
   }
 
   .brand-logo {
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
   }
 
   .brand-name {
@@ -5970,8 +5969,11 @@ img {
   }
 
   .nav-brand-group {
+    order: 1;
     gap: 4px;
     flex-shrink: 0;
+    height: 56px;
+    padding-left: max(14px, env(safe-area-inset-left));
   }
 
   .nav-desktop-auth {
@@ -5979,7 +5981,41 @@ img {
   }
 
   .nav-links {
-    display: none !important;
+    order: 3;
+    flex: 0 0 100%;
+    position: static;
+    transform: none;
+    display: flex !important;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 0;
+    padding: 6px max(12px, env(safe-area-inset-right)) 8px max(12px, env(safe-area-inset-left));
+    border-top: 1px solid var(--border);
+    list-style: none;
+  }
+
+  .nav-item {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 999px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text-dark);
+    white-space: nowrap;
+    transition: all var(--transition-fast);
+  }
+
+  .nav-item.active {
+    background: var(--green-light);
+    border-color: var(--green-mid);
+    color: var(--green-dark);
+    font-weight: 700;
   }
 
   .nav-user-menu {
@@ -5987,8 +6023,12 @@ img {
   }
 
   .nav-right {
+    order: 2;
+    margin-left: auto;
     gap: 6px;
     flex-shrink: 0;
+    height: 56px;
+    padding-right: max(10px, env(safe-area-inset-right));
   }
 
   .nav-lang-btn {
@@ -6217,8 +6257,26 @@ img {
 /* Extra-narrow phones (≤420px): scale down once more */
 @media (max-width: 420px) {
   .navbar {
-    padding: env(safe-area-inset-top) max(8px, env(safe-area-inset-right)) 0 max(10px, env(safe-area-inset-left));
-    gap: 4px;
+    padding: env(safe-area-inset-top) 0 0 0;
+    gap: 0;
+  }
+
+  .nav-brand-group {
+    padding-left: max(10px, env(safe-area-inset-left));
+  }
+
+  .nav-right {
+    padding-right: max(8px, env(safe-area-inset-right));
+  }
+
+  .nav-links {
+    gap: 6px;
+    padding: 6px 8px 8px;
+  }
+
+  .nav-item {
+    padding: 5px 12px;
+    font-size: 12.5px;
   }
 
   .brand-logo {
